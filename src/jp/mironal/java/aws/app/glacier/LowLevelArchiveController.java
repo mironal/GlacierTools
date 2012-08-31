@@ -123,7 +123,6 @@ public class LowLevelArchiveController extends GlacierTools {
                     messageFound = true;
                     if (statusCode.equals("Succeeded")) {
                         jobSuccessful = true;
-                        break;
                     }
                 }
             }
@@ -372,10 +371,12 @@ public class LowLevelArchiveController extends GlacierTools {
             InterruptedException {
         CheckJobResult result = null;
         do {
+            System.out.println("loop");
             Thread.sleep(1000 * 60 * 30);
             result = checkJobToComplete();
-
+            System.out.println(result.toString());
         } while (!result.isMessageFound());
+        System.out.println("exit loop");
         return result.isJobSuccessful();
     }
 

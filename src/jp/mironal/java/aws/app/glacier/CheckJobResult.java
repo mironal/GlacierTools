@@ -28,4 +28,10 @@ public class CheckJobResult {
     public boolean isJobSuccessful() {
         return jobSuccessful;
     }
+
+    @Override
+    public String toString() {
+        return "messageFound:" + messageFound + " jobSuccessful:" + jobSuccessful;
+    }
+
 }

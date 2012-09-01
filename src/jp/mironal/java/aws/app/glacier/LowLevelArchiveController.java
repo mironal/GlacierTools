@@ -175,7 +175,7 @@ public class LowLevelArchiveController extends StateLessJobOperations {
         JobParameters jobParameters = new JobParameters().withType("archive-retrieval")
                 .withArchiveId(archiveId).withSNSTopic(snsSetupResult.topicArn);
 
-        return executeInitiateJob(jobParameters);
+        return executeInitiateJob(jobParameters, vaultName);
     }
 
     private List<Message> getSqsMessage() {
@@ -388,9 +388,11 @@ public class LowLevelArchiveController extends StateLessJobOperations {
      * @return jobId
      */
     private String executeInitiateJob(JobParameters jobParameters, String vaultName) {
+
         InitiateJobRequest request = new InitiateJobRequest().withVaultName(vaultName)
                 .withJobParameters(jobParameters);
         InitiateJobResult result = client.initiateJob(request);
+        this.vaultName = vaultName;
         this.jobId = result.getJobId();
         return jobId;
     }

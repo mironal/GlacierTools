@@ -4,11 +4,15 @@ package jp.mironal.java.aws.app.glacier.cmd;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.ArchiveController;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
+import jp.mironal.java.aws.app.glacier.InventoryRetrievalResult;
 import jp.mironal.java.aws.app.glacier.JobRestoreParam;
 import jp.mironal.java.aws.app.glacier.LowLevelArchiveController;
+import jp.mironal.java.aws.app.glacier.StateLessJobOperations;
 import jp.mironal.java.aws.app.glacier.VaultController;
 
 import org.codehaus.jackson.JsonParseException;
@@ -195,14 +199,13 @@ public class ArchiveLowLevelControlCmd {
     }
 
     private void execInventory(LowLevelArchiveController controller) throws JsonParseException,
-            IOException, InterruptedException {
+            IOException, InterruptedException, ParseException {
         try {
             String jobId = controller.initiateInventoryJob(vaultname);
             System.out.println("JobID=" + jobId);
 
             if (controller.waitForJobToComplete()) {
-                System.out.println("job complete!");
-                // controller.printJobOutput();
+                InventoryRetrievalResult result = controller.downloadInventoryJobOutput();
             } else {
                 System.out.println("job fault");
             }
@@ -225,13 +228,18 @@ public class ArchiveLowLevelControlCmd {
         System.out.println("SqsQueueUrl=" + param.getSqsQueueUrl());
     }
 
-    private void execListJobs(LowLevelArchiveController controller) {
-        /*
-         * List<GlacierJobDescription> jobs = controller.listJobs(vaultname); if
-         * (jobs.size() > 0) { for (GlacierJobDescription job : jobs) {
-         * System.out.println(); printGlacierJobDescriptionf(job); } } else {
-         * System.out.println("There is no Job."); }
-         */
+    private void execListJobs(StateLessJobOperations controller) {
+
+        List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
+        if (jobs.size() > 0) {
+            for (GlacierJobDescription job : jobs) {
+                System.out.println();
+                printGlacierJobDescriptionf(job);
+            }
+        } else {
+            System.out.println("There is no Job.");
+        }
+
     }
 
     private void printGlacierJobDescriptionf(GlacierJobDescription description) {

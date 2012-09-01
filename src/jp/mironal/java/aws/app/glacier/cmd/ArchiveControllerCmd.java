@@ -101,52 +101,26 @@ public class ArchiveControllerCmd {
             System.out.println(filename + " is exist.");
         }
 
-        public static boolean existVault(String vaultName, VaultController vaultController) {
-            List<DescribeVaultOutput> describeVaultOutputs = vaultController.listVaults();
-            for (DescribeVaultOutput output : describeVaultOutputs) {
-                if (output.getVaultName().equals(vaultName)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static boolean checkVaultAndPrintErr(String vaultName,
-                VaultController vaultController) {
-            if (!existVault(vaultName, vaultController)) {
-                System.err.println(vaultName + " is not exist.");
-                return false;
-            }
-            return true;
-        }
     }
 
     enum Kind {
         Bad, Upload, Download, Delete
     }
 
-    /**
-     * java -jar ArchiveController.jar upload --vault vaultname --file filename
-     * --endpoint endpoint<br>
-     * java -jar ArchiveController.jar download --vault vaultname --archive
-     * archiveId --file filename<br>
-     * java -jar ArchiveController.jar download --vault vaultname --archive
-     * archiveId --file filename --force java -jar ArchiveController.jar delete
-     * --vault vaultname --archive archiveId<br>
-     * 
-     * @throws IOException
-     */
-    public static void main(String[] args) throws IOException {
+    Kind cmdKind = Kind.Bad;
+    String endpointStr = null;
+    String vaultName = null;
+    String filename = null;
+    String archiveId = null;
+    String propertiesName = null;
+    boolean debug = false;
+    boolean force = false; /* アーカイブダウンロード時に同名のファイルが既に有った場合、強制的に上書きする */
+    boolean printArchiveIdOnly = false;
+    Region region = null;
+    File propFile = null;
+    File uploadFile = null;
 
-        Kind cmdKind = Kind.Bad;
-        String endpointStr = null;
-        String vaultName = null;
-        String filename = null;
-        String archiveId = null;
-        String propertiesName = null;
-        boolean debug = false;
-        boolean force = false; /* アーカイブダウンロード時に同名のファイルが既に有った場合、強制的に上書きする */
-        boolean printArchiveIdOnly = false;
+    ArchiveControllerCmd(String[] args) {
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -239,7 +213,7 @@ public class ArchiveControllerCmd {
             propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
         }
 
-        File propFile = new File(propertiesName);
+        propFile = new File(propertiesName);
         if (propFile.isDirectory()) {
             propFile = new File(propertiesName + File.separator
                     + VaultController.AWS_PROPERTIES_FILENAME);
@@ -250,7 +224,6 @@ public class ArchiveControllerCmd {
             System.exit(-1);
         }
 
-        Region region = null;
         /* endpoint */
         if (endpointStr == null) {
             region = ArchiveController.getDefaultEndpoint();
@@ -262,100 +235,177 @@ public class ArchiveControllerCmd {
                 System.exit(-1);
             }
         }
+    }
 
+    boolean existVault(String vaultName, VaultController vaultController) {
+        List<DescribeVaultOutput> describeVaultOutputs = vaultController.listVaults();
+        for (DescribeVaultOutput output : describeVaultOutputs) {
+            if (output.getVaultName().equals(vaultName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean checkVaultAndPrintErr(String vaultName) throws IOException {
+        VaultController controller = new VaultController(region, propFile);
+        if (!existVault(vaultName, controller)) {
+            System.err.println(vaultName + " is not exist.");
+            return false;
+        }
+        return true;
+    }
+
+    boolean validateInventoryParam() {
+        // trueを代入するロジックは初期化のところだけとする.
+        boolean ok = true;
+        if (region == null) {
+            ok = false;
+        }
+        if (propFile == null) {
+            ok = false;
+        }
+        switch (cmdKind) {
+            case Upload:
+                if (vaultName == null) {
+                    ok = false;
+                }
+                if (filename == null) {
+                    ok = false;
+                }
+
+                break;
+            case Download:
+                if (vaultName == null) {
+                    ok = false;
+                }
+                if (archiveId == null) {
+                    ok = false;
+                }
+                if (filename == null) {
+                    ok = false;
+                }
+                break;
+
+            case Delete:
+                if (vaultName == null) {
+                    ok = false;
+                }
+                if (archiveId == null) {
+                    ok = false;
+                }
+                break;
+
+            default:
+                break;
+        }
+        return ok;
+    }
+
+    private void execUpload() throws IOException {
         ArchiveController archiveController = new ArchiveController(region, propFile);
-        VaultController vaultController = new VaultController(region, propFile);
+        String description = new Date().toString();
+        UploadResult uploadResult = archiveController.upload(vaultName, description, uploadFile);
+        if (printArchiveIdOnly) {
+            System.out.println(uploadResult.getArchiveId());
+        } else {
+            System.out.println("Archive ID:" + uploadResult.getArchiveId());
+        }
+    }
+
+    private void execDownload() throws IOException {
+        ArchiveController archiveController = new ArchiveController(region, propFile);
+        archiveController.download(vaultName, archiveId, new File(filename));
+        System.out.println("download success!");
+    }
+
+    private void execDelete() throws IOException {
+        ArchiveController archiveController = new ArchiveController(region, propFile);
+        archiveController.delete(vaultName, archiveId);
+        System.out.println("delete success!");
+    }
+
+    private void execBad() {
+
+    }
+
+    boolean checkFileExist(String filename) {
+        File file = new File(filename);
+        return file.exists() && file.isFile();
+    }
+
+    /**
+     * Downloadの時に使用する.特殊な動きをするので注意して使うこと。
+     * 
+     * @param filename 消したいファイル名.
+     * @return 
+     *         true:filenameで指定したファイルは存在しないか、削除済み(結果的に存在していない).false:指定したファイルは削除できなかった
+     *         、もしくはオプションで保護されている.
+     */
+    boolean deleteFile(String filename) {
+        if (checkFileExist(filename)) {
+            if (force) {
+                return new File(filename).delete();
+            } else {
+                return false;
+            }
+        } else {
+            /* ファイルが無い=ファイルを削除済みとする */
+            return true;
+        }
+    }
+
+    /**
+     * エラーなどでプログラムを終了させるときはこの関数で終了させるようにする.
+     * 
+     * @throws IOException
+     */
+    private void exec() throws IOException {
+
+        /* オプションが揃ってるかチェック */
+        if (!validateInventoryParam()) {
+            System.exit(-1);
+        }
+
+        /* vaultの存在確認. なかったらエラー吐いて終了 */
+        if (!checkVaultAndPrintErr(vaultName)) {
+            System.exit(-1);
+        }
 
         switch (cmdKind) {
             case Upload:
-                /* オプションが揃ってるかチェック */
-                if ((vaultName == null) || (filename == null)) {
-                    Util.printUploadHelp();
-                    System.exit(-1);
-                }
 
                 /* 指定したファイルが存在してなかったり、ファイルじゃなかったりしたらエラー吐いて終了 */
-                File uploadFile = new File(filename);
-                if (!uploadFile.exists()) {
-                    Util.printFileNotFoundError(filename);
-                    System.exit(-1);
-                }
-                if (!uploadFile.isFile()) {
-                    Util.printFileIsNotFileError(filename);
+                if (!checkFileExist(filename)) {
                     System.exit(-1);
                 }
 
-                /* vaultの存在確認. なかったらエラー吐いて終了 */
-                if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
-                    System.exit(-1);
-                }
-
-                String description = new Date().toString();
-                UploadResult uploadResult = archiveController.upload(vaultName, description,
-                        uploadFile);
-                if (printArchiveIdOnly) {
-                    System.out.println(uploadResult.getArchiveId());
-                } else {
-                    System.out.println("Archive ID:" + uploadResult.getArchiveId());
-                }
+                execUpload();
                 break;
             case Download:
-                /* オプションが揃ってるかチェック */
-                if ((vaultName == null) || (filename == null) || (archiveId == null)) {
-                    Util.printDownloadHelp();
-                    System.exit(-1);
-                }
+
                 /*
                  * 指定したファイルがすでに存在していたらエラー吐いて終了. <br>
                  * ただし、forceフラグが立っていたら、ファイルを削除して作成する
                  * (ぶっちゃけ消さなくてもAPI側で上書きしてくれるのかも).<br>
                  * ファイルが存在していて、実はファイルじゃなかった場合も適切なエラーを吐いて終了する.
                  */
-                File downloadFile = new File(filename);
-                if (downloadFile.exists()) {
-                    if (downloadFile.isFile()) {
-                        if (force) {
-                            downloadFile.delete();
-                        } else {
-                            Util.printFileExistError(filename);
-                            System.exit(-1);
-                        }
-                    } else {
-                        Util.printFileIsNotFileError(filename);
-                        System.exit(-1);
-                    }
-                }
-
-                /* vaultの存在確認. なかったらエラー吐いて終了 */
-                if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
+                if (!deleteFile(filename)) {
                     System.exit(-1);
                 }
 
-                archiveController.download(vaultName, archiveId, downloadFile);
-                System.out.println("download success!");
+                execDownload();
 
                 break;
             case Delete:
-                /* オプションが揃ってるかチェック */
-                if ((vaultName == null) || (archiveId == null)) {
-                    Util.printDeleteHelp();
-                    System.exit(-1);
-                }
 
-                /* vaultの存在確認. なかったらエラー吐いて終了 */
-                if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
-                    System.exit(-1);
-                }
-
-                archiveController.delete(vaultName, archiveId);
-                System.out.println("delete success!");
+                execDelete();
                 break;
             case Bad:
-                Util.printHelp();
+                execBad();
                 break;
             default:
-                Util.printUnknownCommand();
-                break;
+                throw new IllegalStateException("Unknown command.");
         }
 
         if (debug) {
@@ -366,5 +416,20 @@ public class ArchiveControllerCmd {
             System.out.println("archiveId : " + archiveId);
             System.out.println("force : " + force);
         }
+    }
+
+    /**
+     * java -jar ArchiveController.jar upload --vault vaultname --file filename
+     * --endpoint endpoint<br>
+     * java -jar ArchiveController.jar download --vault vaultname --archive
+     * archiveId --file filename<br>
+     * java -jar ArchiveController.jar download --vault vaultname --archive
+     * archiveId --file filename --force java -jar ArchiveController.jar delete
+     * --vault vaultname --archive archiveId<br>
+     * 
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
+        new ArchiveControllerCmd(args).exec();
     }
 }

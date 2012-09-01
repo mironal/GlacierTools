@@ -72,14 +72,29 @@ public class InventoryRetrievalResult {
         }
     }
 
+    /**
+     * Get the VaultARN.
+     * 
+     * @return String VaultARN
+     */
     public String getVaultArn() {
         return this.vaultArn;
     }
 
+    /**
+     * Get the InventoryDate
+     * 
+     * @return String InventoryDate.
+     */
     public String getInventoryDate() {
         return this.inventoryDate;
     }
 
+    /**
+     * Get the Archive list.
+     * 
+     * @return List Archives
+     */
     public List<ArchiveInfo> getArchiveList() {
         return archiveList;
     }

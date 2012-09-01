@@ -1,11 +1,11 @@
 
-package jp.mironal.java.aws.app.glacier;
+package jp.mironal.java.aws.app.glacier.cmd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import jp.mironal.java.aws.app.glacier.ArchiveLowLevelControlCmd.InvalidRegionException;
-import jp.mironal.java.aws.app.glacier.ArchiveLowLevelControlCmd.Kind;
-import jp.mironal.java.aws.app.glacier.ArchiveLowLevelControlCmd.Sync;
+import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.InvalidRegionException;
+import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Kind;
+import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Sync;
 
 import org.junit.Test;
 

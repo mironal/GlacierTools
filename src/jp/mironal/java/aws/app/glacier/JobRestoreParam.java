@@ -4,7 +4,7 @@ package jp.mironal.java.aws.app.glacier;
 /**
  * InitiateしたJobを後で参照するために必要な情報.
  */
-class JobRestoreParam {
+public class JobRestoreParam {
 
     public static class Builder {
         // 明示的にnullで初期化しておく

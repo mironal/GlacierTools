@@ -15,8 +15,7 @@ import jp.mironal.java.aws.app.glacier.LowLevelArchiveController;
 import jp.mironal.java.aws.app.glacier.StateLessJobOperations;
 import jp.mironal.java.aws.app.glacier.VaultController;
 
-import org.codehaus.jackson.JsonParseException;
-
+import com.amazonaws.services.glacier.model.DescribeJobResult;
 import com.amazonaws.services.glacier.model.GlacierJobDescription;
 
 /**
@@ -158,12 +157,15 @@ public class ArchiveLowLevelControlCmd {
 
     }
 
+    Region region = null;
+    File awsPropFile;
+
     private void exec() throws IOException, InterruptedException, ParseException {
 
-        File awsPropFile = getAwsCredentialsPropertiesFile();
+        awsPropFile = getAwsCredentialsPropertiesFile();
 
         /* endpoint */
-        Region region = null;
+
         try {
             region = getRegion();
         } catch (InvalidRegionException e) {
@@ -171,36 +173,73 @@ public class ArchiveLowLevelControlCmd {
             System.exit(-1);
         }
 
-        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
-        StateLessJobOperations stateLessController = new StateLessJobOperations(region, awsPropFile);
-
         switch (cmdKind) {
             case Inventory:
-                switch (syncType) {
-                    case Sync:
-                        execInventory(controller);
-                        break;
-                    case Async:
-                        execInventoryASync(controller);
-                        break;
-                    default:
-                        printUnknownCmd();
-                        break;
-                }
+                execInventory();
                 break;
             case List:
-                if (vaultname == null) {
-                    System.exit(-1);
-                }
-                execListJobs(stateLessController);
+                execList();
+                break;
+            case Archive:
+                execArchive();
+                break;
+            case Describe:
+                execDescribe();
+                break;
+            case Bad:
+                execBad();
                 break;
             default:
                 break;
         }
     }
 
-    private void execInventory(LowLevelArchiveController controller) throws JsonParseException,
-            IOException, InterruptedException, ParseException {
+    private void execBad() {
+
+    }
+
+    private void execDescribe() throws IOException {
+        StateLessJobOperations controller = new StateLessJobOperations(region, awsPropFile);
+        DescribeJobResult result = controller.describeJob(vaultname, jobId);
+
+    }
+
+    private void printDescribeJob(DescribeJobResult result) {
+        System.out.println("Action               : " + result.getAction());
+        System.out.println("ArchiveId            : " + result.getArchiveId());
+        System.out.println("ArchiveSizeInBytes   : " + result.getArchiveSizeInBytes());
+        System.out.println("Completed            : " + result.getCompleted());
+        System.out.println("CompletionDate       : " + result.getCompletionDate());
+        System.out.println("CreationDate         : " + result.getCreationDate());
+        System.out.println("InventorySizeInBytes : " + result.getInventorySizeInBytes());
+        System.out.println("JobDescription       : " + result.getJobDescription());
+        System.out.println("JobId                : " + result.getJobId());
+        System.out.println("SHA256TreeHash       : " + result.getSHA256TreeHash());
+        System.out.println("SNSTopic             : " + result.getSNSTopic());
+        System.out.println("StatusCode           : " + result.getStatusCode());
+        System.out.println("StatusMessage        : " + result.getStatusMessage());
+        System.out.println("VaultARN             : " + result.getVaultARN());
+    }
+
+    private void execArchive() {
+
+    }
+
+    private void execList() throws IOException {
+        StateLessJobOperations controller = new StateLessJobOperations(region, awsPropFile);
+        List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
+        if (jobs.size() > 0) {
+            for (GlacierJobDescription job : jobs) {
+                System.out.println();
+                printGlacierJobDescriptionf(job);
+            }
+        } else {
+            System.out.println("There is no Job.");
+        }
+    }
+
+    private void execInventorySync() throws IOException, InterruptedException, ParseException {
+        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
         try {
             String jobId = controller.initiateInventoryJob(vaultname);
             System.out.println("JobID=" + jobId);
@@ -214,11 +253,30 @@ public class ArchiveLowLevelControlCmd {
         } finally {
             controller.cleanUp();
         }
+    }
+
+    private void execInventoryAsync() throws IOException {
+
+        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+
+        controller.initiateInventoryJob(vaultname);
+        printJobRestoreParam(controller);
 
     }
 
-    private void execInventoryASync(LowLevelArchiveController controller) {
+    private void execInventory() throws IOException, InterruptedException, ParseException {
+        switch (syncType) {
+            case Sync:
+                execInventorySync();
+                break;
 
+            case Async:
+                execInventoryAsync();
+                break;
+
+            default:
+                break;
+        }
     }
 
     private void printJobRestoreParam(LowLevelArchiveController controller) {
@@ -228,20 +286,6 @@ public class ArchiveLowLevelControlCmd {
         System.out.println("SnsSubscriptionArn=" + param.getSnsSubscriptionArn());
         System.out.println("SnsTopicArn=" + param.getSnsTopicArn());
         System.out.println("SqsQueueUrl=" + param.getSqsQueueUrl());
-    }
-
-    private void execListJobs(StateLessJobOperations controller) {
-
-        List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
-        if (jobs.size() > 0) {
-            for (GlacierJobDescription job : jobs) {
-                System.out.println();
-                printGlacierJobDescriptionf(job);
-            }
-        } else {
-            System.out.println("There is no Job.");
-        }
-
     }
 
     private void printGlacierJobDescriptionf(GlacierJobDescription description) {

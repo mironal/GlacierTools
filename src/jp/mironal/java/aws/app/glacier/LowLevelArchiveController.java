@@ -81,18 +81,6 @@ public class LowLevelArchiveController extends GlacierTools {
         }
     }
 
-    /**
-     * 完了したJobをダウンロードする.
-     * 
-     * @param jobId
-     * @param vaultName
-     * @param saveFile
-     * @param client
-     */
-    public static void downloadJobOutput(String jobId, String vaultName, File saveFile,
-            AmazonGlacierClient client) {
-
-    }
 
     private AmazonSQSClient sqsClient;
     private AmazonSNSClient snsClient;

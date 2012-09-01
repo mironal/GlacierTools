@@ -184,10 +184,6 @@ public class ArchiveLowLevelControlCmd {
         return region;
     }
 
-    private void printUnknownCmd() {
-
-    }
-
     /**
      * エラーなどでプログラムを終了させるときはこの関数で終了させるようにする.
      * 

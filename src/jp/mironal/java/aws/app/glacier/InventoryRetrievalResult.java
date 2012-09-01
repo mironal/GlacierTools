@@ -72,7 +72,7 @@ public class InventoryRetrievalResult {
         }
     }
 
-    public String getVaultName() {
+    public String getVaultArn() {
         return this.vaultArn;
     }
 

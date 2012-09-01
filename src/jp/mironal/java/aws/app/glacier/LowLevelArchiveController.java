@@ -40,6 +40,7 @@ import com.amazonaws.services.glacier.model.InitiateJobResult;
 import com.amazonaws.services.glacier.model.JobParameters;
 import com.amazonaws.services.glacier.model.ListJobsRequest;
 import com.amazonaws.services.glacier.model.ListJobsResult;
+import com.amazonaws.services.glacier.model.transform.GlacierJobDescriptionJsonUnmarshaller;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
@@ -380,13 +381,16 @@ public class LowLevelArchiveController extends GlacierTools {
         return result.isJobSuccessful();
     }
 
-    public void printJobOutput() {
+    public void printJobOutput() throws JsonParseException, IOException {
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
         GetJobOutputResult getJobOutputResult = client.getJobOutput(getJobOutputRequest);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(getJobOutputResult.getBody()));
 
+        
+        
+        
         try {
             String line = null;
             while ((line = br.readLine()) != null) {

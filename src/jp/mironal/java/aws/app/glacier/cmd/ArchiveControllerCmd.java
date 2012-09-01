@@ -8,7 +8,9 @@ import java.util.Date;
 import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.ArchiveController;
+import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
+import jp.mironal.java.aws.app.glacier.GlacierTools;
 import jp.mironal.java.aws.app.glacier.VaultController;
 
 import com.amazonaws.services.glacier.model.DescribeVaultOutput;
@@ -121,15 +123,11 @@ public class ArchiveControllerCmd {
             }
         }
 
-        if (propertiesName == null) {
-            propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
-        }
-
         try {
             awsPropFile = getAwsCredentialsPropertiesFile(propertiesName);
         } catch (FileNotFoundException e) {
             if (debug) {
-                System.out.println(e.getMessage());
+                System.err.println(e.getMessage());
             }
             cmdKind = Kind.Bad;
         }
@@ -139,7 +137,7 @@ public class ArchiveControllerCmd {
             region = getRegion(endpointStr);
         } catch (InvalidRegionException e) {
             if (debug) {
-                System.out.println(e.getMessage() + " is not found.");
+                System.err.println(e.getMessage() + " is not found.");
             }
             cmdKind = Kind.Bad;
         }
@@ -195,42 +193,57 @@ public class ArchiveControllerCmd {
         return true;
     }
 
+    private void debugPrint(String msg) {
+        if (debug) {
+            System.err.println(msg);
+        }
+    }
+
     boolean validateInventoryParam() {
         // trueを代入するロジックは初期化のところだけとする.
         boolean ok = true;
         if (region == null) {
+            debugPrint("region is null.");
             ok = false;
         }
         if (awsPropFile == null) {
+            debugPrint("awsPropFile is null.");
             ok = false;
         }
         switch (cmdKind) {
             case Upload:
                 if (vaultName == null) {
+                    debugPrint("vaultName is null.");
                     ok = false;
                 }
                 if (filename == null) {
+                    debugPrint("filename is null.");
                     ok = false;
                 }
 
                 break;
             case Download:
                 if (vaultName == null) {
+                    debugPrint("vaultName is null.");
                     ok = false;
                 }
                 if (archiveId == null) {
+                    debugPrint("archiveId is null.");
                     ok = false;
                 }
                 if (filename == null) {
+                    debugPrint("filename is null.");
                     ok = false;
                 }
                 break;
 
             case Delete:
                 if (vaultName == null) {
+                    debugPrint("vaultName is null.");
                     ok = false;
                 }
                 if (archiveId == null) {
+                    debugPrint("archiveId is null.");
                     ok = false;
                 }
                 break;
@@ -294,6 +307,32 @@ public class ArchiveControllerCmd {
         }
     }
 
+    private void printInvalidParam() {
+        if (awsPropFile == null) {
+            System.err.println(ArchiveController.AWS_PROPERTIES_FILENAME + " file is not found.");
+        }
+        if (region == null) {
+            System.err.println("Region is not found.");
+            for (Region r : GlacierTools.getGlacierRegions().values()) {
+                System.err.print("    ");
+                System.err.println(r.getEndpoint() + " => "
+                        + VaultController.makeUrl(AwsService.Glacier, r));
+            }
+        }
+
+        switch (cmdKind) {
+            case Upload:
+
+                break;
+            case Download:
+                break;
+            case Delete:
+
+            default:
+                break;
+        }
+    }
+
     /**
      * エラーなどでプログラムを終了させるときはこの関数で終了させるようにする.
      * 
@@ -303,11 +342,13 @@ public class ArchiveControllerCmd {
 
         /* オプションが揃ってるかチェック */
         if (!validateInventoryParam()) {
+            printInvalidParam();
             System.exit(-1);
         }
 
         /* vaultの存在確認. なかったらエラー吐いて終了 */
         if (!checkVaultAndPrintErr(vaultName)) {
+
             System.exit(-1);
         }
 
@@ -340,6 +381,7 @@ public class ArchiveControllerCmd {
 
                 execDelete();
                 break;
+
             case Bad:
                 execBad();
                 break;
@@ -349,7 +391,6 @@ public class ArchiveControllerCmd {
 
         if (debug) {
             System.out.println("cmdKind : " + cmdKind);
-            System.out.println("endpoint : " + endpointStr);
             System.out.println("vaultName : " + vaultName);
             System.out.println("filename : " + filename);
             System.out.println("archiveId : " + archiveId);

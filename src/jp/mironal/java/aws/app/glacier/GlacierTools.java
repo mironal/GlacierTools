@@ -3,7 +3,9 @@ package jp.mironal.java.aws.app.glacier;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
@@ -25,6 +27,10 @@ public class GlacierTools extends AwsTools {
         ENDPOINTS.put(Region.US_WEST_2.getEndpoint(), Region.US_WEST_2);
         ENDPOINTS.put(Region.EU_WEST_1.getEndpoint(), Region.EU_WEST_1);
         ENDPOINTS.put(Region.AP_NORTHEAST_1.getEndpoint(), Region.AP_NORTHEAST_1);
+    }
+
+    public static Map<String, Region> getGlacierRegions() {
+        return Collections.unmodifiableMap(ENDPOINTS);
     }
 
     /**

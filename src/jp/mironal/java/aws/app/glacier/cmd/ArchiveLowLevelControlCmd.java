@@ -158,7 +158,7 @@ public class ArchiveLowLevelControlCmd {
 
     }
 
-    private void exec() throws IOException, InterruptedException {
+    private void exec() throws IOException, InterruptedException, ParseException {
 
         File awsPropFile = getAwsCredentialsPropertiesFile();
 
@@ -172,6 +172,7 @@ public class ArchiveLowLevelControlCmd {
         }
 
         LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+        StateLessJobOperations stateLessController = new StateLessJobOperations(region, awsPropFile);
 
         switch (cmdKind) {
             case Inventory:
@@ -191,7 +192,7 @@ public class ArchiveLowLevelControlCmd {
                 if (vaultname == null) {
                     System.exit(-1);
                 }
-                execListJobs(controller);
+                execListJobs(stateLessController);
                 break;
             default:
                 break;
@@ -206,6 +207,7 @@ public class ArchiveLowLevelControlCmd {
 
             if (controller.waitForJobToComplete()) {
                 InventoryRetrievalResult result = controller.downloadInventoryJobOutput();
+                System.out.println(result.toString());
             } else {
                 System.out.println("job fault");
             }
@@ -276,8 +278,9 @@ public class ArchiveLowLevelControlCmd {
      * @param args
      * @throws IOException
      * @throws InterruptedException
+     * @throws ParseException
      */
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, ParseException {
         new ArchiveLowLevelControlCmd(args).exec();
     }
 

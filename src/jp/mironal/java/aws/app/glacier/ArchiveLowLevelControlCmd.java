@@ -223,6 +223,7 @@ public class ArchiveLowLevelControlCmd {
     }
 
     private void execListJobs(LowLevelArchiveController controller) {
+        /*
         List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
         if (jobs.size() > 0) {
             for (GlacierJobDescription job : jobs) {
@@ -232,6 +233,7 @@ public class ArchiveLowLevelControlCmd {
         } else {
             System.out.println("There is no Job.");
         }
+        */
     }
 
     private void printGlacierJobDescriptionf(GlacierJobDescription description) {

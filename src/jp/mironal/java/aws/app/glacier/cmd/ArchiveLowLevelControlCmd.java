@@ -226,6 +226,7 @@ public class ArchiveLowLevelControlCmd {
     }
 
     private void execList() throws IOException {
+
         StateLessJobOperations controller = new StateLessJobOperations(region, awsPropFile);
         List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
         if (jobs.size() > 0) {
@@ -243,13 +244,22 @@ public class ArchiveLowLevelControlCmd {
         try {
             String jobId = controller.initiateInventoryJob(vaultname);
             System.out.println("JobID=" + jobId);
-
-            if (controller.waitForJobToComplete()) {
-                InventoryRetrievalResult result = controller.downloadInventoryJobOutput();
-                System.out.println(result.toString());
-            } else {
-                System.out.println("job fault");
+            boolean finish = false;
+            while (!finish) {
+                finish = controller.checkJobCompleteByDescribe();
+                if (!finish) {
+                    System.out.println("sleep");
+                    Thread.sleep(1000 * 60 * 30);
+                }
             }
+            InventoryRetrievalResult result = controller.downloadInventoryJobOutput();
+            System.out.println(result.toString());
+            /*
+             * if (controller.waitForJobToComplete()) { InventoryRetrievalResult
+             * result = controller.downloadInventoryJobOutput();
+             * System.out.println(result.toString()); } else {
+             * System.out.println("job fault"); }
+             */
         } finally {
             controller.cleanUp();
         }

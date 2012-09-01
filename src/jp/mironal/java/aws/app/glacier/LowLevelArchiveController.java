@@ -251,28 +251,6 @@ public class LowLevelArchiveController extends GlacierTools {
         return result.isJobSuccessful();
     }
 
-    public void printJobOutput() throws JsonParseException, IOException {
-        GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
-                .withVaultName(vaultName).withJobId(jobId);
-        GetJobOutputResult getJobOutputResult = client.getJobOutput(getJobOutputRequest);
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(getJobOutputResult.getBody()));
-
-        try {
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            throw new AmazonClientException("Unable to save archive", e);
-        } finally {
-            try {
-                br.close();
-            } catch (IOException ignore) {
-
-            }
-        }
-    }
 
     public InventoryRetrievalResult getInveInventoryJobOutput() throws JsonParseException,
             IOException, ParseException {

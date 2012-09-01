@@ -199,7 +199,7 @@ public class ArchiveLowLevelControlCmd {
 
             if (controller.waitForJobToComplete()) {
                 System.out.println("job complete!");
-                controller.printJobOutput();
+                //controller.printJobOutput();
             } else {
                 System.out.println("job fault");
             }

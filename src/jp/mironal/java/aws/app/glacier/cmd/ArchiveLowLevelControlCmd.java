@@ -41,6 +41,7 @@ public class ArchiveLowLevelControlCmd {
     String endpointStr = null;
     String propertiesName = null;
     String jobId = null;
+    String saveFile = null;
 
     private void setCmdKind(Kind cmd) {
         if (this.cmdKind == Kind.Bad) {
@@ -103,6 +104,12 @@ public class ArchiveLowLevelControlCmd {
                     endpointStr = args[i];
                 }
             }
+            if (arg.equals("--file")) {
+                if ((i + 1) < args.length) {
+                    i++;
+                    saveFile = args[i];
+                }
+            }
 
             if (arg.equals("--properties")) {
                 if ((i + 1) < args.length) {
@@ -160,6 +167,13 @@ public class ArchiveLowLevelControlCmd {
     Region region = null;
     File awsPropFile;
 
+    /**
+     * エラーなどでプログラムを終了させるときはこの関数で終了させるようにする.
+     * 
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws ParseException
+     */
     private void exec() throws IOException, InterruptedException, ParseException {
 
         awsPropFile = getAwsCredentialsPropertiesFile();
@@ -172,9 +186,12 @@ public class ArchiveLowLevelControlCmd {
             System.out.println(e.getMessage() + " is not found.");
             System.exit(-1);
         }
-
+        if (!validateInventoryParam()) {
+            System.exit(-1);
+        }
         switch (cmdKind) {
             case Inventory:
+
                 execInventory();
                 break;
             case List:
@@ -190,7 +207,7 @@ public class ArchiveLowLevelControlCmd {
                 execBad();
                 break;
             default:
-                break;
+                throw new IllegalStateException("Unkonwn cmd");
         }
     }
 
@@ -204,24 +221,35 @@ public class ArchiveLowLevelControlCmd {
         printDescribeJob(result);
     }
 
-    private void printDescribeJob(DescribeJobResult result) {
-        System.out.println("Action               : " + result.getAction());
-        System.out.println("ArchiveId            : " + result.getArchiveId());
-        System.out.println("ArchiveSizeInBytes   : " + result.getArchiveSizeInBytes());
-        System.out.println("Completed            : " + result.getCompleted());
-        System.out.println("CompletionDate       : " + result.getCompletionDate());
-        System.out.println("CreationDate         : " + result.getCreationDate());
-        System.out.println("InventorySizeInBytes : " + result.getInventorySizeInBytes());
-        System.out.println("JobDescription       : " + result.getJobDescription());
-        System.out.println("JobId                : " + result.getJobId());
-        System.out.println("SHA256TreeHash       : " + result.getSHA256TreeHash());
-        System.out.println("SNSTopic             : " + result.getSNSTopic());
-        System.out.println("StatusCode           : " + result.getStatusCode());
-        System.out.println("StatusMessage        : " + result.getStatusMessage());
-        System.out.println("VaultARN             : " + result.getVaultARN());
+    private void execArchiveSync() throws IOException, InterruptedException {
+        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+        controller.initiateArchiveJob(vaultname, archiveId);
+        boolean successful = controller.waitForJobToComplete();
+        if (successful) {
+            controller.downloadArchiveJobOutput(new File(saveFile));
+        } else {
+            System.out.println("download fault.");
+        }
     }
 
-    private void execArchive() {
+    private void execArchiveAsync() throws IOException {
+        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+        controller.initiateArchiveJob(vaultname, archiveId);
+        printJobRestoreParam(controller);
+    }
+
+    private void execArchive() throws IOException, InterruptedException {
+
+        switch (syncType) {
+            case Sync:
+                execArchiveSync();
+                break;
+            case Async:
+                execArchiveAsync();
+                break;
+            default:
+                throw new IllegalStateException("Unknown type");
+        }
 
     }
 
@@ -256,10 +284,67 @@ public class ArchiveLowLevelControlCmd {
     private void execInventoryAsync() throws IOException {
 
         LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
-
         controller.initiateInventoryJob(vaultname);
         printJobRestoreParam(controller);
 
+    }
+
+    /**
+     * @return
+     */
+    private boolean validateInventoryParam() {
+        // trueを代入するロジックは初期化のところだけとする.
+        boolean ok = true;
+        if (region == null) {
+            ok = false;
+        }
+        if (awsPropFile == null) {
+            ok = false;
+        }
+        switch (cmdKind) {
+            case Archive:
+                if (vaultname == null) {
+                    ok = false;
+                }
+                if (archiveId == null) {
+                    ok = false;
+                }
+                switch (syncType) {
+                    case Sync:
+                        if (saveFile == null) {
+                            ok = false;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+            case Inventory:
+                if (vaultname == null) {
+                    ok = false;
+                }
+
+                break;
+            case List:
+                if (vaultname == null) {
+                    ok = false;
+                }
+                break;
+            case Describe:
+                if (vaultname == null) {
+                    ok = false;
+                }
+                if (jobId == null) {
+                    ok = false;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return ok;
     }
 
     private void execInventory() throws IOException, InterruptedException, ParseException {
@@ -282,6 +367,23 @@ public class ArchiveLowLevelControlCmd {
         System.out.println("JobId=" + param.getJobId());
         System.out.println("VaultName=" + param.getVaultName());
 
+    }
+
+    private void printDescribeJob(DescribeJobResult result) {
+        System.out.println("Action               : " + result.getAction());
+        System.out.println("ArchiveId            : " + result.getArchiveId());
+        System.out.println("ArchiveSizeInBytes   : " + result.getArchiveSizeInBytes());
+        System.out.println("Completed            : " + result.getCompleted());
+        System.out.println("CompletionDate       : " + result.getCompletionDate());
+        System.out.println("CreationDate         : " + result.getCreationDate());
+        System.out.println("InventorySizeInBytes : " + result.getInventorySizeInBytes());
+        System.out.println("JobDescription       : " + result.getJobDescription());
+        System.out.println("JobId                : " + result.getJobId());
+        System.out.println("SHA256TreeHash       : " + result.getSHA256TreeHash());
+        System.out.println("SNSTopic             : " + result.getSNSTopic());
+        System.out.println("StatusCode           : " + result.getStatusCode());
+        System.out.println("StatusMessage        : " + result.getStatusMessage());
+        System.out.println("VaultARN             : " + result.getVaultARN());
     }
 
     private void printGlacierJobDescriptionf(GlacierJobDescription description) {

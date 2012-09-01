@@ -105,11 +105,15 @@ public class LowLevelArchiveController extends GlacierTools {
     }
 
     /**
-     * Jobの復元に必要なパラメータを取得する.
+     * Jobの復元に必要なパラメータを取得する.<br>
+     * まだJobが開始されていない場合はIllegalStateException()を投げる.
      * 
      * @return Instance of JobRestoreParam.
      */
     public JobRestoreParam getJobRestoreParam() {
+        if (!alreadyInitiate) {
+            throw new IllegalStateException("Job has not yet started");
+        }
         Builder builder = new Builder();
         builder.setVaultName(this.vaultName).setJobId(this.jobId)
                 .setSnsSubscriptionArn(snsSetupResult.subscriptionArn)
@@ -118,19 +122,24 @@ public class LowLevelArchiveController extends GlacierTools {
     }
 
     /**
-     * Jobを復元する.
+     * Jobを復元する.<br>
+     * すでにこのインスタンスでJobが実行されていた場合はIllegalStateException()を投げる.
      * 
-     * @param param
+     * @param param JobRestoreParamのインスタンス
      */
     public void restoreJob(JobRestoreParam param) {
         if (param == null) {
             throw new NullPointerException("param is null.");
+        }
+        if (alreadyInitiate) {
+            throw new IllegalStateException("initiate job request is already node.");
         }
         this.vaultName = param.getVaultName();
         this.jobId = param.getJobId();
         this.snsSetupResult = new SnsSetupResult(param.getSnsTopicArn(),
                 param.getSnsSubscriptionArn());
         this.sqsSetupResult = new SqsSetupResult(param.getSqsQueueUrl(), "");
+        alreadyInitiate = true;
     }
 
     /**
@@ -365,7 +374,8 @@ public class LowLevelArchiveController extends GlacierTools {
     }
 
     /**
-     * SQSとSNSの初期化を行う.
+     * Jobがすでに開始されていないかチェックした後、 SQSとSNSの初期化を行う.<br>
+     * Jobがすでに開始されていた場合はIllegalStateException()を投げる
      */
     private void setupJob() {
         if (alreadyInitiate) {

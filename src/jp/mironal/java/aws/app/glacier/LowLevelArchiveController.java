@@ -91,19 +91,6 @@ public class LowLevelArchiveController extends GlacierTools {
 
     private String jobId;
     private String vaultName;
-    private String archiveId;
-
-    private void setVaultNameAndArchiveId(String vaultName, String archiveId) {
-        if (vaultName == null) {
-            throw new NullPointerException("vaultName is null.");
-        }
-        if (archiveId == null) {
-            throw new NullPointerException("archiveId is null.");
-        }
-
-        this.vaultName = vaultName;
-        this.archiveId = archiveId;
-    }
 
     public LowLevelArchiveController() throws IOException {
         super();
@@ -154,7 +141,6 @@ public class LowLevelArchiveController extends GlacierTools {
      * @return jobId
      */
     public String initiateInventoryJob(String vaultName) {
-        setVaultNameAndArchiveId(vaultName, "");
 
         // setup the SQS and SNS
         setupJob();
@@ -175,7 +161,6 @@ public class LowLevelArchiveController extends GlacierTools {
      * @return jobId
      */
     public String initiateArchiveJob(String vaultName, String archiveId) {
-        setVaultNameAndArchiveId(vaultName, archiveId);
 
         // setup the SQS and SNS
         setupJob();

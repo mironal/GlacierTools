@@ -82,51 +82,6 @@ public class LowLevelArchiveController extends GlacierTools {
     }
 
     /**
-     * @param jobId
-     * @param sqsQueueUrl
-     * @param sqsClient
-     * @return
-     * @throws JsonParseException
-     * @throws IOException
-     */
-    public static CheckJobResult checkJobToComplete(String jobId, String sqsQueueUrl,
-            AmazonSQSClient sqsClient) throws JsonParseException, IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonFactory factory = mapper.getJsonFactory();
-
-        ReceiveMessageRequest messageRequest = new ReceiveMessageRequest(sqsQueueUrl)
-                .withMaxNumberOfMessages(10);
-        List<Message> msgs = sqsClient.receiveMessage(messageRequest).getMessages();
-
-        System.out.println("get message : msg.size=" + msgs.size());
-
-        boolean messageFound = false;
-        boolean jobSuccessful = false;
-        if (msgs.size() > 0) {
-            for (Message m : msgs) {
-                JsonParser jpMessage = factory.createJsonParser(m.getBody());
-                JsonNode JobmessageNode = mapper.readTree(jpMessage);
-                String jobMessage = JobmessageNode.get("Message").getTextValue();
-
-                JsonParser jpDesc = factory.createJsonParser(jobMessage);
-                JsonNode jobDescNode = mapper.readTree(jpDesc);
-                String retrievedJobId = jobDescNode.get("JobId").getTextValue();
-
-                String statusCode = jobDescNode.get("StatusCode").getTextValue();
-                System.out.println("retrievedJobId=" + retrievedJobId);
-                System.out.println("StatusCode=" + statusCode);
-                if (retrievedJobId.equals(jobId)) {
-                    messageFound = true;
-                    if (statusCode.equals("Succeeded")) {
-                        jobSuccessful = true;
-                    }
-                }
-            }
-        }
-        return new CheckJobResult(messageFound, jobSuccessful);
-    }
-
-    /**
      * 完了したJobをダウンロードする.
      * 
      * @param jobId
@@ -275,9 +230,6 @@ public class LowLevelArchiveController extends GlacierTools {
         return executeInitiateJob(jobParameters);
     }
 
-    
-    
-
     /**
      * Jobが完了したかをチェックする.<br>
      * SQSを使ってメッセージが届いたかをチェックし、更にJobが成功したかをチェックする.<br>
@@ -292,8 +244,36 @@ public class LowLevelArchiveController extends GlacierTools {
         if (!alreadyInitiate) {
             throw new IllegalStateException("Job has not yet started");
         }
-        return LowLevelArchiveController.checkJobToComplete(this.jobId, sqsSetupResult.queueUrl,
-                sqsClient);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonFactory factory = mapper.getJsonFactory();
+
+        ReceiveMessageRequest messageRequest = new ReceiveMessageRequest(sqsSetupResult.queueUrl)
+                .withMaxNumberOfMessages(10);
+        List<Message> msgs = sqsClient.receiveMessage(messageRequest).getMessages();
+
+        boolean messageFound = false;
+        boolean jobSuccessful = false;
+        if (msgs.size() > 0) {
+            for (Message m : msgs) {
+                JsonParser jpMessage = factory.createJsonParser(m.getBody());
+                JsonNode JobmessageNode = mapper.readTree(jpMessage);
+                String jobMessage = JobmessageNode.get("Message").getTextValue();
+
+                JsonParser jpDesc = factory.createJsonParser(jobMessage);
+                JsonNode jobDescNode = mapper.readTree(jpDesc);
+                String retrievedJobId = jobDescNode.get("JobId").getTextValue();
+
+                String statusCode = jobDescNode.get("StatusCode").getTextValue();
+
+                if (retrievedJobId.equals(jobId)) {
+                    messageFound = true;
+                    if (statusCode.equals("Succeeded")) {
+                        jobSuccessful = true;
+                    }
+                }
+            }
+        }
+        return new CheckJobResult(messageFound, jobSuccessful);
     }
 
     /**

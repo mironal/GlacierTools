@@ -7,7 +7,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
-import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.InvalidRegionException;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Kind;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Sync;
 

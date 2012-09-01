@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveControllerCmd.Kind;
-import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.InvalidRegionException;
 
 import org.junit.Test;
 
@@ -188,12 +187,13 @@ public class ArchiveControllerCmdTest {
     @Test()
     public void test_Region_Invalid() throws InvalidRegionException {
         ArchiveControllerCmd cmd = new ArchiveControllerCmd(new String[] {
-                "upload", "--vault", "hogehoge", "--file", "filename", "--endpoint", "aa"
+                "upload", "--vault", "hogehoge", "--file", "filename", "--endpoint", "aa",
+                "--debug"
         });
         assertNull(cmd.region);
-        assertEquals(cmd.cmdKind, Kind.Upload);
+        assertEquals(cmd.cmdKind, Kind.Bad);
         assertEquals(cmd.vaultName, "hogehoge");
         assertEquals(cmd.filename, "filename");
-        assertTrue(cmd.validateInventoryParam());
+        assertFalse(cmd.validateInventoryParam());
     }
 }

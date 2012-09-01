@@ -125,6 +125,7 @@ public class ArchiveLowLevelControlCmd {
             }
         }
 
+        // プロパティーファイルが無かったらcmdをBadにする.
         try {
             awsPropFile = getAwsCredentialsPropertiesFile(propertiesName);
         } catch (FileNotFoundException e) {
@@ -134,7 +135,7 @@ public class ArchiveLowLevelControlCmd {
             cmdKind = Kind.Bad;
         }
 
-        /* endpoint */
+        // 変なRegionを設定されたらcmdをBadにする.
         try {
             region = getRegion(endpointStr);
         } catch (InvalidRegionException e) {
@@ -160,14 +161,6 @@ public class ArchiveLowLevelControlCmd {
         }
 
         return propFile;
-    }
-
-    @SuppressWarnings("serial")
-    class InvalidRegionException extends RuntimeException {
-
-        public InvalidRegionException(String msg) {
-            super(msg);
-        }
     }
 
     Region getRegion(String endpointStr) throws InvalidRegionException {

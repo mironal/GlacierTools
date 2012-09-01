@@ -2,6 +2,7 @@
 package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -14,94 +15,6 @@ import com.amazonaws.services.glacier.model.DescribeVaultOutput;
 import com.amazonaws.services.glacier.transfer.UploadResult;
 
 public class ArchiveControllerCmd {
-
-    static class Util {
-        private Util() {
-        }
-
-        private static void printSpace4() {
-            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printSpace4();
-        }
-
-        public static void printEndpointHelp() {
-            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printEndpointHelp();
-
-        }
-
-        public static void printPropertiesHelp() {
-            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printPropertiesHelp();
-        }
-
-        public static void printFileNotFoundError(String filename) {
-            System.out.println(filename + " is not found.");
-        }
-
-        public static void printUploadHelp() {
-            System.out.println("Upload archive");
-            System.out.println();
-            printSpace4();
-            System.out
-                    .println("java -jar ArchiveController.jar upload --vault vaultname --file filename");
-            printSpace4();
-            System.out.println("with endpoint");
-            printSpace4();
-            System.out
-                    .println("java -jar ArchiveController.jar upload --vault vaultname --file filename --endpoint endpoint");
-        }
-
-        public static void printDownloadHelp() {
-            System.out.println("Download archive");
-            printSpace4();
-            System.out
-                    .println("java -jar ArchiveController.jar download --vault vaultname --archive archiveId --file filename");
-            printSpace4();
-            System.out.println("with endpoint");
-            printSpace4();
-            System.out
-                    .println("java -jar ArchiveController.jar download --vault vaultname --archive archiveId --file filename --endpoint endpoint");
-            printSpace4();
-            System.out.println("force download");
-            printSpace4();
-            printSpace4();
-            System.out.println("add --force option");
-        }
-
-        public static void printDeleteHelp() {
-            System.out.println("Delete archive");
-            printSpace4();
-            System.out
-                    .println("java -jar ArchiveController.jar delete --vault vaultname --archive archiveId");
-            printSpace4();
-            System.out.println("with endpoint");
-            printSpace4();
-            System.out
-                    .println("java -jar ArchiveController.jar delete --vault vaultname --archive archiveId --endpoint endpoint");
-
-        }
-
-        public static void printHelp() {
-            printUploadHelp();
-            System.out.println();
-            printDownloadHelp();
-            System.out.println();
-            printDeleteHelp();
-            System.err.println();
-            printEndpointHelp();
-        }
-
-        public static void printUnknownCommand() {
-            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printUnKnownCommand();
-        }
-
-        public static void printFileIsNotFileError(String filename) {
-            System.out.println(filename + " is not file.");
-        }
-
-        public static void printFileExistError(String filename) {
-            System.out.println(filename + " is exist.");
-        }
-
-    }
 
     enum Kind {
         Bad, Upload, Download, Delete
@@ -117,7 +30,7 @@ public class ArchiveControllerCmd {
     boolean force = false; /* アーカイブダウンロード時に同名のファイルが既に有った場合、強制的に上書きする */
     boolean printArchiveIdOnly = false;
     Region region = null;
-    File propFile = null;
+    File awsPropFile = null;
     File uploadFile = null;
 
     ArchiveControllerCmd(String[] args) {
@@ -196,7 +109,6 @@ public class ArchiveControllerCmd {
             }
 
             if (arg.equals("-h") || arg.equals("--help")) {
-                Util.printHelp();
                 System.exit(0);
             }
 
@@ -213,28 +125,55 @@ public class ArchiveControllerCmd {
             propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
         }
 
-        propFile = new File(propertiesName);
-        if (propFile.isDirectory()) {
-            propFile = new File(propertiesName + File.separator
-                    + VaultController.AWS_PROPERTIES_FILENAME);
-        }
-        if (!propFile.exists()) {
-            /* 設定ファイルがなかったらhelpを表示して終了. */
-            Util.printPropertiesHelp();
-            System.exit(-1);
+        try {
+            awsPropFile = getAwsCredentialsPropertiesFile(propertiesName);
+        } catch (FileNotFoundException e) {
+            if (debug) {
+                System.out.println(e.getMessage());
+            }
+            cmdKind = Kind.Bad;
         }
 
         /* endpoint */
+        try {
+            region = getRegion(endpointStr);
+        } catch (InvalidRegionException e) {
+            if (debug) {
+                System.out.println(e.getMessage() + " is not found.");
+            }
+            cmdKind = Kind.Bad;
+        }
+    }
+
+    Region getRegion(String endpointStr) throws InvalidRegionException {
+        Region region = null;
         if (endpointStr == null) {
             region = ArchiveController.getDefaultEndpoint();
         } else {
             if (ArchiveController.containEndpoint(endpointStr)) {
                 region = ArchiveController.convertToRegion(endpointStr);
             } else {
-                Util.printEndpointHelp();
-                System.exit(-1);
+                throw new InvalidRegionException(endpointStr);
             }
         }
+        return region;
+    }
+
+    File getAwsCredentialsPropertiesFile(String propertiesName) throws FileNotFoundException {
+        if (propertiesName == null) {
+            propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
+        }
+
+        File propFile = new File(propertiesName);
+        if (propFile.isDirectory()) {
+            propFile = new File(propertiesName + File.separator
+                    + VaultController.AWS_PROPERTIES_FILENAME);
+        }
+        if (!propFile.exists()) {
+            throw new FileNotFoundException(propFile.getAbsolutePath() + "is not found.");
+        }
+
+        return propFile;
     }
 
     boolean existVault(String vaultName, VaultController vaultController) {
@@ -248,7 +187,7 @@ public class ArchiveControllerCmd {
     }
 
     boolean checkVaultAndPrintErr(String vaultName) throws IOException {
-        VaultController controller = new VaultController(region, propFile);
+        VaultController controller = new VaultController(region, awsPropFile);
         if (!existVault(vaultName, controller)) {
             System.err.println(vaultName + " is not exist.");
             return false;
@@ -262,7 +201,7 @@ public class ArchiveControllerCmd {
         if (region == null) {
             ok = false;
         }
-        if (propFile == null) {
+        if (awsPropFile == null) {
             ok = false;
         }
         switch (cmdKind) {
@@ -303,7 +242,7 @@ public class ArchiveControllerCmd {
     }
 
     private void execUpload() throws IOException {
-        ArchiveController archiveController = new ArchiveController(region, propFile);
+        ArchiveController archiveController = new ArchiveController(region, awsPropFile);
         String description = new Date().toString();
         UploadResult uploadResult = archiveController.upload(vaultName, description, uploadFile);
         if (printArchiveIdOnly) {
@@ -314,13 +253,13 @@ public class ArchiveControllerCmd {
     }
 
     private void execDownload() throws IOException {
-        ArchiveController archiveController = new ArchiveController(region, propFile);
+        ArchiveController archiveController = new ArchiveController(region, awsPropFile);
         archiveController.download(vaultName, archiveId, new File(filename));
         System.out.println("download success!");
     }
 
     private void execDelete() throws IOException {
-        ArchiveController archiveController = new ArchiveController(region, propFile);
+        ArchiveController archiveController = new ArchiveController(region, awsPropFile);
         archiveController.delete(vaultName, archiveId);
         System.out.println("delete success!");
     }

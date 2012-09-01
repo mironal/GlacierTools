@@ -14,10 +14,6 @@ public class JobRestoreParam {
         /** The ID of the job */
         private String jobId = null;
 
-        private String snsSubscriptionArn = null;
-        private String snsTopicArn = null;
-        private String sqsQueueUrl = null;
-
         /**
          * JobRestoreParamインスタンスを生成する.<br>
          * パラメータが足りていないときは例外を投げる.
@@ -30,15 +26,6 @@ public class JobRestoreParam {
             }
             if (this.jobId == null) {
                 throw new NullPointerException("jobId is null.");
-            }
-            if (this.snsSubscriptionArn == null) {
-                throw new NullPointerException("snsSubscriptionArn is null.");
-            }
-            if (this.snsTopicArn == null) {
-                throw new NullPointerException("snsTopicArn is null.");
-            }
-            if (this.sqsQueueUrl == null) {
-                throw new NullPointerException("sqsQueueUrl is null.");
             }
 
             return new JobRestoreParam(this);
@@ -65,40 +52,6 @@ public class JobRestoreParam {
             this.jobId = jobId;
             return this;
         }
-
-        /**
-         * Set the String snsSubscriptionArn.
-         * 
-         * @param snsSubscriptionArn
-         * @return Themselves
-         */
-        public Builder setSnsSubscriptionArn(String snsSubscriptionArn) {
-            this.snsSubscriptionArn = snsSubscriptionArn;
-            return this;
-        }
-
-        /**
-         * Set the String setSnsTopicArn.
-         * 
-         * @param snsTopicArn
-         * @return Themselves
-         */
-        public Builder setSnsTopicArn(String snsTopicArn) {
-            this.snsTopicArn = snsTopicArn;
-            return this;
-        }
-
-        /**
-         * Set the String sqsQueueUrl
-         * 
-         * @param sqsQueueUrl
-         * @return Themselves
-         */
-        public Builder setSqsQueueUrl(String sqsQueueUrl) {
-            this.sqsQueueUrl = sqsQueueUrl;
-            return this;
-        }
-
     }
 
     /** The name of the Vault */
@@ -106,9 +59,6 @@ public class JobRestoreParam {
 
     /** The ID of the job */
     private final String jobId;
-    private final String snsSubscriptionArn;
-    private final String snsTopicArn;
-    private final String sqsQueueUrl;
 
     /**
      * Builder以外からは作れないようにprivateにした.<br>
@@ -118,9 +68,6 @@ public class JobRestoreParam {
     private JobRestoreParam(Builder builder) {
         this.vaultName = builder.vaultName;
         this.jobId = builder.jobId;
-        this.snsSubscriptionArn = builder.snsSubscriptionArn;
-        this.snsTopicArn = builder.snsTopicArn;
-        this.sqsQueueUrl = builder.sqsQueueUrl;
     }
 
     /**
@@ -140,32 +87,4 @@ public class JobRestoreParam {
     public String getJobId() {
         return jobId;
     }
-
-    /**
-     * Get the snsSubscriptionArn.
-     * 
-     * @return snsSubscriptionArn
-     */
-    public String getSnsSubscriptionArn() {
-        return snsSubscriptionArn;
-    }
-
-    /**
-     * Get the snsTopicArn.
-     * 
-     * @return snsTopicArn
-     */
-    public String getSnsTopicArn() {
-        return snsTopicArn;
-    }
-
-    /**
-     * Get the sqsQueueUrl.
-     * 
-     * @return sqsQueueUrl
-     */
-    public String getSqsQueueUrl() {
-        return sqsQueueUrl;
-    }
-
 }

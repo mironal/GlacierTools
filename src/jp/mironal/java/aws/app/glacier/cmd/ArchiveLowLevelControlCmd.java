@@ -241,27 +241,15 @@ public class ArchiveLowLevelControlCmd {
 
     private void execInventorySync() throws IOException, InterruptedException, ParseException {
         LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
-        try {
-            String jobId = controller.initiateInventoryJob(vaultname);
-            System.out.println("JobID=" + jobId);
-            boolean finish = false;
-            while (!finish) {
-                finish = controller.checkJobCompleteByDescribe();
-                if (!finish) {
-                    System.out.println("sleep");
-                    Thread.sleep(1000 * 60 * 30);
-                }
-            }
+
+        String jobId = controller.initiateInventoryJob(vaultname);
+        System.out.println("JobID=" + jobId);
+        boolean successful = controller.waitForJobToComplete();
+        if (successful) {
             InventoryRetrievalResult result = controller.downloadInventoryJobOutput();
             System.out.println(result.toString());
-            /*
-             * if (controller.waitForJobToComplete()) { InventoryRetrievalResult
-             * result = controller.downloadInventoryJobOutput();
-             * System.out.println(result.toString()); } else {
-             * System.out.println("job fault"); }
-             */
-        } finally {
-            controller.cleanUp();
+        } else {
+            System.out.println("Error : Job complete failed.");
         }
     }
 
@@ -293,9 +281,7 @@ public class ArchiveLowLevelControlCmd {
         JobRestoreParam param = controller.getJobRestoreParam();
         System.out.println("JobId=" + param.getJobId());
         System.out.println("VaultName=" + param.getVaultName());
-        System.out.println("SnsSubscriptionArn=" + param.getSnsSubscriptionArn());
-        System.out.println("SnsTopicArn=" + param.getSnsTopicArn());
-        System.out.println("SqsQueueUrl=" + param.getSqsQueueUrl());
+
     }
 
     private void printGlacierJobDescriptionf(GlacierJobDescription description) {

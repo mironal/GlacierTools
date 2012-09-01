@@ -17,9 +17,6 @@ public class RestoreJobController {
 
     String jobId;
     String vaultname;
-    String snsSubscriptionArn;
-    String snsTopicArn;
-    String sqsQueueUrl;
 
     public RestoreJobController(String[] args) {
 
@@ -37,27 +34,6 @@ public class RestoreJobController {
                 if ((i + 1) < arg.length()) {
                     i++;
                     jobId = args[i];
-                }
-            }
-
-            if (arg.equals("--snssub")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    snsSubscriptionArn = args[i];
-                }
-            }
-
-            if (arg.equals("--snstopic")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    snsTopicArn = args[i];
-                }
-            }
-
-            if (arg.equals("--sqsurl")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    sqsQueueUrl = args[i];
                 }
             }
         }
@@ -89,9 +65,6 @@ public class RestoreJobController {
 
         jobId = properties.getProperty("JobId");
         vaultname = properties.getProperty("VaultName");
-        snsSubscriptionArn = properties.getProperty("SnsSubscriptionArn");
-        snsTopicArn = properties.getProperty("SnsTopicArn");
-        sqsQueueUrl = properties.getProperty("SqsQueueUrl");
     }
 
     /**

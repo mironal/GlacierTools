@@ -251,6 +251,14 @@ public class LowLevelArchiveController extends GlacierTools {
         return result.isJobSuccessful();
     }
 
+    /**
+     * inventory-retrievalのJobをダウンロードする.
+     * 
+     * @return InventoryRetrievalResultのインスタンス.
+     * @throws JsonParseException
+     * @throws IOException
+     * @throws ParseException
+     */
     public InventoryRetrievalResult downloadInventoryJobOutput() throws JsonParseException,
             IOException, ParseException {
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
@@ -259,6 +267,11 @@ public class LowLevelArchiveController extends GlacierTools {
         return new InventoryRetrievalResult(result.getBody());
     }
 
+    /**
+     * archive-retrievalで開始したJobのArchiveをダウンロードする.
+     * 
+     * @param saveFile ダウンロードしたファイルの保存先.
+     */
     public void downloadArchiveJobOutput(File saveFile) {
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
@@ -294,6 +307,9 @@ public class LowLevelArchiveController extends GlacierTools {
         }
     }
 
+    /**
+     * Jobをクリーンアップする.
+     */
     public void cleanUp() {
         snsClient.unsubscribe(new UnsubscribeRequest(snsSetupResult.subscriptionArn));
         snsClient.deleteTopic(new DeleteTopicRequest(snsSetupResult.topicArn));

@@ -156,7 +156,7 @@ public class LowLevelArchiveController extends StateLessJobOperations {
                 .withDescription("inventory-retrieval_job").withFormat("JSON")
                 .withSNSTopic(snsSetupResult.topicArn);
 
-        return executeInitiateJob(jobParameters);
+        return executeInitiateJob(jobParameters, vaultName);
     }
 
     /**
@@ -387,7 +387,7 @@ public class LowLevelArchiveController extends StateLessJobOperations {
      * @param jobParameters
      * @return jobId
      */
-    private String executeInitiateJob(JobParameters jobParameters) {
+    private String executeInitiateJob(JobParameters jobParameters, String vaultName) {
         InitiateJobRequest request = new InitiateJobRequest().withVaultName(vaultName)
                 .withJobParameters(jobParameters);
         InitiateJobResult result = client.initiateJob(request);

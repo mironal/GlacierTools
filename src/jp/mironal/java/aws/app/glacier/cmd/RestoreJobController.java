@@ -1,5 +1,5 @@
 
-package jp.mironal.java.aws.app.glacier;
+package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

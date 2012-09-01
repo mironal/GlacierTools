@@ -3,7 +3,7 @@ package jp.mironal.java.aws.app.glacier;
 
 public class AwsTools {
 
-    enum AwsService {
+    public enum AwsService {
         Glacier, Sqs, Sns,
     }
 
@@ -11,7 +11,7 @@ public class AwsTools {
 
     protected static final String URL_TAIL = ".amazonaws.com";
 
-    enum Region {
+    public enum Region {
         /**
          * US East (Northern Virginia) Region
          */
@@ -44,7 +44,7 @@ public class AwsTools {
         }
     }
 
-    protected static String makeUrl(AwsService service, Region region) {
+    public static String makeUrl(AwsService service, Region region) {
         if (service == null) {
             throw new NullPointerException("service is null.");
         }

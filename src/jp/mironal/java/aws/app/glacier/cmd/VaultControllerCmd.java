@@ -1,5 +1,5 @@
 
-package jp.mironal.java.aws.app.glacier;
+package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
+import jp.mironal.java.aws.app.glacier.VaultController;
 
 import com.amazonaws.services.glacier.model.CreateVaultResult;
 import com.amazonaws.services.glacier.model.DescribeVaultOutput;
@@ -34,7 +35,7 @@ public class VaultControllerCmd {
             for (Region r : Region.values()) {
                 printSpace4();
                 System.out.println(r.toString() + " => "
-                        + GlacierTools.makeUrl(AwsService.Glacier, r));
+                        + VaultController.makeUrl(AwsService.Glacier, r));
             }
         }
 

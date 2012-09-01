@@ -1,12 +1,14 @@
 
-package jp.mironal.java.aws.app.glacier;
+package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import jp.mironal.java.aws.app.glacier.ArchiveController;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
+import jp.mironal.java.aws.app.glacier.VaultController;
 
 import com.amazonaws.services.glacier.model.DescribeVaultOutput;
 import com.amazonaws.services.glacier.transfer.UploadResult;
@@ -18,16 +20,16 @@ public class ArchiveControllerCmd {
         }
 
         private static void printSpace4() {
-            jp.mironal.java.aws.app.glacier.VaultControllerCmd.Util.printSpace4();
+            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printSpace4();
         }
 
         public static void printEndpointHelp() {
-            jp.mironal.java.aws.app.glacier.VaultControllerCmd.Util.printEndpointHelp();
+            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printEndpointHelp();
 
         }
 
         public static void printPropertiesHelp() {
-            jp.mironal.java.aws.app.glacier.VaultControllerCmd.Util.printPropertiesHelp();
+            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printPropertiesHelp();
         }
 
         public static void printFileNotFoundError(String filename) {
@@ -88,7 +90,7 @@ public class ArchiveControllerCmd {
         }
 
         public static void printUnknownCommand() {
-            jp.mironal.java.aws.app.glacier.VaultControllerCmd.Util.printUnKnownCommand();
+            jp.mironal.java.aws.app.glacier.cmd.VaultControllerCmd.Util.printUnKnownCommand();
         }
 
         public static void printFileIsNotFileError(String filename) {

@@ -21,11 +21,10 @@ public class ArchiveControllerCmd {
     }
 
     Kind cmdKind = Kind.Bad;
-    String endpointStr = null;
+
     String vaultName = null;
     String filename = null;
     String archiveId = null;
-    String propertiesName = null;
     boolean debug = false;
     boolean force = false; /* アーカイブダウンロード時に同名のファイルが既に有った場合、強制的に上書きする */
     boolean printArchiveIdOnly = false;
@@ -34,7 +33,8 @@ public class ArchiveControllerCmd {
     File uploadFile = null;
 
     ArchiveControllerCmd(String[] args) {
-
+        String propertiesName = null;
+        String endpointStr = null;
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 

@@ -99,4 +99,29 @@ public class InventoryRetrievalResult {
         return archiveList;
     }
 
+    @Override
+    public String toString() {
+        final String NL = System.lineSeparator();
+        final String SP = "    ";
+        StringBuilder builder = new StringBuilder();
+        builder.append("VaultArn      : ").append(getVaultArn()).append(NL);
+        builder.append("InventoryDate : ").append(getInventoryDate()).append(NL);
+        builder.append("ArchiveList   :").append(NL);
+        for (ArchiveInfo info : getArchiveList()) {
+            String separator = "";
+            builder.append(separator);
+            builder.append(SP).append("ArchiveId          : ").append(info.getArchiveId())
+                    .append(NL);
+            builder.append(SP).append("ArchiveDescription : ").append(info.getArchiveDescription())
+                    .append(NL);
+            builder.append(SP).append("CreationDate       : ").append(info.getCreationDate())
+                    .append(NL);
+            builder.append(SP).append("Size               : ").append(info.getSize()).append(NL);
+            builder.append(SP).append("SHA256TreeHash     : ").append(info.getSHA256TreeHash())
+                    .append(NL);
+
+            separator = NL;
+        }
+        return builder.toString();
+    }
 }

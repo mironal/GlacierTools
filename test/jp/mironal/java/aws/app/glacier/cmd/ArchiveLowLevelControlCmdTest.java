@@ -2,7 +2,10 @@
 package jp.mironal.java.aws.app.glacier.cmd;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.InvalidRegionException;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Kind;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Sync;
@@ -14,22 +17,24 @@ public class ArchiveLowLevelControlCmdTest {
     @Test
     public void test_inventoryRetrieval() {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
-                "inventory-retrieval", "--vault", "hogehoge"
+                "inventory-retrieval", "--vault", "hogehoge", "--debug"
         });
 
         assertEquals(cmd.cmdKind, Kind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");
+
+        assertTrue(cmd.validateInventoryParam());
     }
 
     @Test
     public void test_inventoryRetrievalWithEndpoint() {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
-                "inventory-retrieval", "--vault", "hogehoge", "--endpoint", "foo"
+                "inventory-retrieval", "--vault", "hogehoge", "--endpoint", "us-east-1"
         });
 
         assertEquals(cmd.cmdKind, Kind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");
-        assertEquals(cmd.endpointStr, "foo");
+        assertEquals(cmd.region, Region.US_EAST_1);
     }
 
     @Test
@@ -87,30 +92,20 @@ public class ArchiveLowLevelControlCmdTest {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-east-1"
         });
 
-        try {
-            assertEquals(cmd.getRegion(), jp.mironal.java.aws.app.glacier.AwsTools.Region.US_EAST_1);
-        } catch (InvalidRegionException e) {
-            fail();
-            e.printStackTrace();
-        }
+        assertEquals(cmd.region, Region.US_EAST_1);
 
         cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-west-1"
         });
 
-        try {
-            assertEquals(cmd.getRegion(), jp.mironal.java.aws.app.glacier.AwsTools.Region.US_WEST_1);
-        } catch (InvalidRegionException e) {
-            fail();
-            e.printStackTrace();
-        }
+        assertEquals(cmd.region, Region.US_WEST_1);
 
         cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-west-2"
         });
 
         try {
-            assertEquals(cmd.getRegion(), jp.mironal.java.aws.app.glacier.AwsTools.Region.US_WEST_2);
+            assertEquals(cmd.region, Region.US_WEST_2);
         } catch (InvalidRegionException e) {
             fail();
             e.printStackTrace();
@@ -120,31 +115,23 @@ public class ArchiveLowLevelControlCmdTest {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "eu-west-1"
         });
 
-        try {
-            assertEquals(cmd.getRegion(), jp.mironal.java.aws.app.glacier.AwsTools.Region.EU_WEST_1);
-        } catch (InvalidRegionException e) {
-            fail();
-            e.printStackTrace();
-        }
+        assertEquals(cmd.region, Region.EU_WEST_1);
 
         cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "ap-northeast-1"
         });
 
-        try {
-            assertEquals(cmd.getRegion(),
-                    jp.mironal.java.aws.app.glacier.AwsTools.Region.AP_NORTHEAST_1);
-        } catch (InvalidRegionException e) {
-            fail();
-            e.printStackTrace();
-        }
+        assertEquals(cmd.region, Region.AP_NORTHEAST_1);
+
     }
 
-    @Test(expected = InvalidRegionException.class)
+    @Test()
     public void test_Region_Invalid() throws InvalidRegionException {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "aa"
         });
-        cmd.getRegion();
+        assertNull(cmd.region);
+        assertEquals(cmd.cmdKind, Kind.Bad);
+
     }
 }

@@ -38,10 +38,12 @@ public class ArchiveLowLevelControlCmd {
     Sync syncType = Sync.Sync;
     String vaultname = null;
     String archiveId = null;
-    String endpointStr = null;
-    String propertiesName = null;
+
     String jobId = null;
     String saveFile = null;
+    Region region = null;
+    File awsPropFile;
+    boolean debug = false;
 
     private void setCmdKind(Kind cmd) {
         if (this.cmdKind == Kind.Bad) {
@@ -53,7 +55,8 @@ public class ArchiveLowLevelControlCmd {
     }
 
     ArchiveLowLevelControlCmd(String[] args) {
-
+        String endpointStr = null;
+        String propertiesName = null;
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 
@@ -117,11 +120,32 @@ public class ArchiveLowLevelControlCmd {
                     propertiesName = args[i];
                 }
             }
+            if (arg.equals("--debug")) {
+                debug = true;
+            }
+        }
 
+        try {
+            awsPropFile = getAwsCredentialsPropertiesFile(propertiesName);
+        } catch (FileNotFoundException e) {
+            if (debug) {
+                System.out.println(e.getMessage());
+            }
+            cmdKind = Kind.Bad;
+        }
+
+        /* endpoint */
+        try {
+            region = getRegion(endpointStr);
+        } catch (InvalidRegionException e) {
+            if (debug) {
+                System.out.println(e.getMessage() + " is not found.");
+            }
+            cmdKind = Kind.Bad;
         }
     }
 
-    File getAwsCredentialsPropertiesFile() throws FileNotFoundException {
+    File getAwsCredentialsPropertiesFile(String propertiesName) throws FileNotFoundException {
         if (propertiesName == null) {
             propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
         }
@@ -139,14 +163,14 @@ public class ArchiveLowLevelControlCmd {
     }
 
     @SuppressWarnings("serial")
-    class InvalidRegionException extends Exception {
+    class InvalidRegionException extends RuntimeException {
 
         public InvalidRegionException(String msg) {
             super(msg);
         }
     }
 
-    Region getRegion() throws InvalidRegionException {
+    Region getRegion(String endpointStr) throws InvalidRegionException {
         Region region = null;
         if (endpointStr == null) {
             region = ArchiveController.getDefaultEndpoint();
@@ -164,9 +188,6 @@ public class ArchiveLowLevelControlCmd {
 
     }
 
-    Region region = null;
-    File awsPropFile;
-
     /**
      * エラーなどでプログラムを終了させるときはこの関数で終了させるようにする.
      * 
@@ -176,16 +197,6 @@ public class ArchiveLowLevelControlCmd {
      */
     private void exec() throws IOException, InterruptedException, ParseException {
 
-        awsPropFile = getAwsCredentialsPropertiesFile();
-
-        /* endpoint */
-
-        try {
-            region = getRegion();
-        } catch (InvalidRegionException e) {
-            System.out.println(e.getMessage() + " is not found.");
-            System.exit(-1);
-        }
         if (!validateInventoryParam()) {
             System.exit(-1);
         }
@@ -292,7 +303,7 @@ public class ArchiveLowLevelControlCmd {
     /**
      * @return
      */
-    private boolean validateInventoryParam() {
+    boolean validateInventoryParam() {
         // trueを代入するロジックは初期化のところだけとする.
         boolean ok = true;
         if (region == null) {

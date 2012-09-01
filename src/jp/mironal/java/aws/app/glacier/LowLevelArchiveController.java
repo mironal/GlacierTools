@@ -56,7 +56,7 @@ import com.amazonaws.services.sqs.model.SetQueueAttributesRequest;
  * 
  * @author yama
  */
-public class LowLevelArchiveController extends GlacierTools {
+public class LowLevelArchiveController extends StateLessJobOperations {
 
     class SqsSetupResult {
         private final String queueUrl;

@@ -201,7 +201,7 @@ public class ArchiveLowLevelControlCmd {
     private void execDescribe() throws IOException {
         StateLessJobOperations controller = new StateLessJobOperations(region, awsPropFile);
         DescribeJobResult result = controller.describeJob(vaultname, jobId);
-
+        printDescribeJob(result);
     }
 
     private void printDescribeJob(DescribeJobResult result) {

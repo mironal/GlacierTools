@@ -280,67 +280,8 @@ public class LowLevelArchiveController extends GlacierTools {
         return executeInitiateJob(jobParameters);
     }
 
-    /**
-     * 指定したVaultの進行中、および最近完了したJobの一覧を取得する.<br>
-     * 
-     * @see <a href=
-     *      "http://docs.amazonwebservices.com/amazonglacier/latest/dev/api-jobs-get.html"
-     *      >List Jobs (GET jobs)<a>
-     * @param vaultName
-     * @return Jobの一覧
-     */
-    public List<GlacierJobDescription> listJobs(String vaultName) {
-        ListJobsRequest request = new ListJobsRequest().withVaultName(vaultName);
-        ListJobsResult result = client.listJobs(request);
-        return result.getJobList();
-    }
-
-    /**
-     * 指定したVaultの進行中、および最近完了したJobの一覧を取得する.<br>
-     * 引数に関しても下記を参照して下さい.
-     * 
-     * @see <a href=
-     *      "http://docs.amazonwebservices.com/amazonglacier/latest/dev/api-jobs-get.html"
-     *      >List Jobs (GET jobs)<a>
-     * @param vaultName
-     * @param completed
-     * @param limit
-     * @param marker
-     * @param statuscode
-     * @return Jobの一覧
-     */
-    public List<GlacierJobDescription> listJobs(String vaultName, String completed, String limit,
-            String marker, String statuscode) {
-
-        ListJobsRequest request = new ListJobsRequest().withVaultName(vaultName)
-                .withCompleted(completed).withLimit(limit).withMarker(marker)
-                .withStatuscode(statuscode);
-        ListJobsResult result = client.listJobs(request);
-        return result.getJobList();
-    }
-
-    /**
-     * 指定したVaultにあるJobIdで指定したJobの詳細を取得する.<br>
-     * 
-     * @see <a
-     *      href="http://docs.amazonwebservices.com/amazonglacier/latest/dev/api-describe-job-get.html">Describe
-     *      Job</a>
-     * @param vaultName Name of Vault.
-     * @param jobId Id of Job.
-     * @return DescribeJobResult
-     */
-    public DescribeJobResult describeJob(String vaultName, String jobId) {
-        if (vaultName == null) {
-            throw new NullPointerException("vaultName is null.");
-        }
-        if (jobId == null) {
-            throw new NullPointerException("jobId is null.");
-        }
-
-        DescribeJobRequest describeJobRequest = new DescribeJobRequest(vaultName, jobId);
-        DescribeJobResult result = client.describeJob(describeJobRequest);
-        return result;
-    }
+    
+    
 
     /**
      * Jobが完了したかをチェックする.<br>

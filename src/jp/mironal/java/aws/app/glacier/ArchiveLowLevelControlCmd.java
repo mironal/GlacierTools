@@ -199,7 +199,7 @@ public class ArchiveLowLevelControlCmd {
 
             if (controller.waitForJobToComplete()) {
                 System.out.println("job complete!");
-                //controller.printJobOutput();
+                // controller.printJobOutput();
             } else {
                 System.out.println("job fault");
             }
@@ -224,16 +224,11 @@ public class ArchiveLowLevelControlCmd {
 
     private void execListJobs(LowLevelArchiveController controller) {
         /*
-        List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
-        if (jobs.size() > 0) {
-            for (GlacierJobDescription job : jobs) {
-                System.out.println();
-                printGlacierJobDescriptionf(job);
-            }
-        } else {
-            System.out.println("There is no Job.");
-        }
-        */
+         * List<GlacierJobDescription> jobs = controller.listJobs(vaultname); if
+         * (jobs.size() > 0) { for (GlacierJobDescription job : jobs) {
+         * System.out.println(); printGlacierJobDescriptionf(job); } } else {
+         * System.out.println("There is no Job."); }
+         */
     }
 
     private void printGlacierJobDescriptionf(GlacierJobDescription description) {

@@ -251,8 +251,7 @@ public class LowLevelArchiveController extends GlacierTools {
         return result.isJobSuccessful();
     }
 
-
-    public InventoryRetrievalResult getInveInventoryJobOutput() throws JsonParseException,
+    public InventoryRetrievalResult downloadInventoryJobOutput() throws JsonParseException,
             IOException, ParseException {
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withAccountId(vaultName).withJobId(jobId);
@@ -260,7 +259,7 @@ public class LowLevelArchiveController extends GlacierTools {
         return new InventoryRetrievalResult(result.getBody());
     }
 
-    public void downloadJobOutput(File saveFile) {
+    public void downloadArchiveJobOutput(File saveFile) {
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
         GetJobOutputResult getJobOutputResult = client.getJobOutput(getJobOutputRequest);

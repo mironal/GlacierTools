@@ -3,12 +3,10 @@ package jp.mironal.java.aws.app.glacier;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -30,7 +28,6 @@ import com.amazonaws.auth.policy.Resource;
 import com.amazonaws.auth.policy.Statement;
 import com.amazonaws.auth.policy.Statement.Effect;
 import com.amazonaws.auth.policy.actions.SQSActions;
-import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.model.GetJobOutputRequest;
 import com.amazonaws.services.glacier.model.GetJobOutputResult;
 import com.amazonaws.services.glacier.model.InitiateJobRequest;
@@ -180,6 +177,12 @@ public class LowLevelArchiveController extends GlacierTools {
         return executeInitiateJob(jobParameters);
     }
 
+    private List<Message> getSqsMessage() {
+        ReceiveMessageRequest messageRequest = new ReceiveMessageRequest(sqsSetupResult.queueUrl)
+                .withMaxNumberOfMessages(10);
+        return sqsClient.receiveMessage(messageRequest).getMessages();
+    }
+
     /**
      * Jobが完了したかをチェックする.<br>
      * SQSを使ってメッセージが届いたかをチェックし、更にJobが成功したかをチェックする.<br>
@@ -194,12 +197,11 @@ public class LowLevelArchiveController extends GlacierTools {
         if (!alreadyInitiate) {
             throw new IllegalStateException("Job has not yet started");
         }
+
+        List<Message> msgs = getSqsMessage();
+
         ObjectMapper mapper = new ObjectMapper();
         JsonFactory factory = mapper.getJsonFactory();
-
-        ReceiveMessageRequest messageRequest = new ReceiveMessageRequest(sqsSetupResult.queueUrl)
-                .withMaxNumberOfMessages(10);
-        List<Message> msgs = sqsClient.receiveMessage(messageRequest).getMessages();
 
         boolean messageFound = false;
         boolean jobSuccessful = false;
@@ -212,7 +214,6 @@ public class LowLevelArchiveController extends GlacierTools {
                 JsonParser jpDesc = factory.createJsonParser(jobMessage);
                 JsonNode jobDescNode = mapper.readTree(jpDesc);
                 String retrievedJobId = jobDescNode.get("JobId").getTextValue();
-
                 String statusCode = jobDescNode.get("StatusCode").getTextValue();
 
                 if (retrievedJobId.equals(jobId)) {
@@ -236,6 +237,9 @@ public class LowLevelArchiveController extends GlacierTools {
      */
     public boolean waitForJobToComplete() throws JsonParseException, IOException,
             InterruptedException {
+        if (!alreadyInitiate) {
+            throw new IllegalStateException("Job has not yet started");
+        }
         CheckJobResult result = null;
         do {
             System.out.println("loop");
@@ -255,6 +259,10 @@ public class LowLevelArchiveController extends GlacierTools {
      */
     public InventoryRetrievalResult downloadInventoryJobOutput() throws JsonParseException,
             IOException, ParseException {
+        if (!alreadyInitiate) {
+            throw new IllegalStateException("Job has not yet started");
+        }
+
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withAccountId(vaultName).withJobId(jobId);
         GetJobOutputResult result = client.getJobOutput(getJobOutputRequest);
@@ -267,6 +275,10 @@ public class LowLevelArchiveController extends GlacierTools {
      * @param saveFile ダウンロードしたファイルの保存先.
      */
     public void downloadArchiveJobOutput(File saveFile) {
+        if (!alreadyInitiate) {
+            throw new IllegalStateException("Job has not yet started");
+        }
+
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
         GetJobOutputResult getJobOutputResult = client.getJobOutput(getJobOutputRequest);
@@ -305,6 +317,9 @@ public class LowLevelArchiveController extends GlacierTools {
      * Jobをクリーンアップする.
      */
     public void cleanUp() {
+        if (!alreadyInitiate) {
+            throw new IllegalStateException("Job has not yet started");
+        }
         snsClient.unsubscribe(new UnsubscribeRequest(snsSetupResult.subscriptionArn));
         snsClient.deleteTopic(new DeleteTopicRequest(snsSetupResult.topicArn));
         sqsClient.deleteQueue(new DeleteQueueRequest(sqsSetupResult.queueUrl));

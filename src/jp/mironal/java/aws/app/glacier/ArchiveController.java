@@ -1,3 +1,4 @@
+
 package jp.mironal.java.aws.app.glacier;
 
 import java.io.File;
@@ -23,8 +24,7 @@ public class ArchiveController extends GlacierTools {
      * 
      * @param vaultName
      * @param description
-     * @param file
-     *            アップロードするファイル.
+     * @param file アップロードするファイル.
      * @return
      * @throws FileNotFoundException
      */
@@ -42,8 +42,7 @@ public class ArchiveController extends GlacierTools {
      * 
      * @param vaultName
      * @param archiveId
-     * @param file
-     *            ダウンロードしたファイルの保存先.
+     * @param file ダウンロードしたファイルの保存先.
      */
     public void download(String vaultName, String archiveId, File file) {
         ArchiveTransferManager atm = new ArchiveTransferManager(client, credentials);
@@ -52,7 +51,6 @@ public class ArchiveController extends GlacierTools {
 
     /**
      * アーカイブの削除
-     * 
      */
     public void delete(String vaultName, String archiveId) {
         DeleteArchiveRequest dar = new DeleteArchiveRequest().withVaultName(vaultName)

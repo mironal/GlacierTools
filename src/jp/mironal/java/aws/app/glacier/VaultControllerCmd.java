@@ -1,3 +1,4 @@
+
 package jp.mironal.java.aws.app.glacier;
 
 import java.io.File;
@@ -236,7 +237,6 @@ public class VaultControllerCmd {
 
         /*
          * vaultNameが
-         * 
          * @see <a href=
          * "http://docs.amazonwebservices.com/amazonglacier/latest/dev/api-vault-put.html"
          * > <br> に違反してたらhelpを表示して終了.
@@ -249,43 +249,43 @@ public class VaultControllerCmd {
         VaultController controller = new VaultController(region, propFile);
 
         switch (cmdKind) {
-        case Create:
-            CreateVaultResult createVaultResult = controller.createVault(vaultName);
-            System.out.println("Success!");
-            System.out.println("Location:" + createVaultResult.getLocation());
-            break;
-        case Describe:
-            DescribeVaultResult describeVaultResult = controller.describeVault(vaultName);
-            System.out.println("Describing the vault: " + vaultName);
-            System.out.print("CreationDate: " + describeVaultResult.getCreationDate()
-                    + "\nLastInventoryDate: " + describeVaultResult.getLastInventoryDate()
-                    + "\nNumberOfArchives: " + describeVaultResult.getNumberOfArchives()
-                    + "\nSizeInBytes: " + describeVaultResult.getSizeInBytes() + "\nVaultARN: "
-                    + describeVaultResult.getVaultARN() + "\nVaultName: "
-                    + describeVaultResult.getVaultName());
-            System.out.println();
-            break;
-        case List:
-            List<DescribeVaultOutput> vaultList = controller.listVaults();
-            System.out.println("\nDescribing all vaults (vault list):");
-            for (DescribeVaultOutput vault : vaultList) {
-                System.out.println("\nCreationDate: " + vault.getCreationDate()
-                        + "\nLastInventoryDate: " + vault.getLastInventoryDate()
-                        + "\nNumberOfArchives: " + vault.getNumberOfArchives() + "\nSizeInBytes: "
-                        + vault.getSizeInBytes() + "\nVaultARN: " + vault.getVaultARN()
-                        + "\nVaultName: " + vault.getVaultName());
-            }
-            break;
-        case Delete:
-            controller.deleteVault(vaultName);
-            System.out.println("Deleted vault: " + vaultName);
-            break;
-        case Bad:
-            Util.printHelp();
-            break;
-        default:
-            Util.printUnKnownCommand();
-            break;
+            case Create:
+                CreateVaultResult createVaultResult = controller.createVault(vaultName);
+                System.out.println("Success!");
+                System.out.println("Location:" + createVaultResult.getLocation());
+                break;
+            case Describe:
+                DescribeVaultResult describeVaultResult = controller.describeVault(vaultName);
+                System.out.println("Describing the vault: " + vaultName);
+                System.out.print("CreationDate: " + describeVaultResult.getCreationDate()
+                        + "\nLastInventoryDate: " + describeVaultResult.getLastInventoryDate()
+                        + "\nNumberOfArchives: " + describeVaultResult.getNumberOfArchives()
+                        + "\nSizeInBytes: " + describeVaultResult.getSizeInBytes() + "\nVaultARN: "
+                        + describeVaultResult.getVaultARN() + "\nVaultName: "
+                        + describeVaultResult.getVaultName());
+                System.out.println();
+                break;
+            case List:
+                List<DescribeVaultOutput> vaultList = controller.listVaults();
+                System.out.println("\nDescribing all vaults (vault list):");
+                for (DescribeVaultOutput vault : vaultList) {
+                    System.out.println("\nCreationDate: " + vault.getCreationDate()
+                            + "\nLastInventoryDate: " + vault.getLastInventoryDate()
+                            + "\nNumberOfArchives: " + vault.getNumberOfArchives()
+                            + "\nSizeInBytes: " + vault.getSizeInBytes() + "\nVaultARN: "
+                            + vault.getVaultARN() + "\nVaultName: " + vault.getVaultName());
+                }
+                break;
+            case Delete:
+                controller.deleteVault(vaultName);
+                System.out.println("Deleted vault: " + vaultName);
+                break;
+            case Bad:
+                Util.printHelp();
+                break;
+            default:
+                Util.printUnKnownCommand();
+                break;
         }
 
         if (debug) {

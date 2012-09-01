@@ -1,3 +1,4 @@
+
 package jp.mironal.java.aws.app.glacier;
 
 import java.io.File;
@@ -264,95 +265,95 @@ public class ArchiveControllerCmd {
         VaultController vaultController = new VaultController(region, propFile);
 
         switch (cmdKind) {
-        case Upload:
-            /* オプションが揃ってるかチェック */
-            if ((vaultName == null) || (filename == null)) {
-                Util.printUploadHelp();
-                System.exit(-1);
-            }
+            case Upload:
+                /* オプションが揃ってるかチェック */
+                if ((vaultName == null) || (filename == null)) {
+                    Util.printUploadHelp();
+                    System.exit(-1);
+                }
 
-            /* 指定したファイルが存在してなかったり、ファイルじゃなかったりしたらエラー吐いて終了 */
-            File uploadFile = new File(filename);
-            if (!uploadFile.exists()) {
-                Util.printFileNotFoundError(filename);
-                System.exit(-1);
-            }
-            if (!uploadFile.isFile()) {
-                Util.printFileIsNotFileError(filename);
-                System.exit(-1);
-            }
-
-            /* vaultの存在確認. なかったらエラー吐いて終了 */
-            if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
-                System.exit(-1);
-            }
-
-            String description = new Date().toString();
-            UploadResult uploadResult = archiveController
-                    .upload(vaultName, description, uploadFile);
-            if (printArchiveIdOnly) {
-                System.out.println(uploadResult.getArchiveId());
-            } else {
-                System.out.println("Archive ID:" + uploadResult.getArchiveId());
-            }
-            break;
-        case Download:
-            /* オプションが揃ってるかチェック */
-            if ((vaultName == null) || (filename == null) || (archiveId == null)) {
-                Util.printDownloadHelp();
-                System.exit(-1);
-            }
-            /*
-             * 指定したファイルがすでに存在していたらエラー吐いて終了. <br>
-             * ただし、forceフラグが立っていたら、ファイルを削除して作成する
-             * (ぶっちゃけ消さなくてもAPI側で上書きしてくれるのかも).<br>
-             * ファイルが存在していて、実はファイルじゃなかった場合も適切なエラーを吐いて終了する.
-             */
-            File downloadFile = new File(filename);
-            if (downloadFile.exists()) {
-                if (downloadFile.isFile()) {
-                    if (force) {
-                        downloadFile.delete();
-                    } else {
-                        Util.printFileExistError(filename);
-                        System.exit(-1);
-                    }
-                } else {
+                /* 指定したファイルが存在してなかったり、ファイルじゃなかったりしたらエラー吐いて終了 */
+                File uploadFile = new File(filename);
+                if (!uploadFile.exists()) {
+                    Util.printFileNotFoundError(filename);
+                    System.exit(-1);
+                }
+                if (!uploadFile.isFile()) {
                     Util.printFileIsNotFileError(filename);
                     System.exit(-1);
                 }
-            }
 
-            /* vaultの存在確認. なかったらエラー吐いて終了 */
-            if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
-                System.exit(-1);
-            }
+                /* vaultの存在確認. なかったらエラー吐いて終了 */
+                if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
+                    System.exit(-1);
+                }
 
-            archiveController.download(vaultName, archiveId, downloadFile);
-            System.out.println("download success!");
+                String description = new Date().toString();
+                UploadResult uploadResult = archiveController.upload(vaultName, description,
+                        uploadFile);
+                if (printArchiveIdOnly) {
+                    System.out.println(uploadResult.getArchiveId());
+                } else {
+                    System.out.println("Archive ID:" + uploadResult.getArchiveId());
+                }
+                break;
+            case Download:
+                /* オプションが揃ってるかチェック */
+                if ((vaultName == null) || (filename == null) || (archiveId == null)) {
+                    Util.printDownloadHelp();
+                    System.exit(-1);
+                }
+                /*
+                 * 指定したファイルがすでに存在していたらエラー吐いて終了. <br>
+                 * ただし、forceフラグが立っていたら、ファイルを削除して作成する
+                 * (ぶっちゃけ消さなくてもAPI側で上書きしてくれるのかも).<br>
+                 * ファイルが存在していて、実はファイルじゃなかった場合も適切なエラーを吐いて終了する.
+                 */
+                File downloadFile = new File(filename);
+                if (downloadFile.exists()) {
+                    if (downloadFile.isFile()) {
+                        if (force) {
+                            downloadFile.delete();
+                        } else {
+                            Util.printFileExistError(filename);
+                            System.exit(-1);
+                        }
+                    } else {
+                        Util.printFileIsNotFileError(filename);
+                        System.exit(-1);
+                    }
+                }
 
-            break;
-        case Delete:
-            /* オプションが揃ってるかチェック */
-            if ((vaultName == null) || (archiveId == null)) {
-                Util.printDeleteHelp();
-                System.exit(-1);
-            }
+                /* vaultの存在確認. なかったらエラー吐いて終了 */
+                if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
+                    System.exit(-1);
+                }
 
-            /* vaultの存在確認. なかったらエラー吐いて終了 */
-            if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
-                System.exit(-1);
-            }
+                archiveController.download(vaultName, archiveId, downloadFile);
+                System.out.println("download success!");
 
-            archiveController.delete(vaultName, archiveId);
-            System.out.println("delete success!");
-            break;
-        case Bad:
-            Util.printHelp();
-            break;
-        default:
-            Util.printUnknownCommand();
-            break;
+                break;
+            case Delete:
+                /* オプションが揃ってるかチェック */
+                if ((vaultName == null) || (archiveId == null)) {
+                    Util.printDeleteHelp();
+                    System.exit(-1);
+                }
+
+                /* vaultの存在確認. なかったらエラー吐いて終了 */
+                if (!Util.checkVaultAndPrintErr(vaultName, vaultController)) {
+                    System.exit(-1);
+                }
+
+                archiveController.delete(vaultName, archiveId);
+                System.out.println("delete success!");
+                break;
+            case Bad:
+                Util.printHelp();
+                break;
+            default:
+                Util.printUnknownCommand();
+                break;
         }
 
         if (debug) {

@@ -8,6 +8,7 @@ import java.util.Properties;
 
 public class RestoreJobController {
 
+    @SuppressWarnings("serial")
     class JobRestoreParamNotFoundException extends RuntimeException {
         public JobRestoreParamNotFoundException(String msg) {
             super(msg);

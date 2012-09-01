@@ -1,3 +1,4 @@
+
 package jp.mironal.java.aws.app.glacier;
 
 import java.io.File;
@@ -19,7 +20,6 @@ import com.amazonaws.services.glacier.model.ListVaultsResult;
  * コメントいらないっしょｗｗｗ
  * 
  * @author yama
- * 
  */
 public class VaultController extends GlacierTools {
 
@@ -38,9 +38,7 @@ public class VaultController extends GlacierTools {
     }
 
     /**
-     * 
-     * @param endpoint
-     *            endpointの省略形　{@link GlacierTools#endpointSet()}
+     * @param endpoint endpointの省略形　{@link GlacierTools#endpointSet()}
      * @throws IOException
      */
     public VaultController(Region endpoint, File awsProperties) throws IOException {
@@ -48,7 +46,6 @@ public class VaultController extends GlacierTools {
     }
 
     /**
-     * 
      * @param vaultName
      * @return
      */
@@ -59,7 +56,6 @@ public class VaultController extends GlacierTools {
     }
 
     /**
-     * 
      * @param vaultName
      * @return
      */
@@ -80,7 +76,6 @@ public class VaultController extends GlacierTools {
     }
 
     /**
-     * 
      * @param vaultName
      */
     public void deleteVault(String vaultName) {

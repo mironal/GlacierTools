@@ -4,7 +4,6 @@ package jp.mironal.java.aws.app.glacier;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 

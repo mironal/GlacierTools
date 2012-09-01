@@ -91,38 +91,7 @@ public class LowLevelArchiveController extends GlacierTools {
      */
     public static void downloadJobOutput(String jobId, String vaultName, File saveFile,
             AmazonGlacierClient client) {
-        GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
-                .withVaultName(vaultName).withJobId(jobId);
-        GetJobOutputResult getJobOutputResult = client.getJobOutput(getJobOutputRequest);
 
-        InputStream in = new BufferedInputStream(getJobOutputResult.getBody());
-        OutputStream out = null;
-        try {
-            out = new BufferedOutputStream(new FileOutputStream(saveFile));
-            byte[] buffer = new byte[1024 * 1024];
-            int byteRead = 0;
-            do {
-                byteRead = in.read(buffer);
-                if (byteRead <= 0) {
-                    break;
-                }
-                out.write(buffer, 0, byteRead);
-            } while (byteRead > 0);
-        } catch (IOException e) {
-            throw new AmazonClientException("Unable to save archive", e);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException ignore) {
-
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException ignore) {
-                }
-            }
-        }
     }
 
     private AmazonSQSClient sqsClient;
@@ -329,8 +298,38 @@ public class LowLevelArchiveController extends GlacierTools {
     }
 
     public void downloadJobOutput(File saveFile) {
-        LowLevelArchiveController.downloadJobOutput(this.jobId, this.vaultName, saveFile,
-                this.client);
+        GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
+                .withVaultName(vaultName).withJobId(jobId);
+        GetJobOutputResult getJobOutputResult = client.getJobOutput(getJobOutputRequest);
+
+        InputStream in = new BufferedInputStream(getJobOutputResult.getBody());
+        OutputStream out = null;
+        try {
+            out = new BufferedOutputStream(new FileOutputStream(saveFile));
+            byte[] buffer = new byte[1024 * 1024];
+            int byteRead = 0;
+            do {
+                byteRead = in.read(buffer);
+                if (byteRead <= 0) {
+                    break;
+                }
+                out.write(buffer, 0, byteRead);
+            } while (byteRead > 0);
+        } catch (IOException e) {
+            throw new AmazonClientException("Unable to save archive", e);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ignore) {
+
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ignore) {
+                }
+            }
+        }
     }
 
     public void cleanUp() {

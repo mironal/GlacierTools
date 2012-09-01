@@ -9,13 +9,13 @@ import java.text.ParseException;
 import org.codehaus.jackson.JsonParseException;
 import org.junit.Test;
 
-public class InventoryRetrievalOutputParserTest {
+public class InventoryRetrievalResultTest {
 
     @Test
     public void test() throws JsonParseException, UnsupportedEncodingException, IOException,
             ParseException {
 
-        new InventoryRetrievalOutputParser(new FileInputStream("TestString.json"));
+        new InventoryRetrievalResult(new FileInputStream("TestString.json"));
     }
 
 }

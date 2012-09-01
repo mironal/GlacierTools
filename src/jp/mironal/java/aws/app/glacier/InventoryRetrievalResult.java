@@ -13,7 +13,7 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
-public class InventoryRetrievalOutputParser {
+public class InventoryRetrievalResult {
 
     public class ArchiveInfo {
         private String archiveId;
@@ -55,7 +55,7 @@ public class InventoryRetrievalOutputParser {
     private final String inventoryDate;
     private final List<ArchiveInfo> archiveList = new ArrayList<ArchiveInfo>();
 
-    public InventoryRetrievalOutputParser(InputStream in) throws JsonParseException, IOException,
+    public InventoryRetrievalResult(InputStream in) throws JsonParseException, IOException,
             ParseException {
 
         ObjectMapper mapper = new ObjectMapper();

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,6 @@ import com.amazonaws.services.glacier.model.InitiateJobResult;
 import com.amazonaws.services.glacier.model.JobParameters;
 import com.amazonaws.services.glacier.model.ListJobsRequest;
 import com.amazonaws.services.glacier.model.ListJobsResult;
-import com.amazonaws.services.glacier.model.transform.GlacierJobDescriptionJsonUnmarshaller;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
@@ -388,9 +388,6 @@ public class LowLevelArchiveController extends GlacierTools {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(getJobOutputResult.getBody()));
 
-        
-        
-        
         try {
             String line = null;
             while ((line = br.readLine()) != null) {
@@ -405,6 +402,14 @@ public class LowLevelArchiveController extends GlacierTools {
 
             }
         }
+    }
+
+    public InventoryRetrievalResult getInveInventoryJobOutput() throws JsonParseException,
+            IOException, ParseException {
+        GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
+                .withAccountId(vaultName).withJobId(jobId);
+        GetJobOutputResult result = client.getJobOutput(getJobOutputRequest);
+        return new InventoryRetrievalResult(result.getBody());
     }
 
     public void downloadJobOutput(File saveFile) {

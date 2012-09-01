@@ -214,7 +214,7 @@ public class ArchiveLowLevelControlCmd {
                 execBad();
                 break;
             default:
-                throw new IllegalStateException("Unkonwn cmd");
+                throw new IllegalStateException("Unkonwn cmd.");
         }
     }
 
@@ -257,7 +257,6 @@ public class ArchiveLowLevelControlCmd {
             default:
                 throw new IllegalStateException("Unknown type");
         }
-
     }
 
     private void execList() throws IOException {
@@ -327,17 +326,20 @@ public class ArchiveLowLevelControlCmd {
                         break;
                 }
                 break;
+
             case Inventory:
                 if (vaultname == null) {
                     ok = false;
                 }
 
                 break;
+
             case List:
                 if (vaultname == null) {
                     ok = false;
                 }
                 break;
+
             case Describe:
                 if (vaultname == null) {
                     ok = false;
@@ -365,7 +367,7 @@ public class ArchiveLowLevelControlCmd {
                 break;
 
             default:
-                break;
+                throw new IllegalStateException("Unknown type.");
         }
     }
 

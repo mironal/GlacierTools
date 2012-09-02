@@ -195,4 +195,16 @@ public class ArchiveControllerCmdTest {
         assertEquals(cmd.filename, "filename");
         assertFalse(cmd.validateParam());
     }
+
+    @Test
+    public void test_Help() {
+        ArchiveControllerCmd cmd = new ArchiveControllerCmd(new String[] {
+            "help"
+        });
+        assertEquals(cmd.cmdKind, ArchiveCmdKind.Help);
+        assertNull(cmd.filename);
+        assertNull(cmd.vaultName);
+        assertNull(cmd.archiveId);
+        assertTrue(cmd.validateParam());
+    }
 }

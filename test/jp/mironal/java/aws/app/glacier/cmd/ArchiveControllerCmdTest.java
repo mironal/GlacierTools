@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveControllerCmd.ArchiveCmdKind;
 
@@ -134,7 +133,7 @@ public class ArchiveControllerCmdTest {
     @Test
     public void test_Region() {
         ArchiveControllerCmd cmd = new ArchiveControllerCmd(new String[] {
-                "upload", "--vault", "hogehoge", "--file", "filename", "--endpoint", "us-east-1"
+                "upload", "--vault", "hogehoge", "--file", "filename", "--region", "us-east-1"
         });
 
         assertEquals(cmd.cmdKind, ArchiveCmdKind.Upload);
@@ -143,7 +142,7 @@ public class ArchiveControllerCmdTest {
         assertEquals(cmd.region, Region.US_EAST_1);
 
         cmd = new ArchiveControllerCmd(new String[] {
-                "upload", "--vault", "hogehoge", "--file", "filename", "--endpoint", "us-west-1"
+                "upload", "--vault", "hogehoge", "--file", "filename", "--region", "us-west-1"
         });
 
         assertEquals(cmd.cmdKind, ArchiveCmdKind.Upload);
@@ -152,18 +151,13 @@ public class ArchiveControllerCmdTest {
         assertEquals(cmd.region, Region.US_WEST_1);
 
         cmd = new ArchiveControllerCmd(new String[] {
-                "upload", "--vault", "hogehoge", "--file", "filename", "--endpoint", "us-west-2"
+                "upload", "--vault", "hogehoge", "--file", "filename", "--region", "us-west-2"
         });
 
-        try {
-            assertEquals(cmd.region, Region.US_WEST_2);
-        } catch (InvalidRegionException e) {
-            fail();
-            e.printStackTrace();
-        }
+        assertEquals(cmd.region, Region.US_WEST_2);
 
         cmd = new ArchiveControllerCmd(new String[] {
-                "upload", "--vault", "hogehoge", "--file", "filename", "--endpoint", "eu-west-1"
+                "upload", "--vault", "hogehoge", "--file", "filename", "--region", "eu-west-1"
         });
 
         assertEquals(cmd.cmdKind, ArchiveCmdKind.Upload);
@@ -172,8 +166,7 @@ public class ArchiveControllerCmdTest {
         assertEquals(cmd.region, Region.EU_WEST_1);
 
         cmd = new ArchiveControllerCmd(new String[] {
-                "upload", "--vault", "hogehoge", "--file", "filename", "--endpoint",
-                "ap-northeast-1"
+                "upload", "--vault", "hogehoge", "--file", "filename", "--region", "ap-northeast-1"
         });
 
         assertEquals(cmd.cmdKind, ArchiveCmdKind.Upload);
@@ -186,8 +179,7 @@ public class ArchiveControllerCmdTest {
     @Test()
     public void test_Region_Invalid() throws InvalidRegionException {
         ArchiveControllerCmd cmd = new ArchiveControllerCmd(new String[] {
-                "create", "--vault", "hogehoge", "--file", "filename", "--endpoint", "aa",
-                "--debug"
+                "create", "--vault", "hogehoge", "--file", "filename", "--region", "aa", "--debug"
         });
         assertNull(cmd.region);
         assertEquals(cmd.cmdKind, ArchiveCmdKind.Bad);

@@ -264,8 +264,10 @@ public class JobOperatorCmd extends CmdUtils {
                 break;
             case Help:
                 break;
+            case Bad:
+                break;
             default:
-                throw new IllegalStateException("Unknown type.");
+                throw new IllegalStateException("Unknown type." + cmdKind);
         }
 
         return ok;

@@ -256,4 +256,14 @@ public class JobOperatorCmdTest {
         assertEquals(cmd.syncType, Sync.Sync);
         assertTrue(cmd.validateParam());
     }
+
+    @Test
+    public void test_InvalidCommand() {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
+            "hoge"
+        });
+
+        assertTrue(cmd.validateParam());
+        assertEquals(cmd.cmdKind, JobOperatorCmdKind.Bad);
+    }
 }

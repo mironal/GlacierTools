@@ -44,7 +44,7 @@ JobはAmazon Glaierに保存したArchiveやArchiveの一覧を取得するた�
 
 また、Jobには現在以下の種類があります。
 1. Archiveのダウンロード
-2. Archiveの一覧取得
+2. Vaultの目録取得(Archiveの一覧取得)
 
 ##Jobの開始とは？
 Amazon GlaierにJobの開始を指示することです。Amazon Glaierに指示を出すとすぐにJobのID等を含むレスポンスが来ます。この後4時間程度Jobの完了を待つ必要があります。
@@ -59,12 +59,12 @@ Job出力とはArchiveのデータそのものや、Archiveの一覧を含むテ
 
 #コマンドの使用方法
 ##コマンド構成
-コマンドは以下の3つから構成されています。
+コマンドは以下の4つから構成されています。
 
 1. vault_controller.jar
 2. archive_controller.jar
 3. job_operator.jar
-
+4. restore_job.jar
 
 
 ## vault_controller.jar
@@ -181,4 +181,71 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
      java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
      
 
-     
+## job_operator.jar
+Jobに対する操作を行うコマンドです.以下の機能を提供します.
+
+1. Jobの開始
+  1. Vaultの目録取得
+  2. Archiveのダウンロード
+2. Job出力の取得
+3. Jobの詳細取得
+4. Jobの一覧取得
+5. Jobの待機
+
+Jobの開始の際に--asyncオプションをつけることによって、Jobの完了を待機せずにプログラムを終了できます.終了時にJobの復元に必要なパラメータが出力されるので、restore_job.jarと組み合わせることで非同期的にJobの制御を行うことができます.
+
+###使用方法
+`java -jar job_operator.jar cmd [--vault vaultname]　[--archive archiveId] [--file filename] [--job jobId] [--region region] [--properties prop_filename] [--async]`
+
+    cmd          : inventory | archive | list | desc | help
+    --vault      : The name of the Vault.
+    --archive    : The ID of the Archive.
+    --job        : The ID of the Job.
+    --file       : Save file name.
+    --region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
+    --properties : If you want to specify explicitly AwsCredentials.properties.
+    
+###example
+####Vaultの目録取得(Get Vault inventory)
+#####デフォルトのリージョン(us-east-1)のvaultnameというVaultの目録を取得
+    java -jar job_operator.jar inventory --vault vaultname
+##### リージョン指定
+    java -jar job_operator.jar inventory --vault vaultname --region ap-northeast-1
+#####AwsCredentials.properties指定
+    java -jar job_operator.jar inventory --vault vaultname --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar job_operator.jar inventory --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
+    
+####Archiveのダウンロード(Download Archive)
+#####デフォルトのリージョン(us-east-1)のvaultnameというVaultにあるarchiveIdのArchiveをfilenameという名前でダウンロード
+    java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename
+##### リージョン指定
+    java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename --region ap-northeast-1
+#####AwsCredentials.properties指定
+    java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename --region us-west-2 --properties myAwsPropFile.properties
+    
+####Jobの一覧を取得(Get Job list)
+#####デフォルトのリージョン(us-east-1)のvaultnameというVaultのJob一覧を取得
+    java -jar job_operator.jar list --vault vaultname
+##### リージョン指定
+    java -jar job_operator.jar list --vault vaultname --region ap-northeast-1
+#####AwsCredentials.properties指定
+    java -jar job_operator.jar list --vault vaultname --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar job_operator.jar list --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
+    
+※取得できるのは進行中、または最近完了したJobの一覧です.
+
+####Jobの詳細を取得(Get Job Describe )
+#####デフォルトのリージョン(us-east-1)のvaultnameというVaultのjobIdのJobの詳細を取得
+    java -jar job_operator.jar desc --vault vaultname --job jobId
+##### リージョン指定
+    java -jar job_operator.jar desc --vault vaultname --job jobId --region ap-northeast-1
+#####AwsCredentials.properties指定
+    java -jar job_operator.jar desc --vault vaultname --job jobId --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar job_operator.jar desc --vault vaultname --job jobId --region us-west-2 --properties myAwsPropFile.properties
+    
+

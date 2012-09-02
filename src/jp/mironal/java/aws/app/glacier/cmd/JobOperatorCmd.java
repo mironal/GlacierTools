@@ -23,7 +23,7 @@ import com.amazonaws.services.glacier.model.GlacierJobDescription;
 public class JobOperatorCmd extends CmdUtils {
 
     enum ArchiveLowLevelKind {
-        Bad, Inventory, Archive, List, Describe,
+        Bad, Inventory, Archive, List, Describe, Help
 
     }
 
@@ -61,7 +61,7 @@ public class JobOperatorCmd extends CmdUtils {
                 setCmdKind(ArchiveLowLevelKind.Describe);
             }
 
-            if (arg.equals("async")) {
+            if (arg.equals("--async")) {
                 syncType = Sync.Async;
             }
 
@@ -125,10 +125,6 @@ public class JobOperatorCmd extends CmdUtils {
             /* オプション違反 */
             this.cmdKind = ArchiveLowLevelKind.Bad;
         }
-    }
-
-    private void execBad() {
-
     }
 
     private void execDescribe() throws IOException {
@@ -325,27 +321,6 @@ public class JobOperatorCmd extends CmdUtils {
         System.out.println("VaultARN             : " + description.getVaultARN());
     }
 
-    /**
-     * [] is must.<br>
-     * {} is option.<br>
-     * <br>
-     * java -jar lowlevelControl.jar [jobType] {syncType}<br>
-     * {--vault vaultname}<br>
-     * {--archive archiveId}<br>
-     * {--job jobId}<br>
-     * {--endpoint endpoint}<br>
-     * {--properties properties_filename}<br>
-     * <br>
-     * <br>
-     * <br>
-     * 
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        new JobOperatorCmd(args).exec();
-    }
-
     @Override
     void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
         System.err.println(filename + " is not found.");
@@ -374,7 +349,7 @@ public class JobOperatorCmd extends CmdUtils {
                 execDescribe();
                 break;
             case Bad:
-                execBad();
+
                 break;
             default:
                 throw new IllegalStateException("Unkonwn cmd.");
@@ -386,6 +361,14 @@ public class JobOperatorCmd extends CmdUtils {
     void onExecInvalidParam() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        new JobOperatorCmd(args).exec();
     }
 
 }

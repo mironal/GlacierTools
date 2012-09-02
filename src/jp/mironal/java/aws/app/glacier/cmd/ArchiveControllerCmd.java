@@ -111,23 +111,15 @@ public class ArchiveControllerCmd extends CmdUtils {
 
     }
 
-    boolean existVault(String vaultName, VaultController vaultController) {
-        List<DescribeVaultOutput> describeVaultOutputs = vaultController.listVaults();
+    private boolean existVault(String vaultName) throws IOException {
+        VaultController controller = new VaultController(region, awsPropFile);
+        List<DescribeVaultOutput> describeVaultOutputs = controller.listVaults();
         for (DescribeVaultOutput output : describeVaultOutputs) {
             if (output.getVaultName().equals(vaultName)) {
                 return true;
             }
         }
         return false;
-    }
-
-    boolean checkVaultAndPrintErr(String vaultName) throws IOException {
-        VaultController controller = new VaultController(region, awsPropFile);
-        if (!existVault(vaultName, controller)) {
-            System.err.println(vaultName + " is not exist.");
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -197,7 +189,7 @@ public class ArchiveControllerCmd extends CmdUtils {
 
     private void execUpload() throws IOException {
         ArchiveController archiveController = new ArchiveController(region, awsPropFile);
-        String description = new Date().toString();
+        String description = uploadFile.getName();
         UploadResult uploadResult = archiveController.upload(vaultName, description, uploadFile);
         if (printArchiveIdOnly) {
             System.out.println(uploadResult.getArchiveId());
@@ -252,16 +244,19 @@ public class ArchiveControllerCmd extends CmdUtils {
     void onExecCommand() throws Exception {
         switch (cmdKind) {
             case Upload:
-
                 /* 指定したファイルが存在してなかったり、ファイルじゃなかったりしたらエラー吐いて終了 */
                 if (!checkFileExist(filename)) {
+                    System.err.println(filename + " not found.");
                     System.exit(-1);
+                }
+
+                if (!existVault(vaultName)) {
+                    System.err.println(vaultName + " is not exist.");
                 }
 
                 execUpload();
                 break;
             case Download:
-
                 /*
                  * 指定したファイルがすでに存在していたらエラー吐いて終了. <br>
                  * ただし、forceフラグが立っていたら、ファイルを削除して作成する
@@ -269,13 +264,21 @@ public class ArchiveControllerCmd extends CmdUtils {
                  * ファイルが存在していて、実はファイルじゃなかった場合も適切なエラーを吐いて終了する.
                  */
                 if (!deleteFile(filename)) {
+                    System.err.println(filename + " is exist.");
                     System.exit(-1);
+                }
+
+                if (!existVault(vaultName)) {
+                    System.err.println(vaultName + " is not exist.");
                 }
 
                 execDownload();
 
                 break;
             case Delete:
+                if (!existVault(vaultName)) {
+                    System.err.println(vaultName + " is not exist.");
+                }
 
                 execDelete();
                 break;
@@ -283,6 +286,7 @@ public class ArchiveControllerCmd extends CmdUtils {
             case Bad:
                 execBad();
                 break;
+
             default:
                 throw new IllegalStateException("Unknown command.");
         }
@@ -302,6 +306,18 @@ public class ArchiveControllerCmd extends CmdUtils {
         System.exit(-1);
     }
 
+    @Override
+    void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
+        System.err.println(filename + " is not found.");
+        setCmdKind(ArchiveCmdKind.Bad);
+    }
+
+    @Override
+    void onRegionNotFound(String endpointStr, Throwable e) {
+        System.err.println(e.getMessage() + " is not found.");
+        setCmdKind(ArchiveCmdKind.Bad);
+    }
+
     /**
      * java -jar ArchiveController.jar upload --vault vaultname --file filename
      * --endpoint endpoint<br>
@@ -317,15 +333,4 @@ public class ArchiveControllerCmd extends CmdUtils {
         new ArchiveControllerCmd(args).exec();
     }
 
-    @Override
-    void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
-        System.err.println(filename + " is not found.");
-        setCmdKind(ArchiveCmdKind.Bad);
-    }
-
-    @Override
-    void onRegionNotFound(String endpointStr, Throwable e) {
-        System.err.println(e.getMessage() + " is not found.");
-        setCmdKind(ArchiveCmdKind.Bad);
-    }
 }

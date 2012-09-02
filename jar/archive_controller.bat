@@ -1,2 +1,2 @@
 @echo off
-java -jar %~dp0ArchiveContoller.jar --properties %~dp0 %*
+java -jar %~dp0archive_controller.jar --properties %~dp0 %*

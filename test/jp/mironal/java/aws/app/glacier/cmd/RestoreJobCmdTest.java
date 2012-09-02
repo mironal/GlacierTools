@@ -48,8 +48,10 @@ public class RestoreJobCmdTest {
         });
 
         assertEquals(cmd.region, Region.US_WEST_2);
-        assertEquals(cmd.jobId, "hogehoge");
-        assertEquals(cmd.vaultname, "piyopiyo");
+        assertNotNull(cmd.jobRestoreParam);
+        assertEquals(cmd.jobRestoreParam.getJobId(), "hogehoge");
+        assertEquals(cmd.jobRestoreParam.getVaultName(), "piyopiyo");
+        assertEquals(cmd.jobRestoreParam.getRegion(), Region.US_WEST_2);
         assertEquals(cmd.cmdKind, RestoreJobCmdKind.Download);
         assertTrue(cmd.validateParam());
     }
@@ -68,8 +70,9 @@ public class RestoreJobCmdTest {
         });
 
         assertEquals(cmd.region, Region.US_WEST_2);
-        assertEquals(cmd.jobId, "hogehoge");
-        assertEquals(cmd.vaultname, "piyopiyo");
+        assertEquals(cmd.jobRestoreParam.getJobId(), "hogehoge");
+        assertEquals(cmd.jobRestoreParam.getVaultName(), "piyopiyo");
+        assertEquals(cmd.jobRestoreParam.getRegion(), Region.US_WEST_2);
         assertEquals(cmd.cmdKind, RestoreJobCmdKind.Check);
         assertTrue(cmd.validateParam());
     }
@@ -88,8 +91,9 @@ public class RestoreJobCmdTest {
         });
 
         assertEquals(cmd.region, Region.US_WEST_2);
-        assertEquals(cmd.jobId, "hogehoge");
-        assertEquals(cmd.vaultname, "piyopiyo");
+        assertEquals(cmd.jobRestoreParam.getJobId(), "hogehoge");
+        assertEquals(cmd.jobRestoreParam.getVaultName(), "piyopiyo");
+        assertEquals(cmd.jobRestoreParam.getRegion(), Region.US_WEST_2);
         assertEquals(cmd.cmdKind, RestoreJobCmdKind.Desc);
         assertTrue(cmd.validateParam());
     }
@@ -108,8 +112,7 @@ public class RestoreJobCmdTest {
         });
 
         assertNull(cmd.region);
-        assertNull(cmd.jobId);
-        assertNull(cmd.vaultname);
+        assertNull(cmd.jobRestoreParam);
         assertEquals(cmd.cmdKind, RestoreJobCmdKind.Help);
         assertTrue(cmd.validateParam());
 
@@ -118,8 +121,7 @@ public class RestoreJobCmdTest {
         });
 
         assertNull(cmd.region);
-        assertNull(cmd.jobId);
-        assertNull(cmd.vaultname);
+        assertNull(cmd.jobRestoreParam);
         assertEquals(cmd.cmdKind, RestoreJobCmdKind.Help);
         assertTrue(cmd.validateParam());
 
@@ -128,8 +130,7 @@ public class RestoreJobCmdTest {
         });
 
         assertNull(cmd.region);
-        assertNull(cmd.jobId);
-        assertNull(cmd.vaultname);
+        assertNull(cmd.jobRestoreParam);
         assertEquals(cmd.cmdKind, RestoreJobCmdKind.Help);
         assertTrue(cmd.validateParam());
     }

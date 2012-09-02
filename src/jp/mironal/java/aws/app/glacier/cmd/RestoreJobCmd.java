@@ -7,6 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import jp.mironal.java.aws.app.glacier.JobOperator;
+import jp.mironal.java.aws.app.glacier.JobRestoreParam;
+import jp.mironal.java.aws.app.glacier.JobRestoreParam.Builder;
+
 public class RestoreJobCmd extends CmdUtils {
 
     enum RestoreJobCmdKind {
@@ -20,8 +24,7 @@ public class RestoreJobCmd extends CmdUtils {
         }
     }
 
-    String jobId = null;
-    String vaultname = null;
+    JobRestoreParam jobRestoreParam = null;
     RestoreJobCmdKind cmdKind = RestoreJobCmdKind.Bad;
 
     /**
@@ -104,9 +107,14 @@ public class RestoreJobCmd extends CmdUtils {
                 throw new JobRestoreException("Region not found.");
             }
 
-            this.jobId = properties.getProperty("JobId");
-            this.vaultname = properties.getProperty("VaultName");
+            // region周りの処理がうまくないが、目をつぶる.
             setRegion(properties.getProperty("Region"));
+            Builder builder = new Builder();
+            builder.setJobId(properties.getProperty("JobId"));
+            builder.setVaultName(properties.getProperty("VaultName"));
+            builder.setRegion(this.region);
+            jobRestoreParam = builder.build();
+
         } catch (FileNotFoundException ignore) {
             // 無視するが念のためStackTraceは出す.
             ignore.printStackTrace();
@@ -131,6 +139,7 @@ public class RestoreJobCmd extends CmdUtils {
     }
 
     private void execDownload() throws IOException {
+        JobOperator operator = JobOperator.restoreJob(jobRestoreParam, awsPropFile);
         // Jobの種類(archive, inventory)のチェック
         // 完了状態をチェック
         // 完了してなからったら待つ
@@ -178,15 +187,11 @@ public class RestoreJobCmd extends CmdUtils {
             ok = false;
         }
 
-        if (jobId == null) {
-            debugPrint("jobId is null.");
+        if (jobRestoreParam == null) {
+            debugPrint("jobRestoreParam is null.");
             ok = false;
         }
 
-        if (vaultname == null) {
-            debugPrint("vaultname is null.");
-            ok = false;
-        }
         return ok;
     }
 

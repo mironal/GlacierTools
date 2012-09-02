@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.VaultController;
 
@@ -14,121 +13,14 @@ import com.amazonaws.services.glacier.model.DescribeVaultOutput;
 import com.amazonaws.services.glacier.model.DescribeVaultResult;
 
 public class VaultControllerCmd {
-    private VaultControllerCmd() {
-    }
 
-    static class Util {
-        private Util() {
-        }
+    String endpointStr = null; /**/
+    Kind cmdKind = Kind.Bad;
+    String vaultName = "";
+    boolean debug = false;
+    String propertiesName = null;
 
-        public static void printSpace4() {
-            System.out.print("    ");
-        }
-
-        public static boolean checkUseVaultName(Kind cmdKind) {
-            return (cmdKind == Kind.Create) || (cmdKind == Kind.Describe)
-                    || (cmdKind == Kind.Delete);
-        }
-
-        public static void printEndpointHelp() {
-            System.out.println("endpoints are");
-            for (Region r : Region.values()) {
-                printSpace4();
-                System.out.println(r.toString() + " => "
-                        + VaultController.makeUrl(AwsService.Glacier, r));
-            }
-        }
-
-        public static void printPropertiesHelp() {
-            System.out.println(VaultController.AWS_PROPERTIES_FILENAME + " is not found.");
-            System.out.println("specify AwsCredentials.properties directory or filename");
-            System.out.println("--properties path or filename");
-            System.out
-                    .println("see : http://docs.amazonwebservices.com/amazonglacier/latest/dev/using-aws-sdk-for-java.html");
-        }
-
-        public static void printVaultNameHelp() {
-            System.out.println("Illegal vault name.");
-            System.out
-                    .println("see : http://docs.amazonwebservices.com/amazonglacier/latest/dev/api-vault-put.html");
-        }
-
-        public static void printUnKnownCommand() {
-            System.out.println("unknown comannd...");
-            printHelp();
-        }
-
-        public static void printHelp() {
-            System.out.println("Command example.");
-            System.out.println();
-            printSpace4();
-            System.out.println("java -jar VaultController.jar create vaultname");
-            printSpace4();
-            System.out.println("java -jar VaultController.jar describe vaultname");
-            printSpace4();
-            System.out.println("java -jar VaultController.jar list");
-            printSpace4();
-            System.out.println("java -jar VaultController.jar delete vaultname");
-            printSpace4();
-            System.out.println();
-            printSpace4();
-            System.out.println("with endpoint use --endpoint option.");
-            printSpace4();
-            System.out
-                    .println("java -jar VaultController.jar create vaultname --endpoint eu_west_1");
-            System.out.println();
-            printSpace4();
-            System.out.println("specify AwsCredentials.properties directory or filename");
-            System.out.println("--properties path or filename");
-            System.out.println();
-            printEndpointHelp();
-        }
-
-        public static void checkHope(boolean check, boolean hope) {
-            if (check == hope) {
-                System.out.println("OK");
-            } else {
-                System.out.println("!!!!!!!!!!!! NG !!!!!!!!!!!!!!!!!");
-            }
-        }
-
-        public static void testValidate() {
-            StringBuffer toolong = new StringBuffer();
-            for (int i = 0; i < 300; i++) {
-                toolong.append("a");
-            }
-
-            Util.checkHope(VaultController.validateVaultName(""), false);
-            Util.checkHope(VaultController.validateVaultName(toolong.toString()), false);
-            Util.checkHope(VaultController.validateVaultName("aaaaaa000022334444^"), false);
-            Util.checkHope(VaultController.validateVaultName("aaa"), true);
-            Util.checkHope(VaultController.validateVaultName("aaa_sfdafd-dfadsf.fdfa"), true);
-        }
-
-    }
-
-    enum Kind {
-        Bad, Create, Describe, List, Delete
-    }
-
-    /**
-     * java -jar VaultController.jar create vaultname<br>
-     * with endpoint<br>
-     * java -jar VaultController.jar create vaultname -endpoint eu_west_1<br>
-     * java -jar VaultController.jar describe vaultname<br>
-     * java -jar VaultController.jar list<br>
-     * java -jar VaultController.jar delete vaultname
-     * 
-     * @throws IOException
-     */
-
-    public static void main(String[] args) throws IOException {
-
-        String endpointStr = null; /**/
-        Kind cmdKind = Kind.Bad;
-        String vaultName = "";
-        boolean debug = false;
-        String propertiesName = null;
+    private VaultControllerCmd(String[] args) {
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -199,7 +91,6 @@ public class VaultControllerCmd {
             }
 
             if (arg.equals("-h") || arg.equals("--help")) {
-                Util.printHelp();
                 System.exit(0);
             }
             if (arg.equals("--debug")) {
@@ -216,7 +107,6 @@ public class VaultControllerCmd {
                 region = VaultController.convertToRegion(endpointStr);
             } else {
                 /* endpointの指定が正しくない場合はhelpを表示して終了. */
-                Util.printEndpointHelp();
                 System.exit(-1);
             }
         }
@@ -232,22 +122,19 @@ public class VaultControllerCmd {
         }
         if (!propFile.exists()) {
             /* 設定ファイルがなかったらhelpを表示して終了. */
-            Util.printPropertiesHelp();
             System.exit(-1);
         }
+    }
 
+    private void exec() {
         /*
          * vaultNameが
          * @see <a href=
          * "http://docs.amazonwebservices.com/amazonglacier/latest/dev/api-vault-put.html"
          * > <br> に違反してたらhelpを表示して終了.
          */
-        if (Util.checkUseVaultName(cmdKind) && !VaultController.validateVaultName(vaultName)) {
-            Util.printVaultNameHelp();
-            System.exit(-1);
-        }
 
-        VaultController controller = new VaultController(region, propFile);
+        VaultController controller = null;
 
         switch (cmdKind) {
             case Create:
@@ -282,10 +169,8 @@ public class VaultControllerCmd {
                 System.out.println("Deleted vault: " + vaultName);
                 break;
             case Bad:
-                Util.printHelp();
                 break;
             default:
-                Util.printUnKnownCommand();
                 break;
         }
 
@@ -293,6 +178,25 @@ public class VaultControllerCmd {
             System.out.println("endpoint : " + endpointStr);
             System.out.println("vaultName : " + vaultName);
         }
+    }
+
+    enum Kind {
+        Bad, Create, Describe, List, Delete
+    }
+
+    /**
+     * java -jar VaultController.jar create vaultname<br>
+     * with endpoint<br>
+     * java -jar VaultController.jar create vaultname -endpoint eu_west_1<br>
+     * java -jar VaultController.jar describe vaultname<br>
+     * java -jar VaultController.jar list<br>
+     * java -jar VaultController.jar delete vaultname
+     * 
+     * @throws IOException
+     */
+
+    public static void main(String[] args) throws IOException {
+
     }
 
 }

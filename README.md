@@ -68,12 +68,18 @@ Job出力とはArchiveのデータそのものや、Archiveの一覧を含むテ
 
 
 ## vault_controller.jar
-Vaultに対する操作を行うコマンドです.
+Vaultに対する操作を行うコマンドです.以下の機能を提供します.
+
+1. Vaultの作成
+2. Vaultの詳細取得
+3. Vaultの一覧取得
+4. Vaultの削除
+
 ###使用方法
 `java -jar vault_controller.jar cmd [--vault vaultname] [--region region] [--properties prop_filename]`
 
     cmd           : create | desc | list | delete | help
-    vaultname     : The name of the vault.
+    vaultname     : The name of the Vault.
     region        : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
     prop_filename : If you want to specify explicitly AwsCredentials.properties
     
@@ -120,7 +126,57 @@ Vaultに対する操作を行うコマンドです.
     java -jar vault_controller.jar delete --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
 
 ## archive_controller.jar
-Archiveに対する操作をするコマンドです。
+Archiveに対する操作をするコマンドです.以下の機能を提供します.
+
+1. Archiveのアップロード
+2. Archiveのダウンロード
+3. Archiveの削除
 
 ###使用方法
-java -jar archive_controller.jar 
+java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]
+    cmd : upload | donwload | delete
+    --vault : The name of the Vault.
+    --archive : The ID of the archive.
+    --file  : Specifies the name of a file that is uploaded when the upload. When the download is the name of the saved file.
+    --force : If there is a file with the same name at the time of download, Force overwrite.
+    --region        : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
+    --properties : If you want to specify explicitly AwsCredentials.properties
+    
+###exsample
+####Archiveのアップロード
+#####デフォルトのリージョン(us-east-1)のvaultnameというVaultに filenameのファイルをアップロード
+    java -jar archive_controller.jar upload --vault vaultname --file filename
+#####リージョン指定
+    java -jar rchive_controller.jar upload --vault vaultname --file filename --region ap-northeast-1
+#####AwsCredentials.properties指定
+     java -jar rchive_controller.jar upload --vault vaultname --file filename --region ap-northeast-1 --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+     java -jar rchive_controller.jar upload --vault vaultname --file filename --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
+     
+####Archiveのダウンロード
+#####デフォルトのリージョン(us-east-1)のvaultnameというVaultからarchiveIdのArchiveをfilenameというファイル名でダウンロード
+    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename
+#####リージョン指定
+    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename --region ap-northeast-1
+#####AwsCredentials.properties指定
+     java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
+    
+#####ダウンロード先に同名のファイルが在った場合、上書きする
+    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename -force
+    
+※ --forceオプションを指定するとダウンロード開始前に該当ファイルを削除します.
+
+####Archiveの削除
+#####デフォルトのリージョン(us-east-1)のvaultnameというVaultのarchiveIdのArchiveを削除
+    java -jar archive_controller.jar delete --vault vaultname --archive archiveId
+#####リージョン指定
+    java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1
+#####AwsCredentials.properties指定
+     java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1 --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+     java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
+     
+
+     

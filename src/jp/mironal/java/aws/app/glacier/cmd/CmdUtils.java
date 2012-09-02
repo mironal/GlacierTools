@@ -4,8 +4,10 @@ package jp.mironal.java.aws.app.glacier.cmd;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.GlacierTools;
+import jp.mironal.java.aws.app.glacier.VaultController;
 
 public abstract class CmdUtils {
 
@@ -95,6 +97,16 @@ public abstract class CmdUtils {
         }
         onExecInvalidParam();
         return false;
+
+    }
+
+    void printRegion() {
+        System.out.println("Region");
+        for (Region r : GlacierTools.getGlacierRegions().values()) {
+            System.out.print("    ");
+            System.out.println(r.getEndpoint() + " => "
+                    + VaultController.makeUrl(AwsService.Glacier, r));
+        }
 
     }
 

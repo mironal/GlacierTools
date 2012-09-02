@@ -281,6 +281,8 @@ public class VaultControllerCmd extends CmdUtils {
         printListHelp();
         System.out.println();
         printDeleteHelp();
+        System.out.println();
+        printRegion();
     }
 
     @Override

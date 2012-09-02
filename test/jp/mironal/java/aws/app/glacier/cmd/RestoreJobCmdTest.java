@@ -20,22 +20,28 @@ public class RestoreJobCmdTest {
 
     private static final String RESTORE_FILENAME = "RestoreJobParam.properties";
 
+    private static File restore_file;
+
     @BeforeClass
     public static void setupRestoreFile() throws FileNotFoundException {
-        File file = new File(RESTORE_FILENAME);
-        PrintWriter pw = new PrintWriter(file);
+        restore_file = new File(RESTORE_FILENAME);
+        PrintWriter pw = new PrintWriter(restore_file);
         pw.println("JobId=hogehoge");
         pw.println("VaultName=piyopiyo");
         pw.print("Region=us-west-2");
         pw.close();
+        System.out.println("つくりますた");
     }
 
     @AfterClass
     public static void deleteRestoreFile() {
-        File file = new File(RESTORE_FILENAME);
-        if (file.exists()) {
-            file.delete();
+        if (restore_file.exists()) {
+
+            if (restore_file.delete()) {
+                System.out.println("さくじょすますた");
+            }
         }
+
     }
 
     @Test

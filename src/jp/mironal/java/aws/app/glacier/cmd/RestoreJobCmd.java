@@ -7,9 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import jp.mironal.java.aws.app.glacier.JobOperator;
-import jp.mironal.java.aws.app.glacier.cmd.ArchiveControllerCmd.ArchiveCmdKind;
-
 public class RestoreJobCmd extends CmdUtils {
 
     enum RestoreJobCmdKind {
@@ -91,27 +88,34 @@ public class RestoreJobCmd extends CmdUtils {
         if (!restoreFile.exists()) {
             throw new JobRestoreException(restoreFile.getAbsolutePath() + " does not exist.");
         }
-        Properties properties = new Properties();
+        FileReader reader = null;
         try {
-            properties.load(new FileReader(filename));
+            reader = new FileReader(filename);
+            Properties properties = new Properties();
+            properties.load(reader);
+
+            if (!properties.containsKey("JobId")) {
+                throw new JobRestoreException("JobId not found.");
+            }
+            if (!properties.containsKey("VaultName")) {
+                throw new JobRestoreException("VaultName not found.");
+            }
+            if (!properties.containsKey("Region")) {
+                throw new JobRestoreException("Region not found.");
+            }
+
+            this.jobId = properties.getProperty("JobId");
+            this.vaultname = properties.getProperty("VaultName");
+            setRegion(properties.getProperty("Region"));
         } catch (FileNotFoundException ignore) {
             // 無視するが念のためStackTraceは出す.
             ignore.printStackTrace();
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
         }
 
-        if (!properties.containsKey("JobId")) {
-            throw new JobRestoreException("JobId not found.");
-        }
-        if (!properties.containsKey("VaultName")) {
-            throw new JobRestoreException("VaultName not found.");
-        }
-        if (!properties.containsKey("Region")) {
-            throw new JobRestoreException("Region not found.");
-        }
-
-        this.jobId = properties.getProperty("JobId");
-        this.vaultname = properties.getProperty("VaultName");
-        setRegion(properties.getProperty("Region"));
     }
 
     @Override

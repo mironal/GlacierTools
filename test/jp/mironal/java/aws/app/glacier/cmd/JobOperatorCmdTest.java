@@ -1,18 +1,14 @@
 
 package jp.mironal.java.aws.app.glacier.cmd;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.cmd.JobOperatorCmd.ArchiveLowLevelKind;
 import jp.mironal.java.aws.app.glacier.cmd.JobOperatorCmd.Sync;
 
 import org.junit.Test;
 
-public class ArchiveLowLevelControlCmdTest {
+public class JobOperatorCmdTest {
 
     @Test
     public void test_inventoryRetrieval() {

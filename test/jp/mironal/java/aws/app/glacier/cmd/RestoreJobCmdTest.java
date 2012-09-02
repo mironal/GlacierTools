@@ -11,12 +11,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class RestoreJobControllerTest {
+public class RestoreJobCmdTest {
 
     private static final String RESTORE_FILENAME = "RestoreJobParam.properties";
 
     @BeforeClass
-    public void setupRestoreFile() throws FileNotFoundException {
+    public static void setupRestoreFile() throws FileNotFoundException {
         File file = new File(RESTORE_FILENAME);
         PrintWriter pw = new PrintWriter(file);
         pw.println("JobId=hogehoge");
@@ -26,7 +26,7 @@ public class RestoreJobControllerTest {
     }
 
     @AfterClass
-    public void deleteRestoreFile() {
+    public static void deleteRestoreFile() {
         File file = new File(RESTORE_FILENAME);
         if (file.exists()) {
             file.delete();

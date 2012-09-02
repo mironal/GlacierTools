@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-public class RestoreJobController extends CmdUtils {
+public class RestoreJobCmd extends CmdUtils {
 
     enum RestoreJobCmdKind {
         Bad, Download, Check, Desc, Help
@@ -24,7 +24,7 @@ public class RestoreJobController extends CmdUtils {
     String vaultname;
     RestoreJobCmdKind cmdKind;
 
-    public RestoreJobController(String[] args) throws IOException {
+    public RestoreJobCmd(String[] args) throws IOException {
         String restorePropFilename = null;
         String propertiesName = null;
         for (int i = 0; i < args.length; i++) {

@@ -7,8 +7,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
-import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.ArchiveLowLevelKind;
-import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Sync;
+import jp.mironal.java.aws.app.glacier.cmd.JobOperatorCmd.ArchiveLowLevelKind;
+import jp.mironal.java.aws.app.glacier.cmd.JobOperatorCmd.Sync;
 
 import org.junit.Test;
 
@@ -16,7 +16,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_inventoryRetrieval() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "inventory-retrieval", "--vault", "hogehoge", "--debug"
         });
 
@@ -28,7 +28,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_inventoryRetrieval_InvalidParam() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "inventory-retrieval", "--debug"
         });
 
@@ -40,7 +40,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_inventoryRetrievalWithEndpoint() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "inventory-retrieval", "--vault", "hogehoge", "--endpoint", "us-east-1"
         });
 
@@ -52,7 +52,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_inventoryRetrievalWithSync() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "inventory-retrieval", "--vault", "hogehoge", "--debug"
         });
 
@@ -61,7 +61,7 @@ public class ArchiveLowLevelControlCmdTest {
         assertEquals(cmd.syncType, Sync.Sync);
         assertTrue(cmd.validateParam());
 
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "inventory-retrieval", "async", "--vault", "hogehoge",
         });
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
@@ -73,7 +73,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_archiveRetrieval() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "archive-retrieval", "--vault", "homuhomu", "--archive", "archiveId", "--file",
                 "hoge.zip"
         });
@@ -88,7 +88,7 @@ public class ArchiveLowLevelControlCmdTest {
     @Test
     public void test_archiveRetrieval_InvalidParam() {
         // vault無し
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "archive-retrieval", "--archive", "archiveId", "--file", "hoge.zip"
         });
 
@@ -99,7 +99,7 @@ public class ArchiveLowLevelControlCmdTest {
         assertFalse(cmd.validateParam());
 
         // archive無し
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "archive-retrieval", "--vault", "homuhomu", "--file", "hoge.zip"
         });
 
@@ -110,7 +110,7 @@ public class ArchiveLowLevelControlCmdTest {
         assertFalse(cmd.validateParam());
 
         // file無し
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "archive-retrieval", "--vault", "homuhomu", "--archive", "archiveId",
         });
 
@@ -123,7 +123,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_list() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "list", "--vault", "aaaaaa", "--debug"
         });
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.List);
@@ -133,7 +133,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_list_InvalidParam() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
             "list",
         });
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.List);
@@ -143,7 +143,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_desc() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId"
         });
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Describe);
@@ -155,7 +155,7 @@ public class ArchiveLowLevelControlCmdTest {
     @Test
     public void test_desc_InvalidParam() {
         // vault無し
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "desc", "--job", "jobId"
         });
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Describe);
@@ -164,7 +164,7 @@ public class ArchiveLowLevelControlCmdTest {
         assertFalse(cmd.validateParam());
 
         // job無し
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb",
         });
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Describe);
@@ -176,19 +176,19 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test
     public void test_Region() {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-east-1"
         });
 
         assertEquals(cmd.region, Region.US_EAST_1);
 
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-west-1"
         });
 
         assertEquals(cmd.region, Region.US_WEST_1);
 
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-west-2"
         });
 
@@ -199,13 +199,13 @@ public class ArchiveLowLevelControlCmdTest {
             e.printStackTrace();
         }
 
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "eu-west-1"
         });
 
         assertEquals(cmd.region, Region.EU_WEST_1);
 
-        cmd = new ArchiveLowLevelControlCmd(new String[] {
+        cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "ap-northeast-1"
         });
 
@@ -216,7 +216,7 @@ public class ArchiveLowLevelControlCmdTest {
 
     @Test()
     public void test_Region_Invalid() throws InvalidRegionException {
-        ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
+        JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "aa"
         });
         assertNull(cmd.region);

@@ -24,7 +24,10 @@ import com.amazonaws.services.glacier.model.JobParameters;
 
 /**
  * 一つのインスタンスにつき、一回リクエストを行える.<br>
- * マルチスレッド非対応
+ * マルチスレッド非対応<br>
+ * Jobに待ち方はAmazonの推奨しているSNS、SQSを使わず、Describe Jobをポーリングする方法を採用した.<br>
+ * 理由は処理を簡潔にするためである.<br>
+ * SNS、SQSを使用する方法は別途提供する.
  * 
  * @author yama
  */

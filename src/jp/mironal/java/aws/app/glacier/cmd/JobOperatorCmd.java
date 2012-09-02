@@ -20,7 +20,7 @@ import com.amazonaws.services.glacier.model.GlacierJobDescription;
  * 
  * @author yama
  */
-public class ArchiveLowLevelControlCmd extends CmdUtils {
+public class JobOperatorCmd extends CmdUtils {
 
     enum ArchiveLowLevelKind {
         Bad, Inventory, Archive, List, Describe,
@@ -39,7 +39,7 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
     String jobId = null;
     String saveFile = null;
 
-    ArchiveLowLevelControlCmd(String[] args) {
+    JobOperatorCmd(String[] args) {
         String endpointStr = null;
         String propertiesName = null;
         for (int i = 0; i < args.length; i++) {
@@ -343,7 +343,7 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        new ArchiveLowLevelControlCmd(args).exec();
+        new JobOperatorCmd(args).exec();
     }
 
     @Override

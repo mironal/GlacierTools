@@ -22,8 +22,6 @@ public class ArchiveControllerCmd extends CmdUtils {
     boolean force = false; /* アーカイブダウンロード時に同名のファイルが既に有った場合、強制的に上書きする */
     boolean printArchiveIdOnly = false;
 
-    File uploadFile = null;
-
     ArchiveControllerCmd(String[] args) {
         String propertiesName = null;
         String endpointStr = null;
@@ -175,6 +173,7 @@ public class ArchiveControllerCmd extends CmdUtils {
 
     private void execUpload() throws IOException {
         ArchiveController archiveController = new ArchiveController(region, awsPropFile);
+        File uploadFile = new File(filename);
         String description = uploadFile.getName();
         UploadResult uploadResult = archiveController.upload(vaultName, description, uploadFile);
         if (printArchiveIdOnly) {

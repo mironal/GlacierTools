@@ -22,7 +22,7 @@ import com.amazonaws.services.glacier.model.GlacierJobDescription;
  */
 public class JobOperatorCmd extends CmdUtils {
 
-    enum ArchiveLowLevelKind {
+    enum JobOperatorCmdKind {
         Bad, Inventory, Archive, List, Describe, Help
 
     }
@@ -31,7 +31,7 @@ public class JobOperatorCmd extends CmdUtils {
         Sync, Async,
     }
 
-    ArchiveLowLevelKind cmdKind = ArchiveLowLevelKind.Bad;
+    JobOperatorCmdKind cmdKind = JobOperatorCmdKind.Bad;
     Sync syncType = Sync.Sync;
     String vaultname = null;
     String archiveId = null;
@@ -46,23 +46,23 @@ public class JobOperatorCmd extends CmdUtils {
             String arg = args[i];
 
             if (arg.equals("inventory-retrieval")) {
-                setCmdKind(ArchiveLowLevelKind.Inventory);
+                setCmdKind(JobOperatorCmdKind.Inventory);
             }
 
             if (arg.equals("archive-retrieval")) {
-                setCmdKind(ArchiveLowLevelKind.Archive);
+                setCmdKind(JobOperatorCmdKind.Archive);
             }
 
             if (arg.equals("list")) {
-                setCmdKind(ArchiveLowLevelKind.List);
+                setCmdKind(JobOperatorCmdKind.List);
             }
 
             if (arg.equals("desc")) {
-                setCmdKind(ArchiveLowLevelKind.Describe);
+                setCmdKind(JobOperatorCmdKind.Describe);
             }
 
             if (arg.equals("-h") || arg.equals("--help") || arg.equals("help")) {
-                setCmdKind(ArchiveLowLevelKind.Help);
+                setCmdKind(JobOperatorCmdKind.Help);
             }
 
             if (arg.equals("--async")) {
@@ -124,12 +124,12 @@ public class JobOperatorCmd extends CmdUtils {
 
     }
 
-    private void setCmdKind(ArchiveLowLevelKind cmd) {
-        if (this.cmdKind == ArchiveLowLevelKind.Bad) {
+    private void setCmdKind(JobOperatorCmdKind cmd) {
+        if (this.cmdKind == JobOperatorCmdKind.Bad) {
             this.cmdKind = cmd;
         } else {
             /* オプション違反 */
-            this.cmdKind = ArchiveLowLevelKind.Bad;
+            this.cmdKind = JobOperatorCmdKind.Bad;
         }
     }
 
@@ -329,13 +329,13 @@ public class JobOperatorCmd extends CmdUtils {
     @Override
     void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
         System.err.println(filename + " is not found.");
-        setCmdKind(ArchiveLowLevelKind.Bad);
+        setCmdKind(JobOperatorCmdKind.Bad);
     }
 
     @Override
     void onRegionNotFound(String endpointStr, Throwable e) {
         System.err.println(e.getMessage() + " is not found.");
-        setCmdKind(ArchiveLowLevelKind.Bad);
+        setCmdKind(JobOperatorCmdKind.Bad);
     }
 
     @Override

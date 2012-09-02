@@ -1,2 +1,2 @@
 @echo off
-java -jar %~dp0VaultContoller.jar --properties %~dp0 %*
+java -jar %~dp0vault_controller.jar --properties %~dp0 %*

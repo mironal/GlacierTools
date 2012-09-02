@@ -7,7 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
-import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Kind;
+import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.ArchiveLowLevelKind;
 import jp.mironal.java.aws.app.glacier.cmd.ArchiveLowLevelControlCmd.Sync;
 
 import org.junit.Test;
@@ -20,10 +20,10 @@ public class ArchiveLowLevelControlCmdTest {
                 "inventory-retrieval", "--vault", "hogehoge", "--debug"
         });
 
-        assertEquals(cmd.cmdKind, Kind.Inventory);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");
 
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
     }
 
     @Test
@@ -32,10 +32,10 @@ public class ArchiveLowLevelControlCmdTest {
                 "inventory-retrieval", "--debug"
         });
 
-        assertEquals(cmd.cmdKind, Kind.Inventory);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
         assertEquals(cmd.vaultname, null);
 
-        assertFalse(cmd.validateInventoryParam());
+        assertFalse(cmd.validateParam());
     }
 
     @Test
@@ -44,30 +44,30 @@ public class ArchiveLowLevelControlCmdTest {
                 "inventory-retrieval", "--vault", "hogehoge", "--endpoint", "us-east-1"
         });
 
-        assertEquals(cmd.cmdKind, Kind.Inventory);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");
         assertEquals(cmd.region, Region.US_EAST_1);
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
     }
 
     @Test
     public void test_inventoryRetrievalWithSync() {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
-                "inventory-retrieval", "--vault", "hogehoge",
+                "inventory-retrieval", "--vault", "hogehoge", "--debug"
         });
 
-        assertEquals(cmd.cmdKind, Kind.Inventory);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");
         assertEquals(cmd.syncType, Sync.Sync);
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
 
         cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "inventory-retrieval", "async", "--vault", "hogehoge",
         });
-        assertEquals(cmd.cmdKind, Kind.Inventory);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");
         assertEquals(cmd.syncType, Sync.Async);
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
 
     }
 
@@ -78,11 +78,11 @@ public class ArchiveLowLevelControlCmdTest {
                 "hoge.zip"
         });
 
-        assertEquals(cmd.cmdKind, Kind.Archive);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, "homuhomu");
         assertEquals(cmd.archiveId, "archiveId");
         assertEquals(cmd.saveFile, "hoge.zip");
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
     }
 
     @Test
@@ -92,43 +92,43 @@ public class ArchiveLowLevelControlCmdTest {
                 "archive-retrieval", "--archive", "archiveId", "--file", "hoge.zip"
         });
 
-        assertEquals(cmd.cmdKind, Kind.Archive);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, null);
         assertEquals(cmd.archiveId, "archiveId");
         assertEquals(cmd.saveFile, "hoge.zip");
-        assertFalse(cmd.validateInventoryParam());
+        assertFalse(cmd.validateParam());
 
         // archive無し
         cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "archive-retrieval", "--vault", "homuhomu", "--file", "hoge.zip"
         });
 
-        assertEquals(cmd.cmdKind, Kind.Archive);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, "homuhomu");
         assertEquals(cmd.archiveId, null);
         assertEquals(cmd.saveFile, "hoge.zip");
-        assertFalse(cmd.validateInventoryParam());
+        assertFalse(cmd.validateParam());
 
         // file無し
         cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "archive-retrieval", "--vault", "homuhomu", "--archive", "archiveId",
         });
 
-        assertEquals(cmd.cmdKind, Kind.Archive);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, "homuhomu");
         assertEquals(cmd.archiveId, "archiveId");
         assertEquals(cmd.saveFile, null);
-        assertFalse(cmd.validateInventoryParam());
+        assertFalse(cmd.validateParam());
     }
 
     @Test
     public void test_list() {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
-                "list", "--vault", "aaaaaa"
+                "list", "--vault", "aaaaaa", "--debug"
         });
-        assertEquals(cmd.cmdKind, Kind.List);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.List);
         assertEquals(cmd.vaultname, "aaaaaa");
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
     }
 
     @Test
@@ -136,9 +136,9 @@ public class ArchiveLowLevelControlCmdTest {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
             "list",
         });
-        assertEquals(cmd.cmdKind, Kind.List);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.List);
         assertEquals(cmd.vaultname, null);
-        assertFalse(cmd.validateInventoryParam());
+        assertFalse(cmd.validateParam());
     }
 
     @Test
@@ -146,10 +146,10 @@ public class ArchiveLowLevelControlCmdTest {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "desc", "--vault", "bbbbb", "--job", "jobId"
         });
-        assertEquals(cmd.cmdKind, Kind.Describe);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Describe);
         assertEquals(cmd.vaultname, "bbbbb");
         assertEquals(cmd.jobId, "jobId");
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
     }
 
     @Test
@@ -158,19 +158,19 @@ public class ArchiveLowLevelControlCmdTest {
         ArchiveLowLevelControlCmd cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "desc", "--job", "jobId"
         });
-        assertEquals(cmd.cmdKind, Kind.Describe);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Describe);
         assertEquals(cmd.vaultname, null);
         assertEquals(cmd.jobId, "jobId");
-        assertFalse(cmd.validateInventoryParam());
+        assertFalse(cmd.validateParam());
 
         // job無し
         cmd = new ArchiveLowLevelControlCmd(new String[] {
                 "desc", "--vault", "bbbbb",
         });
-        assertEquals(cmd.cmdKind, Kind.Describe);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Describe);
         assertEquals(cmd.vaultname, "bbbbb");
         assertEquals(cmd.jobId, null);
-        assertFalse(cmd.validateInventoryParam());
+        assertFalse(cmd.validateParam());
 
     }
 
@@ -210,7 +210,7 @@ public class ArchiveLowLevelControlCmdTest {
         });
 
         assertEquals(cmd.region, Region.AP_NORTHEAST_1);
-        assertTrue(cmd.validateInventoryParam());
+        assertTrue(cmd.validateParam());
 
     }
 
@@ -220,7 +220,7 @@ public class ArchiveLowLevelControlCmdTest {
                 "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "aa"
         });
         assertNull(cmd.region);
-        assertEquals(cmd.cmdKind, Kind.Bad);
+        assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Bad);
     }
 
 }

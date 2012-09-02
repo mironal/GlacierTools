@@ -2,7 +2,6 @@
 package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -16,22 +15,20 @@ import jp.mironal.java.aws.app.glacier.VaultController;
 import com.amazonaws.services.glacier.model.DescribeVaultOutput;
 import com.amazonaws.services.glacier.transfer.UploadResult;
 
-public class ArchiveControllerCmd {
+public class ArchiveControllerCmd extends CmdUtils {
 
-    enum Kind {
+    enum ArchiveCmdKind {
         Bad, Upload, Download, Delete
     }
 
-    Kind cmdKind = Kind.Bad;
+    ArchiveCmdKind cmdKind = ArchiveCmdKind.Bad;
 
     String vaultName = null;
     String filename = null;
     String archiveId = null;
-    boolean debug = false;
     boolean force = false; /* アーカイブダウンロード時に同名のファイルが既に有った場合、強制的に上書きする */
     boolean printArchiveIdOnly = false;
-    Region region = null;
-    File awsPropFile = null;
+
     File uploadFile = null;
 
     ArchiveControllerCmd(String[] args) {
@@ -44,31 +41,15 @@ public class ArchiveControllerCmd {
              * すでに別のオプションが割り当てられていたら不正な引数とみなす.
              */
             if (arg.equals("upload")) {
-                if (cmdKind == Kind.Bad) {
-                    cmdKind = Kind.Upload;
-                } else {
-                    /* オプション違反 */
-                    cmdKind = Kind.Bad;
-                    break;
-                }
+                setCmdKind(ArchiveCmdKind.Upload);
             }
 
             if (arg.equals("download")) {
-                if (cmdKind == Kind.Bad) {
-                    cmdKind = Kind.Download;
-                } else {
-                    cmdKind = Kind.Bad;
-                    break;
-                }
+                setCmdKind(ArchiveCmdKind.Download);
             }
 
             if (arg.equals("delete")) {
-                if (cmdKind == Kind.Bad) {
-                    cmdKind = Kind.Delete;
-                } else {
-                    cmdKind = Kind.Bad;
-                    break;
-                }
+                setCmdKind(ArchiveCmdKind.Delete);
             }
 
             if (arg.equals("--vault")) {
@@ -123,55 +104,11 @@ public class ArchiveControllerCmd {
             }
         }
 
-        try {
-            awsPropFile = getAwsCredentialsPropertiesFile(propertiesName);
-        } catch (FileNotFoundException e) {
-            if (debug) {
-                System.err.println(e.getMessage());
-            }
-            cmdKind = Kind.Bad;
-        }
+        setAwsCredentialsPropertiesFile(propertiesName);
 
         /* endpoint */
-        try {
-            region = getRegion(endpointStr);
-        } catch (InvalidRegionException e) {
-            if (debug) {
-                System.err.println(e.getMessage() + " is not found.");
-            }
-            cmdKind = Kind.Bad;
-        }
-    }
+        setRegion(endpointStr);
 
-    Region getRegion(String endpointStr) throws InvalidRegionException {
-        Region region = null;
-        if (endpointStr == null) {
-            region = ArchiveController.getDefaultEndpoint();
-        } else {
-            if (ArchiveController.containEndpoint(endpointStr)) {
-                region = ArchiveController.convertToRegion(endpointStr);
-            } else {
-                throw new InvalidRegionException(endpointStr);
-            }
-        }
-        return region;
-    }
-
-    File getAwsCredentialsPropertiesFile(String propertiesName) throws FileNotFoundException {
-        if (propertiesName == null) {
-            propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
-        }
-
-        File propFile = new File(propertiesName);
-        if (propFile.isDirectory()) {
-            propFile = new File(propertiesName + File.separator
-                    + VaultController.AWS_PROPERTIES_FILENAME);
-        }
-        if (!propFile.exists()) {
-            throw new FileNotFoundException(propFile.getAbsolutePath() + "is not found.");
-        }
-
-        return propFile;
     }
 
     boolean existVault(String vaultName, VaultController vaultController) {
@@ -193,13 +130,8 @@ public class ArchiveControllerCmd {
         return true;
     }
 
-    private void debugPrint(String msg) {
-        if (debug) {
-            System.err.println(msg);
-        }
-    }
-
-    boolean validateInventoryParam() {
+    @Override
+    boolean validateParam() {
         // trueを代入するロジックは初期化のところだけとする.
         boolean ok = true;
         if (region == null) {
@@ -252,6 +184,15 @@ public class ArchiveControllerCmd {
                 break;
         }
         return ok;
+    }
+
+    private void setCmdKind(ArchiveCmdKind cmd) {
+        if (this.cmdKind == ArchiveCmdKind.Bad) {
+            this.cmdKind = cmd;
+        } else {
+            /* オプション違反 */
+            this.cmdKind = ArchiveCmdKind.Bad;
+        }
     }
 
     private void execUpload() throws IOException {
@@ -333,25 +274,8 @@ public class ArchiveControllerCmd {
         }
     }
 
-    /**
-     * エラーなどでプログラムを終了させるときはこの関数で終了させるようにする.
-     * 
-     * @throws IOException
-     */
-    private void exec() throws IOException {
-
-        /* オプションが揃ってるかチェック */
-        if (!validateInventoryParam()) {
-            printInvalidParam();
-            System.exit(-1);
-        }
-
-        /* vaultの存在確認. なかったらエラー吐いて終了 */
-        if (!checkVaultAndPrintErr(vaultName)) {
-
-            System.exit(-1);
-        }
-
+    @Override
+    void onExecCommand() throws Exception {
         switch (cmdKind) {
             case Upload:
 
@@ -396,6 +320,12 @@ public class ArchiveControllerCmd {
             System.out.println("archiveId : " + archiveId);
             System.out.println("force : " + force);
         }
+
+    }
+
+    @Override
+    void onExecInvalidParam() {
+        System.exit(-1);
     }
 
     /**
@@ -407,9 +337,21 @@ public class ArchiveControllerCmd {
      * archiveId --file filename --force java -jar ArchiveController.jar delete
      * --vault vaultname --archive archiveId<br>
      * 
-     * @throws IOException
+     * @throws Exception
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         new ArchiveControllerCmd(args).exec();
+    }
+
+    @Override
+    void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
+        System.err.println(filename + " is not found.");
+        setCmdKind(ArchiveCmdKind.Bad);
+    }
+
+    @Override
+    void onRegionNotFound(String endpointStr, Throwable e) {
+        System.err.println(e.getMessage() + " is not found.");
+        setCmdKind(ArchiveCmdKind.Bad);
     }
 }

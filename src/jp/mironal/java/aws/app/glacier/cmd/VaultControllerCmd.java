@@ -1,82 +1,59 @@
 
 package jp.mironal.java.aws.app.glacier.cmd;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.VaultController;
 
 import com.amazonaws.services.glacier.model.CreateVaultResult;
 import com.amazonaws.services.glacier.model.DescribeVaultOutput;
 import com.amazonaws.services.glacier.model.DescribeVaultResult;
 
-public class VaultControllerCmd {
+public class VaultControllerCmd extends CmdUtils {
 
-    String endpointStr = null; /**/
-    Kind cmdKind = Kind.Bad;
-    String vaultName = "";
-    boolean debug = false;
-    String propertiesName = null;
+    enum VaultCmdKind {
+        Bad, Create, Describe, List, Delete, Help,
+    }
 
-    private VaultControllerCmd(String[] args) {
+    VaultCmdKind cmdKind = VaultCmdKind.Bad;
+    String vaultName = null;
+
+    VaultControllerCmd(String[] args) {
+        String endpointStr = null; /**/
+        String propertiesName = null;
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
+
             if (arg.equals("create")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    vaultName = args[i];
-
-                    /* すでに別のオプションが割り当てられていたら不正な引数とみなす */
-                    if (cmdKind == Kind.Bad) {
-                        cmdKind = Kind.Create;
-                    } else {
-                        /* オプション違反 */
-                        cmdKind = Kind.Bad;
-                        break;
-                    }
-
-                }
+                setCmdKind(VaultCmdKind.Create);
             }
 
-            if (arg.equals("describe")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    vaultName = args[i];
-                    if (cmdKind == Kind.Bad) {
-                        cmdKind = Kind.Describe;
-                    } else {
-                        cmdKind = Kind.Bad;
-                        break;
-                    }
-                }
+            if (arg.equals("desc")) {
+                setCmdKind(VaultCmdKind.Describe);
             }
 
             if (arg.equals("list")) {
-                if (cmdKind == Kind.Bad) {
-                    cmdKind = Kind.List;
-                } else {
-                    cmdKind = Kind.Bad;
-                    break;
-                }
+                setCmdKind(VaultCmdKind.List);
             }
 
             if (arg.equals("delete")) {
+                setCmdKind(VaultCmdKind.Delete);
+            }
+
+            if (arg.equals("-h") || arg.equals("--help")) {
+                setCmdKind(VaultCmdKind.Help);
+            }
+
+            if (arg.equals("--vault")) {
                 if ((i + 1) < args.length) {
                     i++;
                     vaultName = args[i];
-                    if (cmdKind == Kind.Bad) {
-                        cmdKind = Kind.Delete;
-                    } else {
-                        cmdKind = Kind.Bad;
-                        break;
-                    }
                 }
             }
 
-            if (arg.equals("--endpoint")) {
+            if (arg.equals("--region")) {
                 if ((i + 1) < args.length) {
                     i++;
                     endpointStr = args[i];
@@ -90,98 +67,246 @@ public class VaultControllerCmd {
                 }
             }
 
-            if (arg.equals("-h") || arg.equals("--help")) {
-                System.exit(0);
-            }
             if (arg.equals("--debug")) {
                 debug = true;
             }
         }
 
-        Region region = null;
-        /* endpoint */
-        if (endpointStr == null) {
-            region = VaultController.getDefaultEndpoint();
+        setAwsCredentialsPropertiesFile(propertiesName);
+
+        setRegion(endpointStr);
+
+    }
+
+    private void setCmdKind(VaultCmdKind cmd) {
+        if (this.cmdKind == VaultCmdKind.Bad) {
+            this.cmdKind = cmd;
         } else {
-            if (VaultController.containEndpoint(endpointStr)) {
-                region = VaultController.convertToRegion(endpointStr);
-            } else {
-                /* endpointの指定が正しくない場合はhelpを表示して終了. */
-                System.exit(-1);
-            }
-        }
-
-        if (propertiesName == null) {
-            propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
-        }
-
-        File propFile = new File(propertiesName);
-        if (propFile.isDirectory()) {
-            propFile = new File(propertiesName + File.separator
-                    + VaultController.AWS_PROPERTIES_FILENAME);
-        }
-        if (!propFile.exists()) {
-            /* 設定ファイルがなかったらhelpを表示して終了. */
-            System.exit(-1);
+            /* オプション違反 */
+            this.cmdKind = VaultCmdKind.Bad;
         }
     }
 
-    private void exec() {
-        /*
-         * vaultNameが
-         * @see <a href=
-         * "http://docs.amazonwebservices.com/amazonglacier/latest/dev/api-vault-put.html"
-         * > <br> に違反してたらhelpを表示して終了.
-         */
+    @Override
+    void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
+        if (debug) {
+            System.err.println(e.getMessage());
+        }
+        System.err.println(filename + " not found.");
+        setCmdKind(VaultCmdKind.Bad);
+    }
 
-        VaultController controller = null;
+    @Override
+    void onRegionNotFound(String endpointStr, Throwable e) {
+        if (debug) {
+            System.out.println(e.getMessage());
+        }
+        System.err.println(e.getMessage() + " not found.");
+        setCmdKind(VaultCmdKind.Bad);
+    }
+
+    @Override
+    boolean validateParam() {
+        boolean ok = true;
+
+        if (region == null) {
+            debugPrint("region is null.");
+            ok = false;
+        }
+        if (awsPropFile == null) {
+            debugPrint("awsPropFile is null.");
+            ok = false;
+        }
 
         switch (cmdKind) {
             case Create:
-                CreateVaultResult createVaultResult = controller.createVault(vaultName);
-                System.out.println("Success!");
-                System.out.println("Location:" + createVaultResult.getLocation());
+                if (vaultName == null) {
+                    debugPrint("vaultName is null.");
+                    ok = false;
+                }
+
                 break;
             case Describe:
-                DescribeVaultResult describeVaultResult = controller.describeVault(vaultName);
-                System.out.println("Describing the vault: " + vaultName);
-                System.out.print("CreationDate: " + describeVaultResult.getCreationDate()
-                        + "\nLastInventoryDate: " + describeVaultResult.getLastInventoryDate()
-                        + "\nNumberOfArchives: " + describeVaultResult.getNumberOfArchives()
-                        + "\nSizeInBytes: " + describeVaultResult.getSizeInBytes() + "\nVaultARN: "
-                        + describeVaultResult.getVaultARN() + "\nVaultName: "
-                        + describeVaultResult.getVaultName());
-                System.out.println();
+                if (vaultName == null) {
+                    debugPrint("vaultName is null.");
+                    ok = false;
+                }
+
                 break;
             case List:
-                List<DescribeVaultOutput> vaultList = controller.listVaults();
-                System.out.println("\nDescribing all vaults (vault list):");
-                for (DescribeVaultOutput vault : vaultList) {
-                    System.out.println("\nCreationDate: " + vault.getCreationDate()
-                            + "\nLastInventoryDate: " + vault.getLastInventoryDate()
-                            + "\nNumberOfArchives: " + vault.getNumberOfArchives()
-                            + "\nSizeInBytes: " + vault.getSizeInBytes() + "\nVaultARN: "
-                            + vault.getVaultARN() + "\nVaultName: " + vault.getVaultName());
-                }
                 break;
+
             case Delete:
-                controller.deleteVault(vaultName);
-                System.out.println("Deleted vault: " + vaultName);
+                if (vaultName == null) {
+                    debugPrint("vaultName is null.");
+                    ok = false;
+                }
                 break;
             case Bad:
                 break;
-            default:
+            case Help:
                 break;
+
+            default:
+                throw new IllegalStateException("Unknown command.");
         }
 
-        if (debug) {
-            System.out.println("endpoint : " + endpointStr);
-            System.out.println("vaultName : " + vaultName);
+        return ok;
+    }
+
+    private void execCreate() throws IOException {
+        VaultController controller = new VaultController(region, awsPropFile);
+        CreateVaultResult createVaultResult = controller.createVault(vaultName);
+        System.out.println("Success!");
+        System.out.println("Location:" + createVaultResult.getLocation());
+    }
+
+    private void execDescribe() throws IOException {
+        VaultController controller = new VaultController(region, awsPropFile);
+        DescribeVaultResult describeVaultResult = controller.describeVault(vaultName);
+        System.out.println("Describing the vault: " + vaultName);
+        System.out.print("CreationDate: " + describeVaultResult.getCreationDate()
+                + "\nLastInventoryDate: " + describeVaultResult.getLastInventoryDate()
+                + "\nNumberOfArchives: " + describeVaultResult.getNumberOfArchives()
+                + "\nSizeInBytes: " + describeVaultResult.getSizeInBytes() + "\nVaultARN: "
+                + describeVaultResult.getVaultARN() + "\nVaultName: "
+                + describeVaultResult.getVaultName());
+        System.out.println();
+    }
+
+    private void execList() throws IOException {
+        VaultController controller = new VaultController(region, awsPropFile);
+        List<DescribeVaultOutput> vaultList = controller.listVaults();
+        System.out.println("\nDescribing all vaults (vault list):");
+        for (DescribeVaultOutput vault : vaultList) {
+            System.out.println("\nCreationDate: " + vault.getCreationDate()
+                    + "\nLastInventoryDate: " + vault.getLastInventoryDate()
+                    + "\nNumberOfArchives: " + vault.getNumberOfArchives() + "\nSizeInBytes: "
+                    + vault.getSizeInBytes() + "\nVaultARN: " + vault.getVaultARN()
+                    + "\nVaultName: " + vault.getVaultName());
         }
     }
 
-    enum Kind {
-        Bad, Create, Describe, List, Delete
+    private void execDelete() throws IOException {
+        VaultController controller = new VaultController(region, awsPropFile);
+        controller.deleteVault(vaultName);
+        System.out.println("Deleted vault: " + vaultName);
+    }
+
+    @Override
+    void onExecCommand() throws Exception {
+        switch (cmdKind) {
+            case Create:
+                execCreate();
+                break;
+            case Describe:
+                execDescribe();
+                break;
+            case List:
+                execList();
+                break;
+            case Delete:
+                execDelete();
+                break;
+            case Bad:
+                printHelp();
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+
+        if (debug) {
+            System.out.println("vaultName : " + vaultName);
+        }
+
+    }
+
+    private void printCreateHelp() {
+        System.out.println("Create a Vault named vaultname.");
+        System.out.print("    ");
+        System.out.println("java -jar vault_controller.jar create --vault vaultname");
+        printHelpHelper("create", " --vault vaultname");
+    }
+
+    private void printDescribeHelp() {
+        System.out.println("Get the describe of Vault named vaultname.");
+        System.out.print("    ");
+        System.out.println("java -jar vault_controller.jar desc --vault vaultname");
+        printHelpHelper("desc", " --vault vaultname");
+    }
+
+    private void printHelpHelper(String kind, String opt) {
+        System.out.println("Specify the region.");
+        System.out.print("    ");
+        System.out.println("java -jar vault_controller.jar " + kind + opt + " --region us-west-2");
+        System.out.println("Specifies the AwsCredentials.properties file.");
+        System.out.print("    ");
+        System.out.println("java -jar vault_controller.jar " + kind + opt
+                + " --properties myAwsPropFile.properties");
+        System.out.println("Specify the region and AwsCredentials.properties.");
+        System.out.print("    ");
+        System.out.println("java -jar vault_controller.jar " + kind + opt
+                + " --region us-west-2 --properties myAwsPropFile.properties");
+    }
+
+    private void printListHelp() {
+        System.out.println("Gets a list Vault.");
+        System.out.print("    ");
+        System.out.println("java -jar vault_controller.jar list");
+        printHelpHelper("list", "");
+    }
+
+    private void printDeleteHelp() {
+        System.out.println("Delete Vault.");
+        System.out.print("    ");
+        System.out.println("java -jar vault_controller.jar delete --vault vaultname.");
+        printHelpHelper("delete", " --vault vaultname");
+    }
+
+    private void printHelp() {
+        System.out
+                .println("java -jar vault_controller.jar cmd [--vault vaultname] [--region region] [--properties prop_filename]");
+        System.out.println();
+        System.out.println("cmd           : create | desc | list | delete | help");
+        System.out.println("vaultname     : The name of the vault.");
+        System.out
+                .println("region        : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1");
+        System.out
+                .println("prop_filename : If you want to specify explicitly AwsCredentials.properties");
+        System.out.println();
+        printCreateHelp();
+        System.out.println();
+        printDescribeHelp();
+        System.out.println();
+        printListHelp();
+        System.out.println();
+        printDeleteHelp();
+    }
+
+    @Override
+    void onExecInvalidParam() {
+        switch (cmdKind) {
+            case Create:
+                printCreateHelp();
+                break;
+            case Describe:
+                printDescribeHelp();
+                break;
+            case List:
+                printListHelp();
+                break;
+            case Delete:
+                printDeleteHelp();
+                break;
+            case Bad:
+                printHelp();
+                break;
+            case Help:
+                printHelp();
+                break;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     /**
@@ -192,11 +317,13 @@ public class VaultControllerCmd {
      * java -jar VaultController.jar list<br>
      * java -jar VaultController.jar delete vaultname
      * 
-     * @throws IOException
+     * @throws Exception
      */
 
-    public static void main(String[] args) throws IOException {
-
+    public static void main(String[] args) throws Exception {
+        if (!new VaultControllerCmd(args).exec()) {
+            System.exit(-1);
+        }
     }
 
 }

@@ -2,18 +2,14 @@
 package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
-import jp.mironal.java.aws.app.glacier.ArchiveController;
-import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.InventoryRetrievalResult;
 import jp.mironal.java.aws.app.glacier.JobRestoreParam;
 import jp.mironal.java.aws.app.glacier.LowLevelArchiveController;
 import jp.mironal.java.aws.app.glacier.StateLessJobOperations;
-import jp.mironal.java.aws.app.glacier.VaultController;
 
 import com.amazonaws.services.glacier.model.DescribeJobResult;
 import com.amazonaws.services.glacier.model.GlacierJobDescription;
@@ -24,35 +20,24 @@ import com.amazonaws.services.glacier.model.GlacierJobDescription;
  * 
  * @author yama
  */
-public class ArchiveLowLevelControlCmd {
+public class ArchiveLowLevelControlCmd extends CmdUtils {
 
-    enum Kind {
+    enum ArchiveLowLevelKind {
         Bad, Inventory, Archive, List, Describe,
+
     }
 
     enum Sync {
         Sync, Async,
     }
 
-    Kind cmdKind = Kind.Bad;
+    ArchiveLowLevelKind cmdKind = ArchiveLowLevelKind.Bad;
     Sync syncType = Sync.Sync;
     String vaultname = null;
     String archiveId = null;
 
     String jobId = null;
     String saveFile = null;
-    Region region = null;
-    File awsPropFile;
-    boolean debug = false;
-
-    private void setCmdKind(Kind cmd) {
-        if (this.cmdKind == Kind.Bad) {
-            this.cmdKind = cmd;
-        } else {
-            /* オプション違反 */
-            this.cmdKind = Kind.Bad;
-        }
-    }
 
     ArchiveLowLevelControlCmd(String[] args) {
         String endpointStr = null;
@@ -61,19 +46,19 @@ public class ArchiveLowLevelControlCmd {
             String arg = args[i];
 
             if (arg.equals("inventory-retrieval")) {
-                setCmdKind(Kind.Inventory);
+                setCmdKind(ArchiveLowLevelKind.Inventory);
             }
 
             if (arg.equals("archive-retrieval")) {
-                setCmdKind(Kind.Archive);
+                setCmdKind(ArchiveLowLevelKind.Archive);
             }
 
             if (arg.equals("list")) {
-                setCmdKind(Kind.List);
+                setCmdKind(ArchiveLowLevelKind.List);
             }
 
             if (arg.equals("desc")) {
-                setCmdKind(Kind.Describe);
+                setCmdKind(ArchiveLowLevelKind.Describe);
             }
 
             if (arg.equals("async")) {
@@ -126,88 +111,19 @@ public class ArchiveLowLevelControlCmd {
         }
 
         // プロパティーファイルが無かったらcmdをBadにする.
-        try {
-            awsPropFile = getAwsCredentialsPropertiesFile(propertiesName);
-        } catch (FileNotFoundException e) {
-            if (debug) {
-                System.out.println(e.getMessage());
-            }
-            cmdKind = Kind.Bad;
-        }
+        setAwsCredentialsPropertiesFile(propertiesName);
 
         // 変なRegionを設定されたらcmdをBadにする.
-        try {
-            region = getRegion(endpointStr);
-        } catch (InvalidRegionException e) {
-            if (debug) {
-                System.out.println(e.getMessage() + " is not found.");
-            }
-            cmdKind = Kind.Bad;
-        }
+        setRegion(endpointStr);
+
     }
 
-    File getAwsCredentialsPropertiesFile(String propertiesName) throws FileNotFoundException {
-        if (propertiesName == null) {
-            propertiesName = VaultController.AWS_PROPERTIES_FILENAME;
-        }
-
-        File propFile = new File(propertiesName);
-        if (propFile.isDirectory()) {
-            propFile = new File(propertiesName + File.separator
-                    + VaultController.AWS_PROPERTIES_FILENAME);
-        }
-        if (!propFile.exists()) {
-            throw new FileNotFoundException(propFile.getAbsolutePath() + "is not found.");
-        }
-
-        return propFile;
-    }
-
-    Region getRegion(String endpointStr) throws InvalidRegionException {
-        Region region = null;
-        if (endpointStr == null) {
-            region = ArchiveController.getDefaultEndpoint();
+    private void setCmdKind(ArchiveLowLevelKind cmd) {
+        if (this.cmdKind == ArchiveLowLevelKind.Bad) {
+            this.cmdKind = cmd;
         } else {
-            if (ArchiveController.containEndpoint(endpointStr)) {
-                region = ArchiveController.convertToRegion(endpointStr);
-            } else {
-                throw new InvalidRegionException(endpointStr);
-            }
-        }
-        return region;
-    }
-
-    /**
-     * エラーなどでプログラムを終了させるときはこの関数で終了させるようにする.
-     * 
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ParseException
-     */
-    private void exec() throws IOException, InterruptedException, ParseException {
-
-        if (!validateInventoryParam()) {
-            System.exit(-1);
-        }
-        switch (cmdKind) {
-            case Inventory:
-
-                execInventory();
-                break;
-            case List:
-                execList();
-                break;
-            case Archive:
-                execArchive();
-                break;
-            case Describe:
-                execDescribe();
-                break;
-            case Bad:
-                execBad();
-                break;
-            default:
-                throw new IllegalStateException("Unkonwn cmd.");
+            /* オプション違反 */
+            this.cmdKind = ArchiveLowLevelKind.Bad;
         }
     }
 
@@ -285,19 +201,21 @@ public class ArchiveLowLevelControlCmd {
         LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
         controller.initiateInventoryJob(vaultname);
         printJobRestoreParam(controller);
-
     }
 
     /**
      * @return
      */
-    boolean validateInventoryParam() {
+    @Override
+    boolean validateParam() {
         // trueを代入するロジックは初期化のところだけとする.
         boolean ok = true;
         if (region == null) {
+            debugPrint("region is null.");
             ok = false;
         }
         if (awsPropFile == null) {
+            debugPrint("awsPropFile is null.");
             ok = false;
         }
         switch (cmdKind) {
@@ -322,6 +240,7 @@ public class ArchiveLowLevelControlCmd {
 
             case Inventory:
                 if (vaultname == null) {
+                    debugPrint("vaultname is null.");
                     ok = false;
                 }
 
@@ -329,6 +248,7 @@ public class ArchiveLowLevelControlCmd {
 
             case List:
                 if (vaultname == null) {
+                    debugPrint("vaultname is null.");
                     ok = false;
                 }
                 break;
@@ -420,12 +340,52 @@ public class ArchiveLowLevelControlCmd {
      * <br>
      * 
      * @param args
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ParseException
+     * @throws Exception
      */
-    public static void main(String[] args) throws IOException, InterruptedException, ParseException {
+    public static void main(String[] args) throws Exception {
         new ArchiveLowLevelControlCmd(args).exec();
+    }
+
+    @Override
+    void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
+        System.err.println(filename + " is not found.");
+        setCmdKind(ArchiveLowLevelKind.Bad);
+    }
+
+    @Override
+    void onRegionNotFound(String endpointStr, Throwable e) {
+        System.err.println(e.getMessage() + " is not found.");
+        setCmdKind(ArchiveLowLevelKind.Bad);
+    }
+
+    @Override
+    void onExecCommand() throws Exception {
+        switch (cmdKind) {
+            case Inventory:
+                execInventory();
+                break;
+            case List:
+                execList();
+                break;
+            case Archive:
+                execArchive();
+                break;
+            case Describe:
+                execDescribe();
+                break;
+            case Bad:
+                execBad();
+                break;
+            default:
+                throw new IllegalStateException("Unkonwn cmd.");
+        }
+
+    }
+
+    @Override
+    void onExecInvalidParam() {
+        // TODO Auto-generated method stub
+
     }
 
 }

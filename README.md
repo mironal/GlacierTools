@@ -65,7 +65,55 @@ Job出力とはArchiveのデータそのものや、Archiveの一覧を含むテ
 2. archive_controller.jar
 3. job_controller.jar
 
-### vault_controller.jar
+## vault_controller.jar
 Vaultに対する操作を行うコマンドです.
-####使用方法
-java -jar vault_controller.jar cmd [--vault vaultname]
+###使用方法
+`java -jar vault_controller.jar cmd [--vault vaultname] [--region region] [--properties prop_filename]`
+
+    cmd           : create | desc | list | delete | help
+    vaultname     : The name of the vault.
+    region        : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
+    prop_filename : If you want to specify explicitly AwsCredentials.properties
+    
+###example
+####Vaultの作成(Create Vault)
+#####デフォルトのリージョン(us-east-1)にvaultnameというVaultを作成
+    java -jar vault_controller.jar create --vault vaultname
+    
+#####指定したリージョン(ap-northeast-1)にvaultnameというVaultを作成
+    java -jar vault_controller.jar create --vault vaultname --region ap-northeast-1
+#####指定したとAwsCredentials.propertiesを使用してvaultnameというVaultを作成
+    java -jar vault_controller.jar create --vault vaultname --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.propertiesを指定してvaultnameというVaultを作成
+    java -jar vault_controller.jar create --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
+
+####Vaultの詳細取得
+#####デフォルトのリージョンのvaultnameというVaultの詳細を取得.
+    java -jar vault_controller.jar desc --vault vaultname
+#####リージョン指定
+    java -jar vault_controller.jar desc --vault vaultname --region us_west-2
+#####AwsCredentials.properties指定
+    java -jar vault_controller.jar desc --vault vaultname --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar vault_controller.jar desc --vault vaultname --region us_west-2 --properties myAwsPropFile.properties
+####Vault一覧を取得
+#####デフォルトのリージョンのVault一覧を取得
+    java -jar vault_controller.jar list
+#####リージョン指定
+    java -jar vault_controller.jar list --region ue-west-2
+#####AwsCredentials.properties指定
+    java -jar vault_controller.jar list --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar vault_controller.jar list --region us_west-2 --properties myAwsPropFile.properties
+    
+    
+####Vault削除
+#####デフォルトのリージョン(us-east-1)にvaultnameというVaultを削除
+    java -jar vault_controller.jar delete --vault vaultname
+#####リージョン指定
+    java -jar vault_controller.jar delete --vault vaultname --region ap-northeast-1
+#####AwsCredentials.properties指定
+    java -jar vault_controller.jar delete --vault vaultname --properties myAwsPropFile.properties
+#####リージョンとAwsCredentials.properties指定
+    java -jar vault_controller.jar delete --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
+

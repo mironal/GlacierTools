@@ -176,36 +176,31 @@ public class JobOperatorCmdTest {
     @Test
     public void test_Region() {
         JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
-                "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-east-1"
+                "desc", "--vault", "bbbbb", "--job", "jobId", "--region", "us-east-1"
         });
 
         assertEquals(cmd.region, Region.US_EAST_1);
 
         cmd = new JobOperatorCmd(new String[] {
-                "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-west-1"
+                "desc", "--vault", "bbbbb", "--job", "jobId", "--region", "us-west-1"
         });
 
         assertEquals(cmd.region, Region.US_WEST_1);
 
         cmd = new JobOperatorCmd(new String[] {
-                "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "us-west-2"
+                "desc", "--vault", "bbbbb", "--job", "jobId", "--region", "us-west-2"
         });
 
-        try {
-            assertEquals(cmd.region, Region.US_WEST_2);
-        } catch (InvalidRegionException e) {
-            fail();
-            e.printStackTrace();
-        }
+        assertEquals(cmd.region, Region.US_WEST_2);
 
         cmd = new JobOperatorCmd(new String[] {
-                "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "eu-west-1"
+                "desc", "--vault", "bbbbb", "--job", "jobId", "--region", "eu-west-1"
         });
 
         assertEquals(cmd.region, Region.EU_WEST_1);
 
         cmd = new JobOperatorCmd(new String[] {
-                "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "ap-northeast-1"
+                "desc", "--vault", "bbbbb", "--job", "jobId", "--region", "ap-northeast-1"
         });
 
         assertEquals(cmd.region, Region.AP_NORTHEAST_1);
@@ -216,7 +211,7 @@ public class JobOperatorCmdTest {
     @Test()
     public void test_Region_Invalid() throws InvalidRegionException {
         JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
-                "desc", "--vault", "bbbbb", "--job", "jobId", "--endpoint", "aa"
+                "desc", "--vault", "bbbbb", "--job", "jobId", "--region", "aa"
         });
         assertNull(cmd.region);
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Bad);

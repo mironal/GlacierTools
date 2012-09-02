@@ -3,13 +3,9 @@ package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.ArchiveController;
-import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
-import jp.mironal.java.aws.app.glacier.AwsTools.Region;
-import jp.mironal.java.aws.app.glacier.GlacierTools;
 import jp.mironal.java.aws.app.glacier.VaultController;
 
 import com.amazonaws.services.glacier.model.DescribeVaultOutput;
@@ -50,6 +46,10 @@ public class ArchiveControllerCmd extends CmdUtils {
 
             if (arg.equals("delete")) {
                 setCmdKind(ArchiveCmdKind.Delete);
+            }
+
+            if (arg.equals("-h") || arg.equals("--help") || arg.equals("help")) {
+                setCmdKind(ArchiveCmdKind.Help);
             }
 
             if (arg.equals("--vault")) {

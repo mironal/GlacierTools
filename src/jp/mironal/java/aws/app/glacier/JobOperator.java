@@ -37,12 +37,11 @@ public class JobOperator extends StateLessJobOperator {
     public static final String STATUS_SUCCEEDED = "Succeeded";
     public static final String STATUS_FAILED = "Failed";
 
-    public static JobOperator restoreJob(JobRestoreParam param, File awsProperties)
-            throws IOException {
-        JobOperator operator = new JobOperator(param.getRegion(), awsProperties);
-        operator.jobId = param.getJobId();
-        operator.vaultName = param.getVaultName();
-        return operator;
+    static JobOperator restore(JobRestoreParam param, File awsProperties) throws IOException {
+
+        JobOperator jobOperator = new JobOperator(param.getRegion(), awsProperties);
+        jobOperator.alreadyInitiate = true;
+        return jobOperator;
     }
 
     private boolean alreadyInitiate = false;

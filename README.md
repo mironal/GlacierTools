@@ -76,7 +76,7 @@ Vaultに対する操作を行うコマンドです.以下の機能を提供し�
 4. Vaultの削除
 
 ###使用方法
-`java -jar vault_controller.jar cmd [--vault vaultname] [--region region] [--properties prop_filename]`
+    java -jar vault_controller.jar cmd [--vault vaultname] [--region region] [--properties prop_filename]
 
     cmd          : create | desc | list | delete | help
     --vault      : The name of the Vault.
@@ -121,7 +121,7 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
 3. Archiveの削除
 
 ###使用方法
-`java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]`
+    java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]
 
     cmd          : upload | donwload | delete
     --vault      : The name of the Vault.
@@ -173,7 +173,7 @@ Jobに対する操作を行うコマンドです.以下の機能を提供しま�
 Jobの開始の際に--asyncオプションをつけることによって、Jobの完了を待機せずにプログラムを終了できます.終了時にJobの復元に必要なパラメータが出力されるので、restore_job.jarと組み合わせることで非同期的にJobの制御を行うことができます.
 
 ###使用方法
-`java -jar job_operator.jar cmd [--vault vaultname]　[--archive archiveId] [--file filename] [--job jobId] [--region region] [--properties prop_filename] [--async]`
+    java -jar job_operator.jar cmd [--vault vaultname]　[--archive archiveId] [--file filename] [--job jobId] [--region region] [--properties prop_filename] [--async]
 
     cmd          : inventory | archive | list | desc | help
     --vault      : The name of the Vault.
@@ -219,9 +219,26 @@ job_operator.jarに--asyncオプションを指定して実行したJobの復元
 
 
 ###使用方法
-`java -jar restore_job.jar cmd [--restore restore_prop_filename] [--properties prop_filename]`
+java -jar restore_job.jar cmd [--restore restore_prop_filename] [--file filename] [--properties prop_filename]
 
     cmd          : download | check | desc
-    --restore    : 
+    --restore    : job_operator.jarの結果が記述されているファイル.
+    --file       : When the download of Archive is the name of the saved file
     --properties : If you want to specify explicitly AwsCredentials.properties
+    
+###exsample
+####inventoryのJobを復元してダウンロード
+    java -jar restore_job.jar download --restore  restore_prop_filename
+####archiveのJobを復元してダウンロード
+    java -jar restore_job.jar download --file filename --restore  restore_prop_filename
+####Jobを復元して、StatusCodeをチェック
+    java -jar restore_job.jar check --restore  restore_prop_filename
+####Jobを復元して、詳細を取得
+    java -jar restore_job.jar desc --restore  restore_prop_filename
+    
+###--restoreのファイル構造
+
+    JobId=XXXXXXXXXXX
+    VaultName=YYYYYYY
+    Region=ZZZZZZZZZZ
     

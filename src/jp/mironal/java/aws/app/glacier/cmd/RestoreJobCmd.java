@@ -5,11 +5,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Properties;
 
-import jp.mironal.java.aws.app.glacier.JobOperator;
+import jp.mironal.java.aws.app.glacier.InventoryRetrievalResult;
 import jp.mironal.java.aws.app.glacier.JobRestoreParam;
 import jp.mironal.java.aws.app.glacier.JobRestoreParam.Builder;
+import jp.mironal.java.aws.app.glacier.RestoreJobOperator;
+
+import com.amazonaws.services.glacier.model.DescribeJobResult;
 
 public class RestoreJobCmd extends CmdUtils {
 
@@ -26,6 +30,7 @@ public class RestoreJobCmd extends CmdUtils {
 
     JobRestoreParam jobRestoreParam = null;
     RestoreJobCmdKind cmdKind = RestoreJobCmdKind.Bad;
+    String filename;
 
     /**
      * @param args
@@ -49,6 +54,12 @@ public class RestoreJobCmd extends CmdUtils {
 
             if (arg.equals("-h") || arg.equals("--help") || arg.equals("help")) {
                 setCmdKind(RestoreJobCmdKind.Help);
+            }
+            if (arg.equals("--file")) {
+                if ((i + 1) < args.length) {
+                    i++;
+                    filename = args[i];
+                }
             }
 
             if (arg.equals("--restore")) {
@@ -138,23 +149,53 @@ public class RestoreJobCmd extends CmdUtils {
         setCmdKind(RestoreJobCmdKind.Bad);
     }
 
-    private void execDownload() throws IOException {
-        JobOperator operator = JobOperator.restoreJob(jobRestoreParam, awsPropFile);
-        // Jobの種類(archive, inventory)のチェック
+    private void execDownload() throws IOException, InterruptedException, ParseException {
+        RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam, awsPropFile);
+
         // 完了状態をチェック
         // 完了してなからったら待つ
-        // 完了してたらダウンロード
+        if (operator.waitForJobComplete()) {
+            // 完了してたらダウンロード
+            // Jobの種類(archive, inventory)のチェック
+            operator.updateJobKind();
 
+            if (operator.getAction().equals(RestoreJobOperator.ACTION_ARCHIVE_RETRIEVAL)) {
+                if (filename == null) {
+                    System.out.println("--filename option is not specified");
+                    System.exit(-1);
+                }
+                operator.downloadArchiveJobOutput(new File(filename));
+            } else if (operator.getAction().equals(RestoreJobOperator.ACTION_INVENTORY_RETRIEVAL)) {
+                InventoryRetrievalResult result = operator.downloadInventoryJobOutput();
+                System.out.println(result.toString());
+            }
+        } else {
+            System.out.println("job fault.");
+        }
+    }
+
+    private void execCheck() throws IOException {
+        RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam, awsPropFile);
+        System.out.println(operator.getStatusCode());
+    }
+
+    private void execDesc() throws IOException {
+        RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam, awsPropFile);
+        DescribeJobResult result = operator.describeJob();
+        printDescribeJob(result);
     }
 
     @Override
     void onExecCommand() throws Exception {
         switch (cmdKind) {
             case Download:
+                execDownload();
                 break;
             case Check:
+                execCheck();
                 break;
             case Desc:
+                execDesc();
                 break;
             case Help:
                 break;
@@ -168,8 +209,6 @@ public class RestoreJobCmd extends CmdUtils {
 
     @Override
     void onExecInvalidParam() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import com.amazonaws.services.glacier.model.DescribeJobResult;
 import com.amazonaws.services.glacier.model.DescribeVaultOutput;
+import com.amazonaws.services.glacier.model.GlacierJobDescription;
 
 import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
@@ -123,6 +125,40 @@ public abstract class CmdUtils {
             }
         }
         return false;
+    }
+
+    protected void printDescribeJob(DescribeJobResult result) {
+        System.out.println("Action               : " + result.getAction());
+        System.out.println("ArchiveId            : " + result.getArchiveId());
+        System.out.println("ArchiveSizeInBytes   : " + result.getArchiveSizeInBytes());
+        System.out.println("Completed            : " + result.getCompleted());
+        System.out.println("CompletionDate       : " + result.getCompletionDate());
+        System.out.println("CreationDate         : " + result.getCreationDate());
+        System.out.println("InventorySizeInBytes : " + result.getInventorySizeInBytes());
+        System.out.println("JobDescription       : " + result.getJobDescription());
+        System.out.println("JobId                : " + result.getJobId());
+        System.out.println("SHA256TreeHash       : " + result.getSHA256TreeHash());
+        System.out.println("SNSTopic             : " + result.getSNSTopic());
+        System.out.println("StatusCode           : " + result.getStatusCode());
+        System.out.println("StatusMessage        : " + result.getStatusMessage());
+        System.out.println("VaultARN             : " + result.getVaultARN());
+    }
+
+    protected void printGlacierJobDescriptionf(GlacierJobDescription description) {
+        System.out.println("Action               : " + description.getAction());
+        System.out.println("ArchiveId            : " + description.getArchiveId());
+        System.out.println("ArchiveSizeInBytes   : " + description.getArchiveSizeInBytes());
+        System.out.println("Completed            : " + description.getCompleted());
+        System.out.println("CompletionDate       : " + description.getCompletionDate());
+        System.out.println("CreationDate         : " + description.getCreationDate());
+        System.out.println("InventorySizeInBytes : " + description.getInventorySizeInBytes());
+        System.out.println("JobDescription       : " + description.getJobDescription());
+        System.out.println("JobId                : " + description.getJobId());
+        System.out.println("SHA256TreeHash       : " + description.getSHA256TreeHash());
+        System.out.println("SNSTopic             : " + description.getSNSTopic());
+        System.out.println("StatusCode           : " + description.getStatusCode());
+        System.out.println("StatusMessage        : " + description.getStatusMessage());
+        System.out.println("VaultARN             : " + description.getVaultARN());
     }
 
     abstract void onExecCommand() throws Exception;

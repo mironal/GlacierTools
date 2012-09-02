@@ -1,6 +1,8 @@
 
 package jp.mironal.java.aws.app.glacier;
 
+import jp.mironal.java.aws.app.glacier.AwsTools.Region;
+
 /**
  * InitiateしたJobを後で参照するために必要な情報.
  */
@@ -13,6 +15,8 @@ public class JobRestoreParam {
 
         /** The ID of the job */
         private String jobId = null;
+
+        private Region region = null;
 
         /**
          * JobRestoreParamインスタンスを生成する.<br>
@@ -27,6 +31,9 @@ public class JobRestoreParam {
             if (this.jobId == null) {
                 throw new NullPointerException("jobId is null.");
             }
+            if (this.region == null) {
+                throw new NullPointerException("region is null.");
+            }
 
             return new JobRestoreParam(this);
         }
@@ -38,6 +45,10 @@ public class JobRestoreParam {
          * @return　Themselves
          */
         public Builder setVaultName(String vaultname) {
+            if (vaultname == null) {
+                throw new NullPointerException("vaultname is null.");
+            }
+
             this.vaultName = vaultname;
             return this;
         }
@@ -49,7 +60,20 @@ public class JobRestoreParam {
          * @return Themselves
          */
         public Builder setJobId(String jobId) {
+            if (jobId == null) {
+                throw new NullPointerException("jobId is null.");
+            }
+
             this.jobId = jobId;
+            return this;
+        }
+
+        public Builder setRegion(Region region) {
+            if (region == null) {
+                throw new NullPointerException("region is null.");
+            }
+
+            this.region = region;
             return this;
         }
     }
@@ -60,6 +84,9 @@ public class JobRestoreParam {
     /** The ID of the job */
     private final String jobId;
 
+    /* region */
+    private final Region region;
+
     /**
      * Builder以外からは作れないようにprivateにした.<br>
      * 
@@ -68,6 +95,7 @@ public class JobRestoreParam {
     private JobRestoreParam(Builder builder) {
         this.vaultName = builder.vaultName;
         this.jobId = builder.jobId;
+        this.region = builder.region;
     }
 
     /**
@@ -86,5 +114,14 @@ public class JobRestoreParam {
      */
     public String getJobId() {
         return jobId;
+    }
+
+    /**
+     * Get the region.
+     * 
+     * @return region.
+     */
+    public Region getRegion() {
+        return region;
     }
 }

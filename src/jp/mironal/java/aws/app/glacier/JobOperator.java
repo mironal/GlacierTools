@@ -61,7 +61,7 @@ public class JobOperator extends StateLessJobOperator {
             throw new IllegalStateException("Job has not yet started");
         }
         Builder builder = new Builder();
-        builder.setVaultName(this.vaultName).setJobId(this.jobId);
+        builder.setVaultName(this.vaultName).setJobId(this.jobId).setRegion(this.region);
         return builder.build();
     }
 

@@ -18,6 +18,7 @@ public class GlacierTools extends AwsTools {
      * コマンドラインオプションの変換等に使う
      */
     private static final HashMap<String, Region> ENDPOINTS;
+
     static {
         ENDPOINTS = new HashMap<String, AwsTools.Region>();
         // リージョンは色々あるが、Glacierが対応しているリージョンのみを含める
@@ -62,17 +63,19 @@ public class GlacierTools extends AwsTools {
         return ENDPOINTS.get(key);
     }
 
-    protected AmazonGlacierClient client;
-    protected AWSCredentials credentials;
+    protected final AmazonGlacierClient client;
+    protected final AWSCredentials credentials;
+    protected final Region region;
 
     public GlacierTools() throws IOException {
         this(getDefaultEndpoint(), new File(AWS_PROPERTIES_FILENAME));
     }
 
     public GlacierTools(Region endpoint, File awsProperties) throws IOException {
-        credentials = new PropertiesCredentials(awsProperties);
-        client = new AmazonGlacierClient(credentials);
-        client.setEndpoint(makeUrl(AwsService.Glacier, endpoint));
+        this.region = endpoint;
+        this.credentials = new PropertiesCredentials(awsProperties);
+        this.client = new AmazonGlacierClient(credentials);
+        this.client.setEndpoint(makeUrl(AwsService.Glacier, endpoint));
     }
 
 }

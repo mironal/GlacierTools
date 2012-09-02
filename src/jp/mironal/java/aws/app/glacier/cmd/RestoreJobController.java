@@ -62,7 +62,7 @@ public class RestoreJobController {
      * * java -jar lowlevelControl.jar [restore] [jobType] {syncType}<br>
      * [--restore restore_prop_filename]<br>
      * <br>
-     * [jobType] = inventory-retrieval | archive-retrieval | list | desc<br>
+     * [jobType] = download | check<br>
      * [syncType] = sync | async<br>
      * [endpoint] = ushogehoge<br>
      * <br>

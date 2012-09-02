@@ -190,7 +190,6 @@ Jobの開始の際に--asyncオプションをつけることによって、Job�
 ##### リージョン指定
     java -jar job_operator.jar inventory --vault vaultname --region ap-northeast-1
 
-    
 ####Archiveのダウンロード(Download Archive)
 #####デフォルトのリージョン(us-east-1)のvaultnameというVaultにあるarchiveIdのArchiveをfilenameという名前でダウンロード
     java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename
@@ -212,3 +211,17 @@ Jobの開始の際に--asyncオプションをつけることによって、Job�
     java -jar job_operator.jar desc --vault vaultname --job jobId --region ap-northeast-1
 
 
+## restore_job.jar
+job_operator.jarに--asyncオプションを指定して実行したJobの復元を行います.
+
+1. Job出力の取得(donload)
+2. Jobが完了しているかチェック.
+
+
+###使用方法
+`java -jar restore_job.jar cmd [--restore restore_prop_filename] [--properties prop_filename]`
+
+    cmd          : download | check | desc
+    --restore    : 
+    --properties : If you want to specify explicitly AwsCredentials.properties
+    

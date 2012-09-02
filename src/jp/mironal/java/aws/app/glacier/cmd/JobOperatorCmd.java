@@ -292,6 +292,7 @@ public class JobOperatorCmd extends CmdUtils {
         JobRestoreParam param = controller.getJobRestoreParam();
         System.out.println("JobId=" + param.getJobId());
         System.out.println("VaultName=" + param.getVaultName());
+        System.out.println("Region=" + param.getRegion().getEndpoint());
 
     }
 

@@ -262,7 +262,8 @@ public class JobOperatorCmd extends CmdUtils {
                     ok = false;
                 }
                 break;
-
+            case Help:
+                break;
             default:
                 throw new IllegalStateException("Unknown type.");
         }
@@ -354,16 +355,98 @@ public class JobOperatorCmd extends CmdUtils {
                 execDescribe();
                 break;
             case Bad:
-
+                printHelp();
                 break;
             default:
                 throw new IllegalStateException("Unkonwn cmd.");
         }
     }
 
+    private void printInventoryHelp() {
+        System.out.println("Get Vault inventory.");
+        System.out.print("    ");
+        System.out.println("java -jar job_operator.jar inventory --vault vaultname");
+        printHelpHelper("inventory", " --vault vaultname");
+    }
+
+    private void printArchiveHelp() {
+        System.out.println("Download Archive.");
+        System.out.print("    ");
+        System.out
+                .println("java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename");
+        printHelpHelper("archive", " --vault vaultname --archive archiveId --file filename");
+    }
+
+    private void printListHelp() {
+        System.out.println("Get Job list.");
+        System.out.print("    ");
+        System.out.println("java -jar job_operator.jar list --vault vaultname");
+        printHelpHelper("list", " --vault vaultname");
+    }
+
+    private void printDescriveHelp() {
+        System.out.println("Get Job Describe.");
+        System.out.print("    ");
+        System.out.println("java -jar job_operator.jar desc --vault vaultname --job jobId");
+        printHelpHelper("desc", " --vault vaultname --job jobId");
+    }
+
+    private void printHelp() {
+        System.out
+                .println("java -jar job_operator.jar cmd [--vault vaultname]　[--archive archiveId] [--file filename] [--job jobId] [--region region] [--properties prop_filename] [--async]");
+        System.out.println();
+        System.out.println("cmd          : inventory | archive | list | desc | help");
+        System.out.println("--vault      : The name of the Vault.");
+        System.out.println("--archive    : The ID of the Archive.");
+        System.out.println("--job        : The ID of the Job.");
+        System.out.println("--file       : Save file name.");
+        System.out
+                .println("--region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1");
+        System.out
+                .println("--properties : If you want to specify explicitly AwsCredentials.properties.");
+        System.out.println();
+        printInventoryHelp();
+        System.out.println();
+        printArchiveHelp();
+        System.out.println();
+        printListHelp();
+        System.out.println();
+        printDescriveHelp();
+        System.out.println();
+        printRegion();
+    }
+
+    private void printHelpHelper(String kind, String opt) {
+        System.out.println("Specify the region.");
+        System.out.print("    ");
+        System.out.println("java -jar job_operator.jar " + kind + opt + " --region us-west-2");
+        System.out.println("Specifies the AwsCredentials.properties file.");
+        System.out.print("    ");
+        System.out.println("java -jar job_operator.jar " + kind + opt
+                + " --properties myAwsPropFile.properties");
+        System.out.println("Specify the region and AwsCredentials.properties.");
+        System.out.print("    ");
+        System.out.println("java -jar job_operator.jar " + kind + opt
+                + " --region us-west-2 --properties myAwsPropFile.properties");
+    }
+
     @Override
     void onExecInvalidParam() {
-
+        switch (cmdKind) {
+            case Inventory:
+                printInventoryHelp();
+                break;
+            case Archive:
+                printArchiveHelp();
+                break;
+            case List:
+                printListHelp();
+                break;
+            case Describe:
+                printDescriveHelp();
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     /**

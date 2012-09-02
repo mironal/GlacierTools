@@ -119,3 +119,8 @@ Vaultに対する操作を行うコマンドです.
 #####リージョンとAwsCredentials.properties指定
     java -jar vault_controller.jar delete --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
 
+## archive_controller.jar
+Archiveに対する操作をするコマンドです。
+
+###使用方法
+java -jar archive_controller.jar 

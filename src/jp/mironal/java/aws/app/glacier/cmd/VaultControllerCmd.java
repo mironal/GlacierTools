@@ -42,7 +42,7 @@ public class VaultControllerCmd extends CmdUtils {
                 setCmdKind(VaultCmdKind.Delete);
             }
 
-            if (arg.equals("-h") || arg.equals("--help")) {
+            if (arg.equals("-h") || arg.equals("--help") || arg.equals("help")) {
                 setCmdKind(VaultCmdKind.Help);
             }
 

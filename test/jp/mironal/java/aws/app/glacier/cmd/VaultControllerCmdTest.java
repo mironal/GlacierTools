@@ -168,6 +168,13 @@ public class VaultControllerCmdTest {
         assertEquals(cmd.cmdKind, VaultCmdKind.Help);
         assertNull(cmd.vaultName);
         assertTrue(cmd.validateParam());
+
+        cmd = new VaultControllerCmd(new String[] {
+            "help"
+        });
+        assertEquals(cmd.cmdKind, VaultCmdKind.Help);
+        assertNull(cmd.vaultName);
+        assertTrue(cmd.validateParam());
     }
 
 }

@@ -18,7 +18,7 @@ import com.amazonaws.services.glacier.transfer.UploadResult;
 public class ArchiveControllerCmd extends CmdUtils {
 
     enum ArchiveCmdKind {
-        Bad, Upload, Download, Delete
+        Bad, Upload, Download, Delete, Help,
     }
 
     ArchiveCmdKind cmdKind = ArchiveCmdKind.Bad;

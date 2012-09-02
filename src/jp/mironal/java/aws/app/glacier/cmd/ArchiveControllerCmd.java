@@ -210,10 +210,6 @@ public class ArchiveControllerCmd extends CmdUtils {
         System.out.println("delete success!");
     }
 
-    private void execBad() {
-
-    }
-
     boolean checkFileExist(String filename) {
         File file = new File(filename);
         return file.exists() && file.isFile();
@@ -284,7 +280,7 @@ public class ArchiveControllerCmd extends CmdUtils {
                 break;
 
             case Bad:
-                execBad();
+                printHelp();
                 break;
 
             default:
@@ -301,9 +297,100 @@ public class ArchiveControllerCmd extends CmdUtils {
 
     }
 
+    private void printUploadHelp() {
+        System.out.println("Upload Archive");
+        System.out.print("    ");
+        System.out
+                .println("java -jar archive_controller.jar upload --vault vaultname --file filename");
+        printHelpHelper("create", " --vault vaultname --file filename");
+    }
+
+    private void printDownloadHelp() {
+        System.out.println("Download Archive");
+        System.out.print("    ");
+        System.out
+                .println("java -jar archive_controller.jar download --vault vaultname --archive archiveId --file filename");
+        printHelpHelper("create", "--vault vaultname --archive archiveId --file filename");
+        System.out
+                .println("If there is a file with the same name at the time of download, Force overwrite.");
+        System.out
+                .println("java -jar archive_controller.jar download --vault vaultname --archive archiveId --file filename -force");
+
+    }
+
+    private void printDeleteHelp() {
+        System.out.println("Delete Archive");
+        System.out.print("    ");
+        System.out
+                .println("java -jar archive_controller.jar delete --vault vaultname --file filename");
+        printHelpHelper("delete", " --vault vaultname --file filename");
+    }
+
+    private void printHelpHelper(String kind, String opt) {
+        System.out.println("Specify the region.");
+        System.out.print("    ");
+        System.out
+                .println("java -jar archive_controller.jar " + kind + opt + " --region us-west-2");
+        System.out.println("Specifies the AwsCredentials.properties file.");
+        System.out.print("    ");
+        System.out.println("java -jar archive_controller.jar " + kind + opt
+                + " --properties myAwsPropFile.properties");
+        System.out.println("Specify the region and AwsCredentials.properties.");
+        System.out.print("    ");
+        System.out.println("java -jar archive_controller.jar " + kind + opt
+                + " --region us-west-2 --properties myAwsPropFile.properties");
+    }
+
+    private void printHelp() {
+        System.out
+                .println("java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]");
+        System.out.println();
+
+        System.out.println("cmd          : upload | donwload | delete");
+        System.out.println("--vault      : The name of the Vault.");
+        System.out.println("--archive    : The ID of the archive.");
+        System.out
+                .println("--file       : Specifies the name of a file that is uploaded when the upload. When the download is the name of the saved file.");
+        System.out
+                .println("--force      : If there is a file with the same name at the time of download, Force overwrite.");
+        System.out
+                .println("--region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1");
+        System.out
+                .println("--properties : If you want to specify explicitly AwsCredentials.properties");
+        System.out.println();
+        printUploadHelp();
+        System.out.println();
+        printDownloadHelp();
+        System.out.println();
+        printDeleteHelp();
+        System.out.println();
+        printRegion();
+
+    }
+
     @Override
     void onExecInvalidParam() {
-        System.exit(-1);
+        switch (cmdKind) {
+            case Upload:
+                printUploadHelp();
+                break;
+
+            case Download:
+                printDownloadHelp();
+                break;
+
+            case Delete:
+                printDeleteHelp();
+                break;
+
+            case Bad:
+                printHelp();
+                break;
+
+            default:
+                throw new IllegalStateException();
+        }
+
     }
 
     @Override

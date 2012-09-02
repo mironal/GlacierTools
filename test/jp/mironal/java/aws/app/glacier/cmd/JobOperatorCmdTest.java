@@ -20,7 +20,7 @@ public class JobOperatorCmdTest {
         assertEquals(cmd.vaultname, "hogehoge");
         assertNull(cmd.archiveId);
         assertNull(cmd.jobId);
-        assertNull(cmd.saveFile);
+        assertNull(cmd.filename);
         assertEquals(cmd.syncType, Sync.Sync);
 
         assertTrue(cmd.validateParam());
@@ -80,7 +80,7 @@ public class JobOperatorCmdTest {
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, "homuhomu");
         assertEquals(cmd.archiveId, "archiveId");
-        assertEquals(cmd.saveFile, "hoge.zip");
+        assertEquals(cmd.filename, "hoge.zip");
         assertTrue(cmd.validateParam());
     }
 
@@ -94,7 +94,7 @@ public class JobOperatorCmdTest {
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, null);
         assertEquals(cmd.archiveId, "archiveId");
-        assertEquals(cmd.saveFile, "hoge.zip");
+        assertEquals(cmd.filename, "hoge.zip");
         assertFalse(cmd.validateParam());
 
         // archive無し
@@ -105,7 +105,7 @@ public class JobOperatorCmdTest {
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, "homuhomu");
         assertEquals(cmd.archiveId, null);
-        assertEquals(cmd.saveFile, "hoge.zip");
+        assertEquals(cmd.filename, "hoge.zip");
         assertFalse(cmd.validateParam());
 
         // file無し
@@ -116,7 +116,7 @@ public class JobOperatorCmdTest {
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Archive);
         assertEquals(cmd.vaultname, "homuhomu");
         assertEquals(cmd.archiveId, "archiveId");
-        assertEquals(cmd.saveFile, null);
+        assertEquals(cmd.filename, null);
         assertFalse(cmd.validateParam());
     }
 

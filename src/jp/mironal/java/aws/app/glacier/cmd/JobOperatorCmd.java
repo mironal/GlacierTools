@@ -7,8 +7,8 @@ import java.text.ParseException;
 import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.InventoryRetrievalResult;
-import jp.mironal.java.aws.app.glacier.JobRestoreParam;
 import jp.mironal.java.aws.app.glacier.JobOperator;
+import jp.mironal.java.aws.app.glacier.JobRestoreParam;
 import jp.mironal.java.aws.app.glacier.StateLessJobOperator;
 
 import com.amazonaws.services.glacier.model.DescribeJobResult;
@@ -37,7 +37,7 @@ public class JobOperatorCmd extends CmdUtils {
     String archiveId = null;
 
     String jobId = null;
-    String saveFile = null;
+    String filename = null;
 
     JobOperatorCmd(String[] args) {
         String endpointStr = null;
@@ -59,6 +59,10 @@ public class JobOperatorCmd extends CmdUtils {
 
             if (arg.equals("desc")) {
                 setCmdKind(ArchiveLowLevelKind.Describe);
+            }
+
+            if (arg.equals("-h") || arg.equals("--help") || arg.equals("help")) {
+                setCmdKind(ArchiveLowLevelKind.Help);
             }
 
             if (arg.equals("--async")) {
@@ -92,10 +96,11 @@ public class JobOperatorCmd extends CmdUtils {
                     endpointStr = args[i];
                 }
             }
+
             if (arg.equals("--file")) {
                 if ((i + 1) < args.length) {
                     i++;
-                    saveFile = args[i];
+                    filename = args[i];
                 }
             }
 
@@ -105,6 +110,7 @@ public class JobOperatorCmd extends CmdUtils {
                     propertiesName = args[i];
                 }
             }
+
             if (arg.equals("--debug")) {
                 debug = true;
             }
@@ -138,7 +144,7 @@ public class JobOperatorCmd extends CmdUtils {
         controller.initiateArchiveJob(vaultname, archiveId);
         boolean successful = controller.waitForJobToComplete();
         if (successful) {
-            controller.downloadArchiveJobOutput(new File(saveFile));
+            controller.downloadArchiveJobOutput(new File(filename));
         } else {
             System.out.println("download fault.");
         }
@@ -224,7 +230,7 @@ public class JobOperatorCmd extends CmdUtils {
                 }
                 switch (syncType) {
                     case Sync:
-                        if (saveFile == null) {
+                        if (filename == null) {
                             ok = false;
                         }
                         break;

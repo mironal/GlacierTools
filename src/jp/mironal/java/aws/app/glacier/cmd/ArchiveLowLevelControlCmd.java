@@ -8,8 +8,8 @@ import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.InventoryRetrievalResult;
 import jp.mironal.java.aws.app.glacier.JobRestoreParam;
-import jp.mironal.java.aws.app.glacier.LowLevelArchiveController;
-import jp.mironal.java.aws.app.glacier.StateLessJobOperations;
+import jp.mironal.java.aws.app.glacier.JobOperator;
+import jp.mironal.java.aws.app.glacier.StateLessJobOperator;
 
 import com.amazonaws.services.glacier.model.DescribeJobResult;
 import com.amazonaws.services.glacier.model.GlacierJobDescription;
@@ -132,13 +132,13 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
     }
 
     private void execDescribe() throws IOException {
-        StateLessJobOperations controller = new StateLessJobOperations(region, awsPropFile);
+        StateLessJobOperator controller = new StateLessJobOperator(region, awsPropFile);
         DescribeJobResult result = controller.describeJob(vaultname, jobId);
         printDescribeJob(result);
     }
 
     private void execArchiveSync() throws IOException, InterruptedException {
-        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+        JobOperator controller = new JobOperator(region, awsPropFile);
         controller.initiateArchiveJob(vaultname, archiveId);
         boolean successful = controller.waitForJobToComplete();
         if (successful) {
@@ -149,7 +149,7 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
     }
 
     private void execArchiveAsync() throws IOException {
-        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+        JobOperator controller = new JobOperator(region, awsPropFile);
         controller.initiateArchiveJob(vaultname, archiveId);
         printJobRestoreParam(controller);
     }
@@ -170,7 +170,7 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
 
     private void execList() throws IOException {
 
-        StateLessJobOperations controller = new StateLessJobOperations(region, awsPropFile);
+        StateLessJobOperator controller = new StateLessJobOperator(region, awsPropFile);
         List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
         if (jobs.size() > 0) {
             for (GlacierJobDescription job : jobs) {
@@ -183,7 +183,7 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
     }
 
     private void execInventorySync() throws IOException, InterruptedException, ParseException {
-        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+        JobOperator controller = new JobOperator(region, awsPropFile);
 
         String jobId = controller.initiateInventoryJob(vaultname);
         System.out.println("JobID=" + jobId);
@@ -198,7 +198,7 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
 
     private void execInventoryAsync() throws IOException {
 
-        LowLevelArchiveController controller = new LowLevelArchiveController(region, awsPropFile);
+        JobOperator controller = new JobOperator(region, awsPropFile);
         controller.initiateInventoryJob(vaultname);
         printJobRestoreParam(controller);
     }
@@ -284,7 +284,7 @@ public class ArchiveLowLevelControlCmd extends CmdUtils {
         }
     }
 
-    private void printJobRestoreParam(LowLevelArchiveController controller) {
+    private void printJobRestoreParam(JobOperator controller) {
         JobRestoreParam param = controller.getJobRestoreParam();
         System.out.println("JobId=" + param.getJobId());
         System.out.println("VaultName=" + param.getVaultName());

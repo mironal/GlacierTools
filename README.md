@@ -63,7 +63,7 @@ Job出力とはArchiveのデータそのものや、Archiveの一覧を含むテ
 
 1. vault_controller.jar
 2. archive_controller.jar
-3. job_controller.jar
+3. job_operator.jar
 
 
 
@@ -156,18 +156,19 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
      
 ####Archiveのダウンロード
 #####デフォルトのリージョン(us-east-1)のvaultnameというVaultからarchiveIdのArchiveをfilenameというファイル名でダウンロード
-    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename
+    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId
 #####リージョン指定
-    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename --region ap-northeast-1
+    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId --region ap-northeast-1
 #####AwsCredentials.properties指定
-     java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --properties myAwsPropFile.properties
+    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId --region ap-northeast-1 --properties myAwsPropFile.properties
 #####リージョンとAwsCredentials.properties指定
-    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
+    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId  --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
     
 #####ダウンロード先に同名のファイルが在った場合、上書きする
-    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename -force
+    java -jar archive_controller.jar donwload --vault vaultname --file filename -force --archive archiveId
     
 ※ --forceオプションを指定するとダウンロード開始前に該当ファイルを削除します.
+※ ダウンロード完了まで4時間程度掛かります.
 
 ####Archiveの削除
 #####デフォルトのリージョン(us-east-1)のvaultnameというVaultのarchiveIdのArchiveを削除

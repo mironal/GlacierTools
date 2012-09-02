@@ -16,13 +16,13 @@ import com.amazonaws.services.glacier.model.ListJobsResult;
  * 
  * @author yama
  */
-public class StateLessJobOperations extends GlacierTools {
+public class StateLessJobOperator extends GlacierTools {
 
-    public StateLessJobOperations() throws IOException {
+    public StateLessJobOperator() throws IOException {
         super();
     }
 
-    public StateLessJobOperations(Region endpoint, File awsProperties) throws IOException {
+    public StateLessJobOperator(Region endpoint, File awsProperties) throws IOException {
         super(endpoint, awsProperties);
     }
 

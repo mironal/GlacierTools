@@ -21,8 +21,6 @@ import com.amazonaws.services.glacier.model.GetJobOutputResult;
 import com.amazonaws.services.glacier.model.InitiateJobRequest;
 import com.amazonaws.services.glacier.model.InitiateJobResult;
 import com.amazonaws.services.glacier.model.JobParameters;
-import com.amazonaws.services.sns.AmazonSNSClient;
-import com.amazonaws.services.sqs.AmazonSQSClient;
 
 /**
  * 一つのインスタンスにつき、一回リクエストを行える.<br>
@@ -30,30 +28,23 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
  * 
  * @author yama
  */
-public class LowLevelArchiveController extends StateLessJobOperations {
+public class JobOperator extends StateLessJobOperator {
 
     public static final String STATUS_INPROGRESS = "InProgress";
     public static final String STATUS_SUCCEEDED = "Succeeded";
     public static final String STATUS_FAILED = "Failed";
-
-    private AmazonSQSClient sqsClient;
-    private AmazonSNSClient snsClient;
 
     private boolean alreadyInitiate = false;
 
     private String jobId;
     private String vaultName;
 
-    public LowLevelArchiveController() throws IOException {
+    public JobOperator() throws IOException {
         super();
     }
 
-    public LowLevelArchiveController(Region endpoint, File awsProperties) throws IOException {
+    public JobOperator(Region endpoint, File awsProperties) throws IOException {
         super(endpoint, awsProperties);
-        sqsClient = new AmazonSQSClient(credentials);
-        sqsClient.setEndpoint(GlacierTools.makeUrl(AwsService.Sqs, endpoint));
-        snsClient = new AmazonSNSClient(credentials);
-        snsClient.setEndpoint(GlacierTools.makeUrl(AwsService.Sns, endpoint));
     }
 
     /**

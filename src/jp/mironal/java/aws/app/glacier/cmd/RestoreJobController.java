@@ -53,15 +53,6 @@ public class RestoreJobController {
         if (properties.contains("VaultName")) {
             throw new JobRestoreParamNotFoundException("VaultName not found.");
         }
-        if (properties.contains("SnsSubscriptionArn")) {
-            throw new JobRestoreParamNotFoundException("SnsSubscriptionArn not found.");
-        }
-        if (properties.contains("SnsTopicArn")) {
-            throw new JobRestoreParamNotFoundException("SnsTopicArn not found.");
-        }
-        if (properties.contains("SqsQueueUrl")) {
-            throw new JobRestoreParamNotFoundException("SqsQueueUrl not found.");
-        }
 
         jobId = properties.getProperty("JobId");
         vaultname = properties.getProperty("VaultName");

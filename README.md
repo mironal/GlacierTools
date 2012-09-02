@@ -65,6 +65,8 @@ Job出力とはArchiveのデータそのものや、Archiveの一覧を含むテ
 2. archive_controller.jar
 3. job_controller.jar
 
+
+
 ## vault_controller.jar
 Vaultに対する操作を行うコマンドです.
 ###使用方法
@@ -80,9 +82,9 @@ Vaultに対する操作を行うコマンドです.
 #####デフォルトのリージョン(us-east-1)にvaultnameというVaultを作成
     java -jar vault_controller.jar create --vault vaultname
     
-#####指定したリージョン(ap-northeast-1)にvaultnameというVaultを作成
+##### 指定したリージョン(ap-northeast-1)にvaultnameというVaultを作成
     java -jar vault_controller.jar create --vault vaultname --region ap-northeast-1
-#####指定したとAwsCredentials.propertiesを使用してvaultnameというVaultを作成
+#####指定したAwsCredentials.propertiesを使用してvaultnameというVaultを作成
     java -jar vault_controller.jar create --vault vaultname --properties myAwsPropFile.properties
 #####リージョンとAwsCredentials.propertiesを指定してvaultnameというVaultを作成
     java -jar vault_controller.jar create --vault vaultname --region us-west-2 --properties myAwsPropFile.properties

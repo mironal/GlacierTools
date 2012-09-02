@@ -199,7 +199,6 @@ public class JobOperatorCmd extends CmdUtils {
     }
 
     private void execInventoryAsync() throws IOException {
-
         JobOperator controller = new JobOperator(region, awsPropFile);
         controller.initiateInventoryJob(vaultname);
         printJobRestoreParam(controller);
@@ -265,7 +264,7 @@ public class JobOperatorCmd extends CmdUtils {
                 break;
 
             default:
-                break;
+                throw new IllegalStateException("Unknown type.");
         }
 
         return ok;
@@ -360,12 +359,10 @@ public class JobOperatorCmd extends CmdUtils {
             default:
                 throw new IllegalStateException("Unkonwn cmd.");
         }
-
     }
 
     @Override
     void onExecInvalidParam() {
-        // TODO Auto-generated method stub
 
     }
 

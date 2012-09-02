@@ -3,12 +3,9 @@ package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import jp.mironal.java.aws.app.glacier.ArchiveController;
-import jp.mironal.java.aws.app.glacier.VaultController;
 
-import com.amazonaws.services.glacier.model.DescribeVaultOutput;
 import com.amazonaws.services.glacier.transfer.UploadResult;
 
 public class ArchiveControllerCmd extends CmdUtils {
@@ -109,17 +106,6 @@ public class ArchiveControllerCmd extends CmdUtils {
         /* endpoint */
         setRegion(endpointStr);
 
-    }
-
-    private boolean existVault(String vaultName) throws IOException {
-        VaultController controller = new VaultController(region, awsPropFile);
-        List<DescribeVaultOutput> describeVaultOutputs = controller.listVaults();
-        for (DescribeVaultOutput output : describeVaultOutputs) {
-            if (output.getVaultName().equals(vaultName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -246,11 +232,13 @@ public class ArchiveControllerCmd extends CmdUtils {
                     System.exit(-1);
                 }
 
+                // vaultが存在しなかったらエラー吐いて終了.
                 if (!existVault(vaultName)) {
+                    execUpload();
+                } else {
                     System.err.println(vaultName + " is not exist.");
                 }
 
-                execUpload();
                 break;
             case Download:
                 /*
@@ -264,19 +252,21 @@ public class ArchiveControllerCmd extends CmdUtils {
                     System.exit(-1);
                 }
 
-                if (!existVault(vaultName)) {
+                if (existVault(vaultName)) {
+                    execDownload();
+
+                } else {
                     System.err.println(vaultName + " is not exist.");
                 }
-
-                execDownload();
 
                 break;
             case Delete:
-                if (!existVault(vaultName)) {
+                if (existVault(vaultName)) {
+                    execDelete();
+                } else {
                     System.err.println(vaultName + " is not exist.");
                 }
 
-                execDelete();
                 break;
 
             case Bad:

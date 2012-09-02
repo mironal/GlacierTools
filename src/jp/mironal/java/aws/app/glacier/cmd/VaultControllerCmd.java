@@ -200,13 +200,21 @@ public class VaultControllerCmd extends CmdUtils {
                 execCreate();
                 break;
             case Describe:
-                execDescribe();
+                if (existVault(vaultName)) {
+                    execDescribe();
+                } else {
+                    System.err.println(vaultName + " is not exist.");
+                }
                 break;
             case List:
                 execList();
                 break;
             case Delete:
-                execDelete();
+                if (existVault(vaultName)) {
+                    execDelete();
+                } else {
+                    System.err.println(vaultName + " is not exist.");
+                }
                 break;
             case Bad:
                 printHelp();

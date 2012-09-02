@@ -3,6 +3,10 @@ package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
+import com.amazonaws.services.glacier.model.DescribeVaultOutput;
 
 import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
@@ -108,6 +112,17 @@ public abstract class CmdUtils {
                     + VaultController.makeUrl(AwsService.Glacier, r));
         }
 
+    }
+
+    boolean existVault(String vaultName) throws IOException {
+        VaultController controller = new VaultController(region, awsPropFile);
+        List<DescribeVaultOutput> describeVaultOutputs = controller.listVaults();
+        for (DescribeVaultOutput output : describeVaultOutputs) {
+            if (output.getVaultName().equals(vaultName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     abstract void onExecCommand() throws Exception;

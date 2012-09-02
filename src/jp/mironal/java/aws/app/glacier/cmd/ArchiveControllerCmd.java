@@ -248,32 +248,6 @@ public class ArchiveControllerCmd extends CmdUtils {
         }
     }
 
-    private void printInvalidParam() {
-        if (awsPropFile == null) {
-            System.err.println(ArchiveController.AWS_PROPERTIES_FILENAME + " file is not found.");
-        }
-        if (region == null) {
-            System.err.println("Region is not found.");
-            for (Region r : GlacierTools.getGlacierRegions().values()) {
-                System.err.print("    ");
-                System.err.println(r.getEndpoint() + " => "
-                        + VaultController.makeUrl(AwsService.Glacier, r));
-            }
-        }
-
-        switch (cmdKind) {
-            case Upload:
-
-                break;
-            case Download:
-                break;
-            case Delete:
-
-            default:
-                break;
-        }
-    }
-
     @Override
     void onExecCommand() throws Exception {
         switch (cmdKind) {
@@ -291,7 +265,7 @@ public class ArchiveControllerCmd extends CmdUtils {
                 /*
                  * 指定したファイルがすでに存在していたらエラー吐いて終了. <br>
                  * ただし、forceフラグが立っていたら、ファイルを削除して作成する
-                 * (ぶっちゃけ消さなくてもAPI側で上書きしてくれるのかも).<br>
+                 * (消さなくてもAPI側で上書きしてくれるのかも).<br>
                  * ファイルが存在していて、実はファイルじゃなかった場合も適切なエラーを吐いて終了する.
                  */
                 if (!deleteFile(filename)) {

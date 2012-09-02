@@ -133,7 +133,7 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
 3. Archiveの削除
 
 ###使用方法
-java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]
+`java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]`
     cmd : upload | donwload | delete
     --vault : The name of the Vault.
     --archive : The ID of the archive.

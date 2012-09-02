@@ -86,7 +86,7 @@ public class JobOperatorCmd extends CmdUtils {
                 }
             }
 
-            if (arg.equals("--endpoint")) {
+            if (arg.equals("--region")) {
                 if ((i + 1) < args.length) {
                     i++;
                     endpointStr = args[i];

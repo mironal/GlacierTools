@@ -13,11 +13,15 @@ public class JobOperatorCmdTest {
     @Test
     public void test_inventoryRetrieval() {
         JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
-                "inventory-retrieval", "--vault", "hogehoge", "--debug"
+                "inventory-retrieval", "--vault", "hogehoge"
         });
 
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");
+        assertNull(cmd.archiveId);
+        assertNull(cmd.jobId);
+        assertNull(cmd.saveFile);
+        assertEquals(cmd.syncType, Sync.Sync);
 
         assertTrue(cmd.validateParam());
     }
@@ -25,12 +29,11 @@ public class JobOperatorCmdTest {
     @Test
     public void test_inventoryRetrieval_InvalidParam() {
         JobOperatorCmd cmd = new JobOperatorCmd(new String[] {
-                "inventory-retrieval", "--debug"
+            "inventory-retrieval"
         });
 
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
-        assertEquals(cmd.vaultname, null);
-
+        assertNull(cmd.vaultname);
         assertFalse(cmd.validateParam());
     }
 
@@ -58,7 +61,7 @@ public class JobOperatorCmdTest {
         assertTrue(cmd.validateParam());
 
         cmd = new JobOperatorCmd(new String[] {
-                "inventory-retrieval", "async", "--vault", "hogehoge",
+                "inventory-retrieval", "--async", "--vault", "hogehoge",
         });
         assertEquals(cmd.cmdKind, ArchiveLowLevelKind.Inventory);
         assertEquals(cmd.vaultname, "hogehoge");

@@ -100,30 +100,18 @@ Vaultに対する操作を行うコマンドです.以下の機能を提供し�
     java -jar vault_controller.jar desc --vault vaultname
 #####リージョン指定
     java -jar vault_controller.jar desc --vault vaultname --region us_west-2
-#####AwsCredentials.properties指定
-    java -jar vault_controller.jar desc --vault vaultname --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar vault_controller.jar desc --vault vaultname --region us_west-2 --properties myAwsPropFile.properties
+
 ####Vault一覧を取得
 #####デフォルトのリージョンのVault一覧を取得
     java -jar vault_controller.jar list
 #####リージョン指定
     java -jar vault_controller.jar list --region ue-west-2
-#####AwsCredentials.properties指定
-    java -jar vault_controller.jar list --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar vault_controller.jar list --region us_west-2 --properties myAwsPropFile.properties
-    
     
 ####Vault削除
 #####デフォルトのリージョン(us-east-1)にvaultnameというVaultを削除
     java -jar vault_controller.jar delete --vault vaultname
 #####リージョン指定
     java -jar vault_controller.jar delete --vault vaultname --region ap-northeast-1
-#####AwsCredentials.properties指定
-    java -jar vault_controller.jar delete --vault vaultname --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar vault_controller.jar delete --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
 
 ## archive_controller.jar
 Archiveに対する操作をするコマンドです.以下の機能を提供します.
@@ -158,12 +146,7 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
 #####デフォルトのリージョン(us-east-1)のvaultnameというVaultからarchiveIdのArchiveをfilenameというファイル名でダウンロード
     java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId
 #####リージョン指定
-    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId --region ap-northeast-1
-#####AwsCredentials.properties指定
-    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId --region ap-northeast-1 --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId  --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
-    
+    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId --region ap-northeast-1    
 #####ダウンロード先に同名のファイルが在った場合、上書きする
     java -jar archive_controller.jar donwload --vault vaultname --file filename -force --archive archiveId
     
@@ -175,11 +158,6 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
     java -jar archive_controller.jar delete --vault vaultname --archive archiveId
 #####リージョン指定
     java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1
-#####AwsCredentials.properties指定
-     java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1 --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-     java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
-     
 
 ## job_operator.jar
 Jobに対する操作を行うコマンドです.以下の機能を提供します.
@@ -211,30 +189,19 @@ Jobの開始の際に--asyncオプションをつけることによって、Job�
     java -jar job_operator.jar inventory --vault vaultname
 ##### リージョン指定
     java -jar job_operator.jar inventory --vault vaultname --region ap-northeast-1
-#####AwsCredentials.properties指定
-    java -jar job_operator.jar inventory --vault vaultname --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar job_operator.jar inventory --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
+
     
 ####Archiveのダウンロード(Download Archive)
 #####デフォルトのリージョン(us-east-1)のvaultnameというVaultにあるarchiveIdのArchiveをfilenameという名前でダウンロード
     java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename
 ##### リージョン指定
     java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename --region ap-northeast-1
-#####AwsCredentials.properties指定
-    java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar job_operator.jar archive --vault vaultname --archive archiveId --file filename --region us-west-2 --properties myAwsPropFile.properties
     
 ####Jobの一覧を取得(Get Job list)
 #####デフォルトのリージョン(us-east-1)のvaultnameというVaultのJob一覧を取得
     java -jar job_operator.jar list --vault vaultname
 ##### リージョン指定
     java -jar job_operator.jar list --vault vaultname --region ap-northeast-1
-#####AwsCredentials.properties指定
-    java -jar job_operator.jar list --vault vaultname --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar job_operator.jar list --vault vaultname --region us-west-2 --properties myAwsPropFile.properties
     
 ※取得できるのは進行中、または最近完了したJobの一覧です.
 
@@ -243,9 +210,5 @@ Jobの開始の際に--asyncオプションをつけることによって、Job�
     java -jar job_operator.jar desc --vault vaultname --job jobId
 ##### リージョン指定
     java -jar job_operator.jar desc --vault vaultname --job jobId --region ap-northeast-1
-#####AwsCredentials.properties指定
-    java -jar job_operator.jar desc --vault vaultname --job jobId --properties myAwsPropFile.properties
-#####リージョンとAwsCredentials.properties指定
-    java -jar job_operator.jar desc --vault vaultname --job jobId --region us-west-2 --properties myAwsPropFile.properties
-    
+
 

@@ -233,7 +233,7 @@ public class ArchiveControllerCmd extends CmdUtils {
                 }
 
                 // vaultが存在しなかったらエラー吐いて終了.
-                if (!existVault(vaultName)) {
+                if (existVault(vaultName)) {
                     execUpload();
                 } else {
                     System.err.println(vaultName + " is not exist.");

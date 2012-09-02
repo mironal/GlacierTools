@@ -78,10 +78,10 @@ Vaultに対する操作を行うコマンドです.以下の機能を提供し�
 ###使用方法
 `java -jar vault_controller.jar cmd [--vault vaultname] [--region region] [--properties prop_filename]`
 
-    cmd           : create | desc | list | delete | help
-    vaultname     : The name of the Vault.
-    region        : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
-    prop_filename : If you want to specify explicitly AwsCredentials.properties
+    cmd          : create | desc | list | delete | help
+    --vault      : The name of the Vault.
+    --region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
+    --properties : If you want to specify explicitly AwsCredentials.properties
     
 ###example
 ####Vaultの作成(Create Vault)
@@ -135,12 +135,12 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
 ###使用方法
 `java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]`
 
-    cmd : upload | donwload | delete
-    --vault : The name of the Vault.
-    --archive : The ID of the archive.
-    --file  : Specifies the name of a file that is uploaded when the upload. When the download is the name of the saved file.
-    --force : If there is a file with the same name at the time of download, Force overwrite.
-    --region        : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
+    cmd          : upload | donwload | delete
+    --vault      : The name of the Vault.
+    --archive    : The ID of the archive.
+    --file       : Specifies the name of a file that is uploaded when the upload. When the download is the name of the saved file.
+    --force      : If there is a file with the same name at the time of download, Force overwrite.
+    --region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
     --properties : If you want to specify explicitly AwsCredentials.properties
     
 ###exsample

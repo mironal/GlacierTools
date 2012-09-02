@@ -406,14 +406,6 @@ public class ArchiveControllerCmd extends CmdUtils {
     }
 
     /**
-     * java -jar ArchiveController.jar upload --vault vaultname --file filename
-     * --endpoint endpoint<br>
-     * java -jar ArchiveController.jar download --vault vaultname --archive
-     * archiveId --file filename<br>
-     * java -jar ArchiveController.jar download --vault vaultname --archive
-     * archiveId --file filename --force java -jar ArchiveController.jar delete
-     * --vault vaultname --archive archiveId<br>
-     * 
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {

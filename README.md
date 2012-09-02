@@ -156,16 +156,16 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
      
 ####Archiveのダウンロード
 #####デフォルトのリージョン(us-east-1)のvaultnameというVaultからarchiveIdのArchiveをfilenameというファイル名でダウンロード
-    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename
+    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename
 #####リージョン指定
-    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename --region ap-northeast-1
+    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename --region ap-northeast-1
 #####AwsCredentials.properties指定
-     java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --properties myAwsPropFile.properties
+     java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --properties myAwsPropFile.properties
 #####リージョンとAwsCredentials.properties指定
-    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
+    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename --region ap-northeast-1 --region us-west-2 --properties myAwsPropFile.properties
     
 #####ダウンロード先に同名のファイルが在った場合、上書きする
-    java -jar archive_controller.jar upload --vault vaultname --archive archiveId --file filename -force
+    java -jar archive_controller.jar donwload --vault vaultname --archive archiveId --file filename -force
     
 ※ --forceオプションを指定するとダウンロード開始前に該当ファイルを削除します.
 

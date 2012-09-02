@@ -37,6 +37,14 @@ public class JobOperator extends StateLessJobOperator {
     public static final String STATUS_SUCCEEDED = "Succeeded";
     public static final String STATUS_FAILED = "Failed";
 
+    public static JobOperator restoreJob(JobRestoreParam param, File awsProperties)
+            throws IOException {
+        JobOperator operator = new JobOperator(param.getRegion(), awsProperties);
+        operator.jobId = param.getJobId();
+        operator.vaultName = param.getVaultName();
+        return operator;
+    }
+
     private boolean alreadyInitiate = false;
 
     private String jobId;
@@ -63,25 +71,6 @@ public class JobOperator extends StateLessJobOperator {
         Builder builder = new Builder();
         builder.setVaultName(this.vaultName).setJobId(this.jobId).setRegion(this.region);
         return builder.build();
-    }
-
-    /**
-     * Jobを復元する.<br>
-     * すでにこのインスタンスでJobが実行されていた場合はIllegalStateException()を投げる.
-     * 
-     * @param param JobRestoreParamのインスタンス
-     */
-    public void restoreJob(JobRestoreParam param) {
-        if (param == null) {
-            throw new NullPointerException("param is null.");
-        }
-        if (alreadyInitiate) {
-            throw new IllegalStateException("initiate job request is already node.");
-        }
-        this.vaultName = param.getVaultName();
-        this.jobId = param.getJobId();
-
-        alreadyInitiate = true;
     }
 
     /**

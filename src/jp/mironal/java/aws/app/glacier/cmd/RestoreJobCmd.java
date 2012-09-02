@@ -7,6 +7,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import jp.mironal.java.aws.app.glacier.JobOperator;
+import jp.mironal.java.aws.app.glacier.cmd.ArchiveControllerCmd.ArchiveCmdKind;
+
 public class RestoreJobCmd extends CmdUtils {
 
     enum RestoreJobCmdKind {
@@ -20,10 +23,15 @@ public class RestoreJobCmd extends CmdUtils {
         }
     }
 
-    String jobId;
-    String vaultname;
-    RestoreJobCmdKind cmdKind;
+    String jobId = null;
+    String vaultname = null;
+    RestoreJobCmdKind cmdKind = RestoreJobCmdKind.Bad;
 
+    /**
+     * @param args
+     * @throws IOException
+     * @throws JobRestoreException
+     */
     public RestoreJobCmd(String[] args) throws IOException {
         String restorePropFilename = null;
         String propertiesName = null;
@@ -56,13 +64,14 @@ public class RestoreJobCmd extends CmdUtils {
                     propertiesName = args[i];
                 }
             }
-
         }
 
-        // プロパティーファイルが無かったらcmdをBadにする.
-        setAwsCredentialsPropertiesFile(propertiesName);
-
-        restoreJobParam(restorePropFilename);
+        /* helpの時は無視する. */
+        if (cmdKind != RestoreJobCmdKind.Help) {
+            // プロパティーファイルが無かったらcmdをBadにする.
+            setAwsCredentialsPropertiesFile(propertiesName);
+            restoreJobParam(restorePropFilename);
+        }
     }
 
     private void setCmdKind(RestoreJobCmdKind cmd) {
@@ -90,13 +99,13 @@ public class RestoreJobCmd extends CmdUtils {
             ignore.printStackTrace();
         }
 
-        if (!properties.contains("JobId")) {
+        if (!properties.containsKey("JobId")) {
             throw new JobRestoreException("JobId not found.");
         }
-        if (!properties.contains("VaultName")) {
+        if (!properties.containsKey("VaultName")) {
             throw new JobRestoreException("VaultName not found.");
         }
-        if (!properties.contains("Region")) {
+        if (!properties.containsKey("Region")) {
             throw new JobRestoreException("Region not found.");
         }
 
@@ -107,18 +116,41 @@ public class RestoreJobCmd extends CmdUtils {
 
     @Override
     void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
-
+        System.err.println(filename + " is not found.");
+        setCmdKind(RestoreJobCmdKind.Bad);
     }
 
     @Override
     void onRegionNotFound(String endpointStr, Throwable e) {
+        System.err.println(e.getMessage() + " is not found.");
+        setCmdKind(RestoreJobCmdKind.Bad);
+    }
+
+    private void execDownload() throws IOException {
+        // Jobの種類(archive, inventory)のチェック
+        // 完了状態をチェック
+        // 完了してなからったら待つ
+        // 完了してたらダウンロード
 
     }
 
     @Override
     void onExecCommand() throws Exception {
-        // TODO Auto-generated method stub
+        switch (cmdKind) {
+            case Download:
+                break;
+            case Check:
+                break;
+            case Desc:
+                break;
+            case Help:
+                break;
+            case Bad:
+                break;
 
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override
@@ -129,8 +161,29 @@ public class RestoreJobCmd extends CmdUtils {
 
     @Override
     boolean validateParam() {
-        // TODO Auto-generated method stub
-        return false;
+        if (cmdKind == RestoreJobCmdKind.Help) {
+            return true;
+        }
+        boolean ok = true;
+        if (region == null) {
+            debugPrint("region is null.");
+            ok = false;
+        }
+        if (awsPropFile == null) {
+            debugPrint("awsPropFile is null.");
+            ok = false;
+        }
+
+        if (jobId == null) {
+            debugPrint("jobId is null.");
+            ok = false;
+        }
+
+        if (vaultname == null) {
+            debugPrint("vaultname is null.");
+            ok = false;
+        }
+        return ok;
     }
 
     /**

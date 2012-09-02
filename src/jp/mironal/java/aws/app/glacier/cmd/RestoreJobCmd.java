@@ -198,13 +198,28 @@ public class RestoreJobCmd extends CmdUtils {
                 execDesc();
                 break;
             case Help:
+                printHelp();
                 break;
             case Bad:
+                printHelp();
                 break;
 
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    private void printHelp() {
+        System.out
+                .println("java -jar restorejob.jar cmd [--restore restorepropfilename] [--file filename] [--properties propfilename]");
+
+        System.out.println("cmd          : download | check | desc");
+        System.out.println("--restore    : job_operator.jarの結果が記述されているファイル.");
+        System.out
+                .println("--file       : When the download of Archive is the name of the saved file");
+        System.out
+                .println("--properties : If you want to specify explicitly AwsCredentials.properties");
+
     }
 
     @Override
@@ -236,8 +251,14 @@ public class RestoreJobCmd extends CmdUtils {
 
     /**
      * @param args
+     * @throws Exception
+     * @throws IOException
      */
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException, Exception {
+        try {
+            new RestoreJobCmd(args).exec();
+        } catch (JobRestoreException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

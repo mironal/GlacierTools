@@ -96,11 +96,12 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
 1. Archiveのアップロード
 2. Archiveのダウンロード
 3. Archiveの削除
+4. Archiveの一覧取得
 
 ### 使用方法
     java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]
 
-    cmd          : upload | donwload | delete
+    cmd          : upload | donwload | delete | list
     --vault      : The name of the Vault.
     --archive    : The ID of the archive.
     --file       : Specifies the name of a file that is uploaded when the upload. When the download is the name of the saved file.
@@ -135,6 +136,9 @@ Archiveに対する操作をするコマンドです.以下の機能を提供し
     java -jar archive_controller.jar delete --vault vaultname --archive archiveId
 ##### リージョン指定
     java -jar rchive_controller.jar delete --vault vaultname --archive archiveId --region ap-northeast-1
+
+#### Archiveの一覧取得
+    java -jar archive_controller.jar list --vaultname
 
 ## job_operator.jar
 Jobに対する操作を行うコマンドです.以下の機能を提供します.

@@ -96,6 +96,31 @@ public class ArchiveControllerCmdTest {
     }
 
     @Test
+    public void test_List() {
+        ArchiveControllerCmd cmd = new ArchiveControllerCmd(new String[] {
+                "list", "--vault", "hoge"
+        });
+
+        assertEquals(cmd.cmdKind, ArchiveCmdKind.List);
+        assertEquals(cmd.vaultName, "hoge");
+        assertNull(cmd.filename);
+        assertTrue(cmd.validateParam());
+    }
+
+    @Test
+    public void test_List_InvalidParam() {
+        // vault無し.
+        ArchiveControllerCmd cmd = new ArchiveControllerCmd(new String[] {
+            "list"
+        });
+
+        assertEquals(cmd.cmdKind, ArchiveCmdKind.List);
+        assertNull(cmd.vaultName);
+        assertNull(cmd.filename);
+        assertFalse(cmd.validateParam());
+    }
+
+    @Test
     public void test_Delete() {
         ArchiveControllerCmd cmd = new ArchiveControllerCmd(new String[] {
                 "delete", "--vault", "hogehoge", "--archive", "archiveId"

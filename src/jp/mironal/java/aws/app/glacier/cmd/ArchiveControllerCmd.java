@@ -3,15 +3,18 @@ package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 
 import jp.mironal.java.aws.app.glacier.ArchiveController;
+import jp.mironal.java.aws.app.glacier.InventoryRetrievalResult;
+import jp.mironal.java.aws.app.glacier.JobOperator;
 
 import com.amazonaws.services.glacier.transfer.UploadResult;
 
 public class ArchiveControllerCmd extends CmdUtils {
 
     enum ArchiveCmdKind {
-        Bad, Upload, Download, Delete, Help,
+        Bad, Upload, Download, Delete, List, Help,
     }
 
     ArchiveCmdKind cmdKind = ArchiveCmdKind.Bad;
@@ -41,6 +44,10 @@ public class ArchiveControllerCmd extends CmdUtils {
 
             if (arg.equals("delete")) {
                 setCmdKind(ArchiveCmdKind.Delete);
+            }
+
+            if (arg.equals("list")) {
+                setCmdKind(ArchiveCmdKind.List);
             }
 
             if (arg.equals("-h") || arg.equals("--help") || arg.equals("help")) {
@@ -155,9 +162,18 @@ public class ArchiveControllerCmd extends CmdUtils {
                     ok = false;
                 }
                 break;
-
-            default:
+            case List:
+                if (vaultName == null) {
+                    debugPrint("vaultName is null.");
+                    ok = false;
+                }
                 break;
+            case Help:
+                break;
+            case Bad:
+                break;
+            default:
+                throw new IllegalStateException();
         }
         return ok;
     }
@@ -193,6 +209,17 @@ public class ArchiveControllerCmd extends CmdUtils {
         ArchiveController archiveController = new ArchiveController(region, awsPropFile);
         archiveController.delete(vaultName, archiveId);
         System.out.println("delete success!");
+    }
+
+    private void execList() throws IOException, InterruptedException, ParseException {
+        JobOperator operator = new JobOperator(region, awsPropFile);
+        operator.initiateInventoryJob(vaultName);
+        if (operator.waitForJobToComplete()) {
+            InventoryRetrievalResult result = operator.downloadInventoryJobOutput();
+            System.out.println(result.toString());
+        } else {
+            System.out.println("Fault : get list.");
+        }
     }
 
     boolean checkFileExist(String filename) {
@@ -267,7 +294,9 @@ public class ArchiveControllerCmd extends CmdUtils {
                 }
 
                 break;
-
+            case List:
+                execList();
+                break;
             case Bad:
                 printHelp();
                 break;
@@ -284,6 +313,12 @@ public class ArchiveControllerCmd extends CmdUtils {
             System.out.println("force : " + force);
         }
 
+    }
+
+    private void printListHelp() {
+        System.out.println("Get Archive lsit");
+        System.out.print("    ");
+        System.out.println("java -jar list --vault vaultname");
     }
 
     private void printUploadHelp() {
@@ -335,7 +370,7 @@ public class ArchiveControllerCmd extends CmdUtils {
                 .println("java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]");
         System.out.println();
 
-        System.out.println("cmd          : upload | donwload | delete");
+        System.out.println("cmd          : upload | donwload | delete | list");
         System.out.println("--vault      : The name of the Vault.");
         System.out.println("--archive    : The ID of the archive.");
         System.out
@@ -352,6 +387,8 @@ public class ArchiveControllerCmd extends CmdUtils {
         printDownloadHelp();
         System.out.println();
         printDeleteHelp();
+        System.out.println();
+        printListHelp();
         System.out.println();
         printRegion();
 

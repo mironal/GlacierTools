@@ -78,7 +78,7 @@ Vaultに対する操作を行うコマンドです.以下の機能を提供し�
 ##### リージョン指定
     java -jar vault_controller.jar desc --vault vaultname --region us_west-2
 
-#### ault一覧を取得
+#### Vault一覧を取得
 #####デフォルトのリージョンのVault一覧を取得
     java -jar vault_controller.jar list
 ##### リージョン指定

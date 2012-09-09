@@ -29,34 +29,6 @@ Amazon Glaierが提供する機能の殆どをコマンドライン形式で使�
 * Jobの一覧取得
 
 
-#用語の説明
-##Archive
-ArchiveはAmazon Glaierに保存するデータの単位です。一つのテキストファイルをArchiveに保存することもできますし、大量の画像ファイルを一つにまとめた後(zip等)Archiveに保存することもできます。
-##Vault
-VaultはArchiveを保存しておく箱です。
-1つのVaultには0個以上のArchiveが保存されています。
-
-##Job
-JobはAmazon Glaierに保存したArchiveやArchiveの一覧を取得するための作業の単位です。Jobは次の非同期的な２段階プロセスで構成され、開始してから出力の取得が可能になるまで（1～2の間)には通常4時間程度待つ必要があります。
-
-1. Jobの開始
-2. Job出力の取得
-
-また、Jobには現在以下の種類があります。
-1. Archiveのダウンロード
-2. Vaultの目録取得(Archiveの一覧取得)
-
-##Jobの開始とは？
-Amazon GlaierにJobの開始を指示することです。Amazon Glaierに指示を出すとすぐにJobのID等を含むレスポンスが来ます。この後4時間程度Jobの完了を待つ必要があります。
-Jobの完了を検出するためにはAmazon SNS、Amazon SQSを使用する方法が推奨されていますが、ポーリングによる方法でも可能です。
-
-このコマンドラインユーティリティーでは処理を簡潔にするためにポーリングを使用しています。SNS、SQSによる方法は別途提供予定です。
-
-##Job出力の取得とは?
-Job出力とはArchiveのデータそのものや、Archiveの一覧を含むテキストデータのことです。開始したJobが完了するとJob出力が取得可能になります。
-
-
-
 #コマンドの使用方法
 ##コマンド構成
 コマンドは以下の4つから構成されています。
@@ -245,4 +217,31 @@ java -jar restore_job.jar cmd [--restore restore_prop_filename] [--file filename
     JobId=XXXXXXXXXXX
     VaultName=YYYYYYY
     Region=ZZZZZZZZZZ
+    
+    
+#用語の説明
+##Archive
+ArchiveはAmazon Glaierに保存するデータの単位です。一つのテキストファイルをArchiveに保存することもできますし、大量の画像ファイルを一つにまとめた後(zip等)Archiveに保存することもできます。
+##Vault
+VaultはArchiveを保存しておく箱です。
+1つのVaultには0個以上のArchiveが保存されています。
+
+##Job
+JobはAmazon Glaierに保存したArchiveやArchiveの一覧を取得するための作業の単位です。Jobは次の非同期的な２段階プロセスで構成され、開始してから出力の取得が可能になるまで（1～2の間)には通常4時間程度待つ必要があります。
+
+1. Jobの開始
+2. Job出力の取得
+
+また、Jobには現在以下の種類があります。
+1. Archiveのダウンロード
+2. Vaultの目録取得(Archiveの一覧取得)
+
+##Jobの開始とは？
+Amazon GlaierにJobの開始を指示することです。Amazon Glaierに指示を出すとすぐにJobのID等を含むレスポンスが来ます。この後4時間程度Jobの完了を待つ必要があります。
+Jobの完了を検出するためにはAmazon SNS、Amazon SQSを使用する方法が推奨されていますが、ポーリングによる方法でも可能です。
+
+このコマンドラインユーティリティーでは処理を簡潔にするためにポーリングを使用しています。SNS、SQSによる方法は別途提供予定です。
+
+##Job出力の取得とは?
+Job出力とはArchiveのデータそのものや、Archiveの一覧を含むテキストデータのことです。開始したJobが完了するとJob出力が取得可能になります。
     

@@ -10,8 +10,23 @@ Amazon Glaierが提供する機能の殆どをコマンドライン形式で使�
 
 以下に現在対応している機能の一覧を紹介します。Amazon Glaier独自の用語が沢山出てきますが、後ほど説明します。
 
+# 簡単な使用方法説明
+## 準備
+1. プロジェクトのjarディレクトリを何らかの方法でダウンロードします.
+2. AwsCredentials.propertiesを設置します.
 
-# 使用方法
+## Vaultを作成する
+    java -jar vault_controller.jar create --vault vaultname
+
+## Archiveをアップロードする
+    java -jar archive_controller.jar upload --vault vaultname --file filename
+※ アップロードが終了するとarchiveIdが発行されます.
+
+## Archiveをダウンロードする
+    java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId
+※ ダウンロードが開始されるまでに4時間程度の待ち時間が発生します.
+
+# 詳細使用方法
 ## AwsCredentials.propertiesの設置
 AmazonGlacierを使用するためにはAwsCredentials.propertiesが必要です。
 [詳細はここを参照して下さい.](http://docs.amazonwebservices.com/amazonglacier/latest/dev/using-aws-sdk-for-java.html#setting-up-and-testing-sdk-java)
@@ -19,7 +34,6 @@ AmazonGlacierを使用するためにはAwsCredentials.propertiesが必要です
 
     secretKey=XXXXXXXXXXXXXXXXXX
     accessKey=YYYYYYYYYYYYYYYYYY
-
 
 ## コマンド構成
 コマンドは以下の4つから構成されています。

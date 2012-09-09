@@ -232,7 +232,7 @@ java -jar restore_job.jar cmd [--restore restore_prop_filename] [--file filename
     VaultName=YYYYYYY
     Region=ZZZZZZZZZZ
     
-    
+
 # 用語の説明
 ## Archive
 ArchiveはAmazon Glaierに保存するデータの単位です。一つのテキストファイルをArchiveに保存することもできますし、大量の画像ファイルを一つにまとめた後(zip等)Archiveに保存することもできます。

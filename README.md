@@ -26,6 +26,11 @@ Amazon Glaierが提供する機能の殆どをコマンドライン形式で使�
     java -jar archive_controller.jar donwload --vault vaultname --file filename --archive archiveId
 ※ ダウンロードが開始されるまでに4時間程度の待ち時間が発生します.
 
+## Archive一覧を取得する
+    java -jar archive_controller.jar list --vault vaultname
+※ 取得までに4時間程度の待ち時間が発生します.
+
+
 # 詳細使用方法
 ## AwsCredentials.propertiesの設置
 AmazonGlacierを使用するためにはAwsCredentials.propertiesが必要です。

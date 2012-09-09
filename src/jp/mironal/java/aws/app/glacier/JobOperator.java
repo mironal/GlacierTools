@@ -214,7 +214,7 @@ public class JobOperator extends StateLessJobOperator {
      * @return jobId
      */
     private String executeInitiateJob(JobParameters jobParameters, String vaultName) {
-
+        alreadyInitiate = true;
         InitiateJobRequest request = new InitiateJobRequest().withVaultName(vaultName)
                 .withJobParameters(jobParameters);
         InitiateJobResult result = client.initiateJob(request);

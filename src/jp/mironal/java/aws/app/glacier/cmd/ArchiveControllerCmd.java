@@ -345,8 +345,8 @@ public class ArchiveControllerCmd extends CmdUtils {
         System.out.println("Delete Archive");
         System.out.print("    ");
         System.out
-                .println("java -jar archive_controller.jar delete --vault vaultname --file filename");
-        printHelpHelper("delete", " --vault vaultname --file filename");
+                .println("java -jar archive_controller.jar delete --vault vaultname --archive archiveId");
+        printHelpHelper("delete", " --vault vaultname --archive archiveId");
     }
 
     private void printHelpHelper(String kind, String opt) {

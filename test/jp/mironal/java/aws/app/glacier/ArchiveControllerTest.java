@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 
@@ -30,7 +31,7 @@ public class ArchiveControllerTest {
     private static final String DOWN_FILENAME = "down.txt";
 
     @BeforeClass
-    public static void setupRestoreFile() throws IOException {
+    public static void setupR() throws IOException {
 
         VaultController controller = new VaultController();
         controller.createVault(VAULT_NAME);
@@ -42,7 +43,7 @@ public class ArchiveControllerTest {
     }
 
     @AfterClass
-    public static void deleteRestoreFile() throws IOException {
+    public static void delete() throws IOException {
 
         VaultController controller = new VaultController();
         controller.deleteVault(VAULT_NAME);
@@ -50,13 +51,19 @@ public class ArchiveControllerTest {
         File file = new File(FILENAME);
         if (file.exists()) {
             if (!file.delete()) {
-                throw new IllegalStateException("can not delete.");
+                throw new IllegalStateException("can not delete. : " + FILENAME);
+            }
+        }
+        file = new File(DOWN_FILENAME);
+        if (file.exists()) {
+            if (!file.delete()) {
+                throw new IllegalStateException("can not delete. : " + DOWN_FILENAME);
             }
         }
     }
 
     @Test
-    public void test() throws IOException {
+    public void testConstract() throws IOException {
         ArchiveController controller = new ArchiveController();
         assertNotNull(controller);
         assertNotNull(controller.client);
@@ -64,10 +71,20 @@ public class ArchiveControllerTest {
         assertNotNull(controller.region);
 
         assertEquals(Region.US_EAST_1, controller.region);
+    }
 
+    @Test
+    public void test() throws IOException {
+        // 非常に時間がかかるテストのため情報の取りこぼしを最小限に抑えたいので色々printする.
+
+        ArchiveController controller = new ArchiveController();
+
+        printWithTime("upload start");
         UploadResult result = controller.upload(VAULT_NAME, "desc", new File(FILENAME));
+        printWithTime("upload end");
         assertNotNull(result);
 
+        printWithTime(result.toString());
         String archiveId = result.getArchiveId();
         assertNotNull(archiveId);
 
@@ -75,13 +92,30 @@ public class ArchiveControllerTest {
         assertFalse(downfile.exists());
 
         // 4時間待
+        printWithTime("download start");
         controller.download(VAULT_NAME, archiveId, downfile);
-
+        printWithTime("download end");
         assertNotNull(downfile);
         assertTrue(checkSameFile(downfile));
 
+        printWithTime("delete start");
         controller.delete(VAULT_NAME, archiveId);
+        printWithTime("delete end");
+    }
 
+    private void printWithTime(String msg) {
+        System.out.println(new Date().toString() + ":" + msg);
+    }
+
+    /**
+     * checkSameFile()が正しく動作していることをテストする.
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void sameTest() throws IOException {
+
+        assertTrue(checkSameFile(new File(DOWN_FILENAME)));
     }
 
     private boolean checkSameFile(File downfile) throws IOException {
@@ -92,11 +126,19 @@ public class ArchiveControllerTest {
             downfileReader = new BufferedReader(new FileReader(downfile));
             String upfileLine = null;
             String downfileLine = null;
-            while (((upfileLine = upfileReader.readLine()) != null)
-                    && (downfileLine = downfileReader.readLine()) != null) {
-                if (!upfileLine.equals(downfileLine)) {
-                    return false;
+            while (true) {
+                upfileLine = upfileReader.readLine();
+                downfileLine = downfileReader.readLine();
+
+                if ((upfileLine != null) && (downfileLine != null)) {
+                    if (!upfileLine.equals(downfileLine)) {
+                        return false;
+                    }
+                } else {
+                    // どちらかのファイルが終端に達したらループを抜ける.
+                    break;
                 }
+
             }
             return ((upfileLine == null) && (downfileLine == null));
         } finally {
@@ -114,6 +156,5 @@ public class ArchiveControllerTest {
                 }
             }
         }
-
     }
 }

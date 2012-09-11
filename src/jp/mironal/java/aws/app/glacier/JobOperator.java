@@ -64,9 +64,7 @@ public class JobOperator extends StateLessJobOperator {
      * @return Instance of JobRestoreParam.
      */
     public JobRestoreParam getJobRestoreParam() {
-        if (!alreadyInitiate) {
-            throw new IllegalStateException("Job has not yet started");
-        }
+        checkAlreadyInitiateOrThrow();
         Builder builder = new Builder();
         builder.setVaultName(this.vaultName).setJobId(this.jobId).setRegion(this.region);
         return builder.build();
@@ -112,9 +110,7 @@ public class JobOperator extends StateLessJobOperator {
      * @return ステータスコードを示す文字列.
      */
     public String getStausCode() {
-        if (!alreadyInitiate) {
-            throw new IllegalStateException("Job has not yet started");
-        }
+        checkAlreadyInitiateOrThrow();
         DescribeJobResult result = describeJob(vaultName, jobId);
         return result.getStatusCode();
     }
@@ -126,14 +122,12 @@ public class JobOperator extends StateLessJobOperator {
      * @throws InterruptedException
      */
     public boolean waitForJobToComplete() throws InterruptedException {
-        if (!alreadyInitiate) {
-            throw new IllegalStateException("Job has not yet started");
-        }
+        checkAlreadyInitiateOrThrow();
 
         boolean inProgress = true;
         String statusCode = "";
         do {
-            System.out.println("loop");
+
             Thread.sleep(1000 * 60 * 30);
 
             statusCode = getStausCode();
@@ -144,23 +138,27 @@ public class JobOperator extends StateLessJobOperator {
     }
 
     /**
-     * inventory-retrievalのJobをダウンロードする.
+     * inventory-retrievalのJobをダウンロードする.<br>
+     * Jobが未完了のときに呼び出すと例外が発生する.
      * 
      * @return InventoryRetrievalResultのインスタンス.
-     * @throws JsonParseException
-     * @throws IOException
-     * @throws ParseException
      */
-    public InventoryRetrievalResult downloadInventoryJobOutput() throws JsonParseException,
-            IOException, ParseException {
-        if (!alreadyInitiate) {
-            throw new IllegalStateException("Job has not yet started");
-        }
+    public InventoryRetrievalResult downloadInventoryJobOutput() {
+        checkAlreadyInitiateOrThrow();
 
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withAccountId(vaultName).withJobId(jobId);
         GetJobOutputResult result = client.getJobOutput(getJobOutputRequest);
-        return new InventoryRetrievalResult(result.getBody());
+
+        try {
+            return new InventoryRetrievalResult(result.getBody());
+        } catch (JsonParseException e) {
+            throw new AmazonClientException("unable to parse json.", e);
+        } catch (IOException e) {
+            throw new AmazonClientException("unable to parse json.", e);
+        } catch (ParseException e) {
+            throw new AmazonClientException("unable to parse json.", e);
+        }
     }
 
     /**
@@ -169,9 +167,7 @@ public class JobOperator extends StateLessJobOperator {
      * @param saveFile ダウンロードしたファイルの保存先.
      */
     public void downloadArchiveJobOutput(File saveFile) {
-        if (!alreadyInitiate) {
-            throw new IllegalStateException("Job has not yet started");
-        }
+        checkAlreadyInitiateOrThrow();
 
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
@@ -196,7 +192,6 @@ public class JobOperator extends StateLessJobOperator {
             try {
                 in.close();
             } catch (IOException ignore) {
-
             }
             if (out != null) {
                 try {
@@ -214,7 +209,7 @@ public class JobOperator extends StateLessJobOperator {
      * @return jobId
      */
     private String executeInitiateJob(JobParameters jobParameters, String vaultName) {
-        alreadyInitiate = true;
+        initiateJob();
         InitiateJobRequest request = new InitiateJobRequest().withVaultName(vaultName)
                 .withJobParameters(jobParameters);
         InitiateJobResult result = client.initiateJob(request);
@@ -223,4 +218,35 @@ public class JobOperator extends StateLessJobOperator {
         return jobId;
     }
 
+    /**
+     * Jobが開始されていない場合は、IllegalStateException()を投げる.
+     */
+    private void checkAlreadyInitiateOrThrow() {
+        if (!alreadyInitiate) {
+            throw new IllegalStateException("Job has not yet started");
+        }
+    }
+
+    private void initiateJob() {
+        alreadyInitiate = true;
+    }
+
+    public static void main(String[] args) throws IOException {
+        JobOperator jobOperator = new JobOperator();
+
+        // String jobId = jobOperator.initiateInventoryJob("sample");
+        // System.out.println(jobId);
+        // InventoryRetrievalResult result =
+        // jobOperator.downloadInventoryJobOutput();
+
+        String jobId = "OF-cwVQWgnBkfTfom7WWyc4paVVW_NiW9KJnw14Opk481WLoGTYjAaqx6wzblj5XrMMP_rT8JdALOGHAH2XTeMapF762";
+        jobOperator.alreadyInitiate = true;
+        jobOperator.jobId = jobId;
+        jobOperator.vaultName = "sample";
+        InventoryRetrievalResult result = jobOperator.downloadInventoryJobOutput();
+        System.out.println(result.toString());
+        // DescribeJobResult describeJobResult =
+        // jobOperator.describeJob("sample", jobId);
+        // System.out.println(describeJobResult.toString());
+    }
 }

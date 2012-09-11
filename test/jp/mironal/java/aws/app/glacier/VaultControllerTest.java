@@ -18,11 +18,10 @@ import com.amazonaws.services.glacier.model.DescribeVaultResult;
 
 public class VaultControllerTest {
 
-    private static final String VAULT_NAME = "test_vault";
+    private static final String VAULT_NAME = "vault_controller_test";
 
     @Test
-    public void test_CreateVault() throws IOException {
-
+    public void test_Constract() throws IOException {
         VaultController controller = new VaultController();
         assertNotNull(controller);
         assertNotNull(controller.client);
@@ -30,6 +29,11 @@ public class VaultControllerTest {
         assertNotNull(controller.region);
 
         assertEquals(Region.US_EAST_1, controller.region);
+    }
+
+    @Test
+    public void test_CreateVault() throws IOException {
+        VaultController controller = new VaultController();
 
         CreateVaultResult result = controller.createVault(VAULT_NAME);
         assertNotNull(result);

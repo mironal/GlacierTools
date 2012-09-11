@@ -312,7 +312,6 @@ public class ArchiveControllerCmd extends CmdUtils {
             System.out.println("archiveId : " + archiveId);
             System.out.println("force : " + force);
         }
-
     }
 
     private void printListHelp() {

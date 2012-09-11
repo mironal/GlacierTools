@@ -13,9 +13,16 @@ import com.amazonaws.services.glacier.transfer.UploadResult;
 
 public class ArchiveControllerCmd extends CmdUtils {
 
+    // @formatter:off
     enum ArchiveCmdKind {
-        Bad, Upload, Download, Delete, List, Help,
+        Bad,
+        Upload,
+        Download,
+        Delete,
+        List,
+        Help,
     }
+    // @formatter:on
 
     ArchiveCmdKind cmdKind = ArchiveCmdKind.Bad;
 
@@ -321,65 +328,61 @@ public class ArchiveControllerCmd extends CmdUtils {
     }
 
     private void printUploadHelp() {
+        // @formatter:off
         System.out.println("Upload Archive");
         System.out.print("    ");
-        System.out
-                .println("java -jar archive_controller.jar upload --vault vaultname --file filename");
+        System.out.println("java -jar archive_controller.jar upload --vault vaultname --file filename");
         printHelpHelper("create", " --vault vaultname --file filename");
+        // @formatter:on
+
     }
 
     private void printDownloadHelp() {
+        // @formatter:off
         System.out.println("Download Archive");
         System.out.print("    ");
-        System.out
-                .println("java -jar archive_controller.jar download --vault vaultname --archive archiveId --file filename");
+        System.out.println("java -jar archive_controller.jar download --vault vaultname --archive archiveId --file filename");
         printHelpHelper("create", "--vault vaultname --archive archiveId --file filename");
-        System.out
-                .println("If there is a file with the same name at the time of download, Force overwrite.");
-        System.out
-                .println("java -jar archive_controller.jar download --vault vaultname --archive archiveId --file filename -force");
-
+        System.out.println("If there is a file with the same name at the time of download, Force overwrite.");
+        System.out.println("java -jar archive_controller.jar download --vault vaultname --archive archiveId --file filename -force");
+        // @formatter:on
     }
 
     private void printDeleteHelp() {
+        // @formatter:off
         System.out.println("Delete Archive");
         System.out.print("    ");
-        System.out
-                .println("java -jar archive_controller.jar delete --vault vaultname --archive archiveId");
+        System.out.println("java -jar archive_controller.jar delete --vault vaultname --archive archiveId");
         printHelpHelper("delete", " --vault vaultname --archive archiveId");
+        // @formatter:on
+
     }
 
     private void printHelpHelper(String kind, String opt) {
+        // @formatter:off
         System.out.println("Specify the region.");
         System.out.print("    ");
-        System.out
-                .println("java -jar archive_controller.jar " + kind + opt + " --region us-west-2");
+        System.out.println("java -jar archive_controller.jar " + kind + opt + " --region us-west-2");
         System.out.println("Specifies the AwsCredentials.properties file.");
         System.out.print("    ");
-        System.out.println("java -jar archive_controller.jar " + kind + opt
-                + " --properties myAwsPropFile.properties");
+        System.out.println("java -jar archive_controller.jar " + kind + opt + " --properties myAwsPropFile.properties");
         System.out.println("Specify the region and AwsCredentials.properties.");
         System.out.print("    ");
-        System.out.println("java -jar archive_controller.jar " + kind + opt
-                + " --region us-west-2 --properties myAwsPropFile.properties");
+        System.out.println("java -jar archive_controller.jar " + kind + opt + " --region us-west-2 --properties myAwsPropFile.properties");
+        // @formatter:on
     }
 
     private void printHelp() {
-        System.out
-                .println("java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]");
+        // @formatter:off
+        System.out.println("java -jar archive_controller.jar cmd [--vault vaultname] [--archive archiveId] [--file filename] [--force] [--region region] [--properties prop_filename]");
         System.out.println();
-
         System.out.println("cmd          : upload | donwload | delete | list");
         System.out.println("--vault      : The name of the Vault.");
         System.out.println("--archive    : The ID of the archive.");
-        System.out
-                .println("--file       : Specifies the name of a file that is uploaded when the upload. When the download is the name of the saved file.");
-        System.out
-                .println("--force      : If there is a file with the same name at the time of download, Force overwrite.");
-        System.out
-                .println("--region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1");
-        System.out
-                .println("--properties : If you want to specify explicitly AwsCredentials.properties");
+        System.out.println("--file       : Specifies the name of a file that is uploaded when the upload. When the download is the name of the saved file.");
+        System.out.println("--force      : If there is a file with the same name at the time of download, Force overwrite.");
+        System.out.println("--region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1");
+        System.out.println("--properties : If you want to specify explicitly AwsCredentials.properties");
         System.out.println();
         printUploadHelp();
         System.out.println();
@@ -390,7 +393,7 @@ public class ArchiveControllerCmd extends CmdUtils {
         printListHelp();
         System.out.println();
         printRegion();
-
+        // @formatter:on
     }
 
     @Override

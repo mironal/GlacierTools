@@ -415,6 +415,10 @@ public class ArchiveControllerCmd extends CmdUtils {
                 printListHelp();
                 break;
 
+            case Help:
+                printHelp();
+                break;
+
             case Bad:
                 printHelp();
                 break;

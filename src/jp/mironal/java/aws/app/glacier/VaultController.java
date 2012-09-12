@@ -17,9 +17,7 @@ import com.amazonaws.services.glacier.model.ListVaultsRequest;
 import com.amazonaws.services.glacier.model.ListVaultsResult;
 
 /**
- * コメントいらないっしょｗｗｗ
- * 
- * @author yama
+ * @author mironal
  */
 public class VaultController extends GlacierTools {
 
@@ -42,12 +40,21 @@ public class VaultController extends GlacierTools {
         return false;
     }
 
+    /**
+     * デフォルトコンストラクタ<br>
+     * デフォルトのリージョンとカレントディレクトリにあるAwsCredentials.propertiesを使用してインスタンスを作成
+     * 
+     * @throws IOException
+     */
     public VaultController() throws IOException {
         super();
     }
 
     /**
-     * @param endpoint endpointの省略形　{@link GlacierTools#endpointSet()}
+     * 指定したリージョンとAwsCredentials.propertiesファイルでインスタンスを作成
+     * 
+     * @param endpoint リージョン
+     * @param awsProperties AwsCredentials.propertiesファイルのインスタンス
      * @throws IOException
      */
     public VaultController(Region endpoint, File awsProperties) throws IOException {
@@ -55,8 +62,10 @@ public class VaultController extends GlacierTools {
     }
 
     /**
-     * @param vaultName
-     * @return
+     * Vaultを作成する.
+     * 
+     * @param vaultName 作成するVaultの名前
+     * @return 結果
      */
     public CreateVaultResult createVault(String vaultName) {
         CreateVaultRequest createVaultRequest = new CreateVaultRequest().withVaultName(vaultName);
@@ -65,8 +74,10 @@ public class VaultController extends GlacierTools {
     }
 
     /**
-     * @param vaultName
-     * @return
+     * Vaultの詳細を取得する.
+     * 
+     * @param vaultName 詳細を取得したいVaultの名前
+     * @return Vaultの詳細
      */
     public DescribeVaultResult describeVault(String vaultName) {
         DescribeVaultRequest describeVaultRequest = new DescribeVaultRequest()
@@ -76,7 +87,9 @@ public class VaultController extends GlacierTools {
     }
 
     /**
+     * リージョンに存在しているVaultの一覧を取得する.
      * 
+     * @return リージョンの一覧
      */
     public List<DescribeVaultOutput> listVaults() {
         ListVaultsRequest listVaultsRequest = new ListVaultsRequest();
@@ -85,7 +98,9 @@ public class VaultController extends GlacierTools {
     }
 
     /**
-     * @param vaultName
+     * Vaultを削除する.
+     * 
+     * @param vaultName 削除したいVaultの名前
      */
     public void deleteVault(String vaultName) {
         DeleteVaultRequest deleteVaultRequest = new DeleteVaultRequest().withVaultName(vaultName);

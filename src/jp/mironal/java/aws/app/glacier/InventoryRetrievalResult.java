@@ -101,7 +101,7 @@ public class InventoryRetrievalResult {
 
     @Override
     public String toString() {
-        final String NL = System.lineSeparator();
+        final String NL = System.getProperty("line.separator");
         final String SP = "    ";
         StringBuilder builder = new StringBuilder();
         builder.append("VaultArn      : ").append(getVaultArn()).append(NL);

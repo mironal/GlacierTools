@@ -43,6 +43,9 @@ public abstract class CmdUtils {
         } else {
             System.err.println(filename + " is not found.");
         }
+        if (isDebug()) {
+            e.printStackTrace();
+        }
     }
 
     public CmdUtils(String[] args) {
@@ -106,6 +109,9 @@ public abstract class CmdUtils {
 
     void onRegionNotFound(String endpointStr, Throwable e) {
         System.err.println(e.getMessage() + " is not found.");
+        if (isDebug()) {
+            e.printStackTrace();
+        }
     }
 
     /**

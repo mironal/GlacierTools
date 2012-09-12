@@ -12,9 +12,16 @@ import com.amazonaws.services.glacier.model.DescribeVaultResult;
 
 public class VaultControllerCmd extends CmdUtils {
 
+    // @formatter:off
     enum VaultCmdKind {
-        Bad, Create, Describe, List, Delete, Help,
+        Bad, 
+        Create, 
+        Describe, 
+        List, 
+        Delete, 
+        Help,
     }
+    // @formatter:on
 
     VaultCmdKind cmdKind = VaultCmdKind.Bad;
     String vaultName = null;

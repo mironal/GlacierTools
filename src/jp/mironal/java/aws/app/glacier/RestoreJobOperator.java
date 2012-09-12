@@ -11,6 +11,9 @@ import org.codehaus.jackson.JsonParseException;
 import com.amazonaws.services.glacier.model.DescribeJobResult;
 import com.amazonaws.services.glacier.model.GlacierJobDescription;
 
+/**
+ * @author mironal
+ */
 public class RestoreJobOperator extends StateLessJobOperator {
 
     public static final String ACTION_ARCHIVE_RETRIEVAL = "ArchiveRetrieval";

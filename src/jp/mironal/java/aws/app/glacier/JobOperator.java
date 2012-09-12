@@ -29,7 +29,7 @@ import com.amazonaws.services.glacier.model.JobParameters;
  * 理由は処理を簡潔にするためである.<br>
  * SNS、SQSを使用する方法は別途提供する.
  * 
- * @author yama
+ * @author mironal
  */
 public class JobOperator extends StateLessJobOperator {
 
@@ -49,10 +49,23 @@ public class JobOperator extends StateLessJobOperator {
     private String jobId;
     private String vaultName;
 
+    /**
+     * デフォルトコンストラクタ<br>
+     * デフォルトのリージョンとカレントディレクトリにあるAwsCredentials.propertiesを使用してインスタンスを作成
+     * 
+     * @throws IOException
+     */
     public JobOperator() throws IOException {
         super();
     }
 
+    /**
+     * 指定したリージョンとAwsCredentials.propertiesファイルでインスタンスを作成
+     * 
+     * @param endpoint リージョン
+     * @param awsProperties AwsCredentials.propertiesファイルのインスタンス
+     * @throws IOException
+     */
     public JobOperator(Region endpoint, File awsProperties) throws IOException {
         super(endpoint, awsProperties);
     }

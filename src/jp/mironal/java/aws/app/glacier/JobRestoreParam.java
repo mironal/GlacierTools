@@ -5,6 +5,8 @@ import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 
 /**
  * InitiateしたJobを後で参照するために必要な情報.
+ * 
+ * @author mironal
  */
 public class JobRestoreParam {
 

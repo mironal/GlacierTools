@@ -14,14 +14,27 @@ import com.amazonaws.services.glacier.model.ListJobsResult;
 /**
  * 状態を持たないJob Operationsを行うクラス
  * 
- * @author yama
+ * @author mironal
  */
 public class StateLessJobOperator extends GlacierTools {
 
+    /**
+     * デフォルトコンストラクタ<br>
+     * デフォルトのリージョンとカレントディレクトリにあるAwsCredentials.propertiesを使用してインスタンスを作成
+     * 
+     * @throws IOException
+     */
     public StateLessJobOperator() throws IOException {
         super();
     }
 
+    /**
+     * 指定したリージョンとAwsCredentials.propertiesファイルでインスタンスを作成
+     * 
+     * @param endpoint リージョン
+     * @param awsProperties AwsCredentials.propertiesファイルのインスタンス
+     * @throws IOException
+     */
     public StateLessJobOperator(Region endpoint, File awsProperties) throws IOException {
         super(endpoint, awsProperties);
     }

@@ -23,6 +23,15 @@ import com.amazonaws.services.glacier.model.ListVaultsResult;
  */
 public class VaultController extends GlacierTools {
 
+    /**
+     * Vaultの名前に問題が無いかバリデーションを行う<br>
+     * 
+     * @see <a href=
+     *      "http://docs.amazonwebservices.com/amazonglacier/latest/dev/creating-vaults.html"
+     *      >Creating a Vault in Amazon Glacier<a/>
+     * @param vaultName バリデーションを行う文字列
+     * @return true:問題無し、false:問題有り
+     */
     public static boolean validateVaultName(String vaultName) {
         if ((vaultName.length() >= 1) && (vaultName.length() <= 255)) {
             String regex = "[^a-zA-Z0-9_\\-\\.]";

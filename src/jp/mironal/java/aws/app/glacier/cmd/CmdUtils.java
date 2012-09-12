@@ -38,6 +38,34 @@ public abstract class CmdUtils {
 
     abstract void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e);
 
+    public CmdUtils(String[] args) {
+
+        String endpointStr = null; /**/
+        String propertiesName = null;
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (arg.equals("--debug")) {
+                debug = true;
+            }
+            if (arg.equals("--region")) {
+                if ((i + 1) < args.length) {
+                    i++;
+                    endpointStr = args[i];
+                }
+            }
+
+            if (arg.equals("--properties")) {
+                if ((i + 1) < args.length) {
+                    i++;
+                    propertiesName = args[i];
+                }
+            }
+        }
+        setAwsCredentialsPropertiesFile(propertiesName);
+
+        setRegion(endpointStr);
+    }
+
     /**
      * @param propertiesName
      * @return

@@ -20,8 +20,7 @@ public class VaultControllerCmd extends CmdUtils {
     String vaultName = null;
 
     VaultControllerCmd(String[] args) {
-        String endpointStr = null; /**/
-        String propertiesName = null;
+        super(args);
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -52,30 +51,7 @@ public class VaultControllerCmd extends CmdUtils {
                     vaultName = args[i];
                 }
             }
-
-            if (arg.equals("--region")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    endpointStr = args[i];
-                }
-            }
-
-            if (arg.equals("--properties")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    propertiesName = args[i];
-                }
-            }
-
-            if (arg.equals("--debug")) {
-                debug = true;
-            }
         }
-
-        setAwsCredentialsPropertiesFile(propertiesName);
-
-        setRegion(endpointStr);
-
     }
 
     private void setCmdKind(VaultCmdKind cmd) {

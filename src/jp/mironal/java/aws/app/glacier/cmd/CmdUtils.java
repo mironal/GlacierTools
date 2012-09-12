@@ -6,14 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import com.amazonaws.services.glacier.model.DescribeJobResult;
-import com.amazonaws.services.glacier.model.DescribeVaultOutput;
-import com.amazonaws.services.glacier.model.GlacierJobDescription;
-
 import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.GlacierTools;
 import jp.mironal.java.aws.app.glacier.VaultController;
+
+import com.amazonaws.services.glacier.model.DescribeJobResult;
+import com.amazonaws.services.glacier.model.DescribeVaultOutput;
+import com.amazonaws.services.glacier.model.GlacierJobDescription;
 
 public abstract class CmdUtils {
 
@@ -166,4 +166,13 @@ public abstract class CmdUtils {
     abstract void onExecInvalidParam();
 
     abstract boolean validateParam();
+
+    /**
+     * デバッグモードか否かを取得する.
+     * 
+     * @return true:デバッグモード
+     */
+    public boolean isDebug() {
+        return debug;
+    }
 }

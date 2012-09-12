@@ -155,42 +155,58 @@ public class VaultControllerCmd extends CmdUtils {
     }
 
     private void execCreate() throws IOException {
-        VaultController controller = new VaultController(region, awsPropFile);
-        CreateVaultResult createVaultResult = controller.createVault(vaultName);
-        System.out.println("Success!");
-        System.out.println("Location:" + createVaultResult.getLocation());
+        if (!isDebug()) {
+            VaultController controller = new VaultController(region, awsPropFile);
+            CreateVaultResult createVaultResult = controller.createVault(vaultName);
+            System.out.println("Success!");
+            System.out.println("Location:" + createVaultResult.getLocation());
+        } else {
+            System.out.println("execute create");
+        }
     }
 
     private void execDescribe() throws IOException {
-        VaultController controller = new VaultController(region, awsPropFile);
-        DescribeVaultResult describeVaultResult = controller.describeVault(vaultName);
-        System.out.println("Describing the vault: " + vaultName);
-        System.out.print("CreationDate: " + describeVaultResult.getCreationDate()
-                + "\nLastInventoryDate: " + describeVaultResult.getLastInventoryDate()
-                + "\nNumberOfArchives: " + describeVaultResult.getNumberOfArchives()
-                + "\nSizeInBytes: " + describeVaultResult.getSizeInBytes() + "\nVaultARN: "
-                + describeVaultResult.getVaultARN() + "\nVaultName: "
-                + describeVaultResult.getVaultName());
-        System.out.println();
+        if (!isDebug()) {
+            VaultController controller = new VaultController(region, awsPropFile);
+            DescribeVaultResult describeVaultResult = controller.describeVault(vaultName);
+            System.out.println("Describing the vault: " + vaultName);
+            System.out.print("CreationDate: " + describeVaultResult.getCreationDate()
+                    + "\nLastInventoryDate: " + describeVaultResult.getLastInventoryDate()
+                    + "\nNumberOfArchives: " + describeVaultResult.getNumberOfArchives()
+                    + "\nSizeInBytes: " + describeVaultResult.getSizeInBytes() + "\nVaultARN: "
+                    + describeVaultResult.getVaultARN() + "\nVaultName: "
+                    + describeVaultResult.getVaultName());
+            System.out.println();
+        } else {
+            System.out.println("execute describe");
+        }
     }
 
     private void execList() throws IOException {
-        VaultController controller = new VaultController(region, awsPropFile);
-        List<DescribeVaultOutput> vaultList = controller.listVaults();
-        System.out.println("\nDescribing all vaults (vault list):");
-        for (DescribeVaultOutput vault : vaultList) {
-            System.out.println("\nCreationDate: " + vault.getCreationDate()
-                    + "\nLastInventoryDate: " + vault.getLastInventoryDate()
-                    + "\nNumberOfArchives: " + vault.getNumberOfArchives() + "\nSizeInBytes: "
-                    + vault.getSizeInBytes() + "\nVaultARN: " + vault.getVaultARN()
-                    + "\nVaultName: " + vault.getVaultName());
+        if (!isDebug()) {
+            VaultController controller = new VaultController(region, awsPropFile);
+            List<DescribeVaultOutput> vaultList = controller.listVaults();
+            System.out.println("\nDescribing all vaults (vault list):");
+            for (DescribeVaultOutput vault : vaultList) {
+                System.out.println("\nCreationDate: " + vault.getCreationDate()
+                        + "\nLastInventoryDate: " + vault.getLastInventoryDate()
+                        + "\nNumberOfArchives: " + vault.getNumberOfArchives() + "\nSizeInBytes: "
+                        + vault.getSizeInBytes() + "\nVaultARN: " + vault.getVaultARN()
+                        + "\nVaultName: " + vault.getVaultName());
+            }
+        } else {
+            System.out.println("execute list");
         }
     }
 
     private void execDelete() throws IOException {
-        VaultController controller = new VaultController(region, awsPropFile);
-        controller.deleteVault(vaultName);
-        System.out.println("Deleted vault: " + vaultName);
+        if (!isDebug()) {
+            VaultController controller = new VaultController(region, awsPropFile);
+            controller.deleteVault(vaultName);
+            System.out.println("Deleted vault: " + vaultName);
+        } else {
+            System.out.println("execute delete");
+        }
     }
 
     @Override

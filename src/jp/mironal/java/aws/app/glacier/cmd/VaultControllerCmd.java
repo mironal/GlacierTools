@@ -65,17 +65,11 @@ public class VaultControllerCmd extends CmdUtils {
 
     @Override
     void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
-        if (debug) {
-            System.err.println(e.getMessage());
-        }
         setCmdKind(VaultCmdKind.Bad);
     }
 
     @Override
     void onRegionNotFound(String endpointStr, Throwable e) {
-        if (debug) {
-            System.out.println(e.getMessage());
-        }
         setCmdKind(VaultCmdKind.Bad);
     }
 

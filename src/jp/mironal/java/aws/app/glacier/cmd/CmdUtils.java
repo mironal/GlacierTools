@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import jp.mironal.java.aws.app.glacier.AwsTools;
 import jp.mironal.java.aws.app.glacier.AwsTools.AwsService;
 import jp.mironal.java.aws.app.glacier.AwsTools.Region;
 import jp.mironal.java.aws.app.glacier.GlacierTools;
@@ -36,7 +37,13 @@ public abstract class CmdUtils {
         }
     }
 
-    abstract void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e);
+    void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
+        if (filename == null) {
+            System.err.println(AwsTools.AWS_PROPERTIES_FILENAME + " is not found.");
+        } else {
+            System.err.println(filename + " is not found.");
+        }
+    }
 
     public CmdUtils(String[] args) {
 
@@ -97,7 +104,9 @@ public abstract class CmdUtils {
         }
     }
 
-    abstract void onRegionNotFound(String endpointStr, Throwable e);
+    void onRegionNotFound(String endpointStr, Throwable e) {
+        System.err.println(e.getMessage() + " is not found.");
+    }
 
     /**
      * @param endpointStr

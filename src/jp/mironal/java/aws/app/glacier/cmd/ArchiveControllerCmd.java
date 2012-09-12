@@ -33,8 +33,7 @@ public class ArchiveControllerCmd extends CmdUtils {
     boolean printArchiveIdOnly = false;
 
     ArchiveControllerCmd(String[] args) {
-        String propertiesName = null;
-        String endpointStr = null;
+        super(args);
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 
@@ -82,20 +81,6 @@ public class ArchiveControllerCmd extends CmdUtils {
                 }
             }
 
-            if (arg.equals("--region")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    endpointStr = args[i];
-                }
-            }
-
-            if (arg.equals("--properties")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    propertiesName = args[i];
-                }
-            }
-
             if (arg.equals("--idonly")) {
                 printArchiveIdOnly = true;
             }
@@ -107,17 +92,7 @@ public class ArchiveControllerCmd extends CmdUtils {
             if (arg.equals("--force")) {
                 force = true;
             }
-
-            if (arg.equals("--debug")) {
-                debug = true;
-            }
         }
-
-        setAwsCredentialsPropertiesFile(propertiesName);
-
-        /* endpoint */
-        setRegion(endpointStr);
-
     }
 
     @Override

@@ -40,8 +40,7 @@ public class JobOperatorCmd extends CmdUtils {
     String filename = null;
 
     JobOperatorCmd(String[] args) {
-        String endpointStr = null;
-        String propertiesName = null;
+        super(args);
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 
@@ -90,13 +89,6 @@ public class JobOperatorCmd extends CmdUtils {
                 }
             }
 
-            if (arg.equals("--region")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    endpointStr = args[i];
-                }
-            }
-
             if (arg.equals("--file")) {
                 if ((i + 1) < args.length) {
                     i++;
@@ -104,24 +96,10 @@ public class JobOperatorCmd extends CmdUtils {
                 }
             }
 
-            if (arg.equals("--properties")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    propertiesName = args[i];
-                }
-            }
-
             if (arg.equals("--debug")) {
                 debug = true;
             }
         }
-
-        // プロパティーファイルが無かったらcmdをBadにする.
-        setAwsCredentialsPropertiesFile(propertiesName);
-
-        // 変なRegionを設定されたらcmdをBadにする.
-        setRegion(endpointStr);
-
     }
 
     private void setCmdKind(JobOperatorCmdKind cmd) {

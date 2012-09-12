@@ -38,8 +38,9 @@ public class RestoreJobCmd extends CmdUtils {
      * @throws JobRestoreException
      */
     public RestoreJobCmd(String[] args) throws IOException {
+        super(args);
         String restorePropFilename = null;
-        String propertiesName = null;
+
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if (arg.equals("download")) {
@@ -69,18 +70,11 @@ public class RestoreJobCmd extends CmdUtils {
                 }
             }
 
-            if (arg.equals("--properties")) {
-                if ((i + 1) < args.length) {
-                    i++;
-                    propertiesName = args[i];
-                }
-            }
         }
 
         /* helpの時は無視する. */
         if (cmdKind != RestoreJobCmdKind.Help) {
             // プロパティーファイルが無かったらcmdをBadにする.
-            setAwsCredentialsPropertiesFile(propertiesName);
             restoreJobParam(restorePropFilename);
         }
     }
@@ -139,13 +133,11 @@ public class RestoreJobCmd extends CmdUtils {
 
     @Override
     void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
-        System.err.println(filename + " is not found.");
         setCmdKind(RestoreJobCmdKind.Bad);
     }
 
     @Override
     void onRegionNotFound(String endpointStr, Throwable e) {
-        System.err.println(e.getMessage() + " is not found.");
         setCmdKind(RestoreJobCmdKind.Bad);
     }
 

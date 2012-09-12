@@ -22,14 +22,24 @@ import com.amazonaws.services.glacier.model.GlacierJobDescription;
  */
 public class JobOperatorCmd extends CmdUtils {
 
+    // @formatter:off
     enum JobOperatorCmdKind {
-        Bad, Inventory, Archive, List, Describe, Help
+        Bad,
+        Inventory,
+        Archive,
+        List,
+        Describe,
+        Help
 
     }
+    // @formatter:on
 
+    // @formatter:off
     enum Sync {
-        Sync, Async,
+        Sync,
+        Async,
     }
+    // @formatter:on
 
     JobOperatorCmdKind cmdKind = JobOperatorCmdKind.Bad;
     Sync syncType = Sync.Sync;
@@ -112,26 +122,38 @@ public class JobOperatorCmd extends CmdUtils {
     }
 
     private void execDescribe() throws IOException {
-        StateLessJobOperator controller = new StateLessJobOperator(region, awsPropFile);
-        DescribeJobResult result = controller.describeJob(vaultname, jobId);
-        printDescribeJob(result);
+        if (!isDebug()) {
+            StateLessJobOperator controller = new StateLessJobOperator(region, awsPropFile);
+            DescribeJobResult result = controller.describeJob(vaultname, jobId);
+            printDescribeJob(result);
+        } else {
+            System.out.println("execute describe");
+        }
     }
 
     private void execArchiveSync() throws IOException, InterruptedException {
-        JobOperator controller = new JobOperator(region, awsPropFile);
-        controller.initiateArchiveJob(vaultname, archiveId);
-        boolean successful = controller.waitForJobToComplete();
-        if (successful) {
-            controller.downloadArchiveJobOutput(new File(filename));
+        if (!isDebug()) {
+            JobOperator controller = new JobOperator(region, awsPropFile);
+            controller.initiateArchiveJob(vaultname, archiveId);
+            boolean successful = controller.waitForJobToComplete();
+            if (successful) {
+                controller.downloadArchiveJobOutput(new File(filename));
+            } else {
+                System.out.println("download fault.");
+            }
         } else {
-            System.out.println("download fault.");
+            System.out.println("execute archive sync");
         }
     }
 
     private void execArchiveAsync() throws IOException {
-        JobOperator controller = new JobOperator(region, awsPropFile);
-        controller.initiateArchiveJob(vaultname, archiveId);
-        printJobRestoreParam(controller);
+        if (!isDebug()) {
+            JobOperator controller = new JobOperator(region, awsPropFile);
+            controller.initiateArchiveJob(vaultname, archiveId);
+            printJobRestoreParam(controller);
+        } else {
+            System.out.println("execute archive async");
+        }
     }
 
     private void execArchive() throws IOException, InterruptedException {
@@ -149,37 +171,51 @@ public class JobOperatorCmd extends CmdUtils {
     }
 
     private void execList() throws IOException {
-
-        StateLessJobOperator controller = new StateLessJobOperator(region, awsPropFile);
-        List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
-        if (jobs.size() > 0) {
-            for (GlacierJobDescription job : jobs) {
-                System.out.println();
-                printGlacierJobDescriptionf(job);
+        if (!isDebug()) {
+            StateLessJobOperator controller = new StateLessJobOperator(region, awsPropFile);
+            List<GlacierJobDescription> jobs = controller.listJobs(vaultname);
+            if (jobs.size() > 0) {
+                for (GlacierJobDescription job : jobs) {
+                    System.out.println();
+                    printGlacierJobDescriptionf(job);
+                }
+            } else {
+                System.out.println("There is no Job.");
             }
         } else {
-            System.out.println("There is no Job.");
+            System.out.println("execute list");
         }
+
     }
 
     private void execInventorySync() throws IOException, InterruptedException, ParseException {
-        JobOperator controller = new JobOperator(region, awsPropFile);
+        if (!isDebug()) {
+            JobOperator controller = new JobOperator(region, awsPropFile);
 
-        String jobId = controller.initiateInventoryJob(vaultname);
-        System.out.println("JobID=" + jobId);
-        boolean successful = controller.waitForJobToComplete();
-        if (successful) {
-            InventoryRetrievalResult result = controller.downloadInventoryJobOutput();
-            System.out.println(result.toString());
+            String jobId = controller.initiateInventoryJob(vaultname);
+            System.out.println("JobID=" + jobId);
+            boolean successful = controller.waitForJobToComplete();
+            if (successful) {
+                InventoryRetrievalResult result = controller.downloadInventoryJobOutput();
+                System.out.println(result.toString());
+            } else {
+                System.out.println("Error : Job complete failed.");
+            }
         } else {
-            System.out.println("Error : Job complete failed.");
+            System.out.println("execute inventory sync");
         }
+
     }
 
     private void execInventoryAsync() throws IOException {
-        JobOperator controller = new JobOperator(region, awsPropFile);
-        controller.initiateInventoryJob(vaultname);
-        printJobRestoreParam(controller);
+        if (!isDebug()) {
+            JobOperator controller = new JobOperator(region, awsPropFile);
+            controller.initiateInventoryJob(vaultname);
+            printJobRestoreParam(controller);
+        } else {
+            System.out.println("execute inventory async");
+        }
+
     }
 
     /**

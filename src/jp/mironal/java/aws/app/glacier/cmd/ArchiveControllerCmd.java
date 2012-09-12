@@ -3,7 +3,6 @@ package jp.mironal.java.aws.app.glacier.cmd;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 
 import jp.mironal.java.aws.app.glacier.ArchiveController;
 import jp.mironal.java.aws.app.glacier.InventoryRetrievalResult;
@@ -170,37 +169,55 @@ public class ArchiveControllerCmd extends CmdUtils {
     }
 
     private void execUpload() throws IOException {
-        ArchiveController archiveController = new ArchiveController(region, awsPropFile);
-        File uploadFile = new File(filename);
-        String description = uploadFile.getName();
-        UploadResult uploadResult = archiveController.upload(vaultName, description, uploadFile);
-        if (printArchiveIdOnly) {
-            System.out.println(uploadResult.getArchiveId());
+        if (!isDebug()) {
+            ArchiveController archiveController = new ArchiveController(region, awsPropFile);
+            File uploadFile = new File(filename);
+            String description = uploadFile.getName();
+            UploadResult uploadResult = archiveController
+                    .upload(vaultName, description, uploadFile);
+            if (printArchiveIdOnly) {
+                System.out.println(uploadResult.getArchiveId());
+            } else {
+                System.out.println("Archive ID:" + uploadResult.getArchiveId());
+            }
         } else {
-            System.out.println("Archive ID:" + uploadResult.getArchiveId());
+            System.out.println("execute upload");
         }
     }
 
     private void execDownload() throws IOException {
-        ArchiveController archiveController = new ArchiveController(region, awsPropFile);
-        archiveController.download(vaultName, archiveId, new File(filename));
-        System.out.println("download success!");
+        if (!isDebug()) {
+            ArchiveController archiveController = new ArchiveController(region, awsPropFile);
+            archiveController.download(vaultName, archiveId, new File(filename));
+            System.out.println("download success!");
+        } else {
+            System.out.println("execute download");
+        }
     }
 
     private void execDelete() throws IOException {
-        ArchiveController archiveController = new ArchiveController(region, awsPropFile);
-        archiveController.delete(vaultName, archiveId);
-        System.out.println("delete success!");
+        if (!isDebug()) {
+            ArchiveController archiveController = new ArchiveController(region, awsPropFile);
+            archiveController.delete(vaultName, archiveId);
+            System.out.println("delete success!");
+        } else {
+            System.out.println("execute delete");
+        }
+
     }
 
-    private void execList() throws IOException, InterruptedException, ParseException {
-        JobOperator operator = new JobOperator(region, awsPropFile);
-        operator.initiateInventoryJob(vaultName);
-        if (operator.waitForJobToComplete()) {
-            InventoryRetrievalResult result = operator.downloadInventoryJobOutput();
-            System.out.println(result.toString());
+    private void execList() throws IOException, InterruptedException {
+        if (!isDebug()) {
+            JobOperator operator = new JobOperator(region, awsPropFile);
+            operator.initiateInventoryJob(vaultName);
+            if (operator.waitForJobToComplete()) {
+                InventoryRetrievalResult result = operator.downloadInventoryJobOutput();
+                System.out.println(result.toString());
+            } else {
+                System.out.println("Fault : get list.");
+            }
         } else {
-            System.out.println("Fault : get list.");
+            System.out.println("execute list");
         }
     }
 

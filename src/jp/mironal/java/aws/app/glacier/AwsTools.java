@@ -1,6 +1,9 @@
 
 package jp.mironal.java.aws.app.glacier;
 
+/**
+ * @author mironal
+ */
 public class AwsTools {
 
     /**
@@ -83,5 +86,4 @@ public class AwsTools {
         }
         return HTTPS + service.toString().toLowerCase() + "." + region.getEndpoint() + URL_TAIL;
     }
-
 }

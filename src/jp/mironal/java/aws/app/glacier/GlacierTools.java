@@ -11,6 +11,9 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
 
+/**
+ * @author mironal
+ */
 public class GlacierTools extends AwsTools {
 
     /**
@@ -23,6 +26,7 @@ public class GlacierTools extends AwsTools {
         ENDPOINTS = new HashMap<String, AwsTools.Region>();
         // リージョンは色々あるが、Glacierが対応しているリージョンのみを含める
         // 2012/08/29現在
+        // http://docs.amazonwebservices.com/general/latest/gr/rande.html#glacier_region
         ENDPOINTS.put(Region.US_EAST_1.getEndpoint(), Region.US_EAST_1);
         ENDPOINTS.put(Region.US_WEST_1.getEndpoint(), Region.US_WEST_1);
         ENDPOINTS.put(Region.US_WEST_2.getEndpoint(), Region.US_WEST_2);
@@ -30,6 +34,12 @@ public class GlacierTools extends AwsTools {
         ENDPOINTS.put(Region.AP_NORTHEAST_1.getEndpoint(), Region.AP_NORTHEAST_1);
     }
 
+    /**
+     * Glacierが使用できるRegionの一覧を取得する.<br>
+     * コマンドライン引数からRegion列挙体に変換する為に使用しやすい形になっている.
+     * 
+     * @return Regionを示す文字列とRegion列挙体のMap
+     */
     public static Map<String, Region> getGlacierRegions() {
         return Collections.unmodifiableMap(ENDPOINTS);
     }
@@ -47,7 +57,7 @@ public class GlacierTools extends AwsTools {
     /**
      * US EAST 1のRegionを返す
      * 
-     * @return
+     * @return Region.US_EAST_1
      */
     public static Region getDefaultEndpoint() {
         return Region.US_EAST_1;
@@ -67,15 +77,27 @@ public class GlacierTools extends AwsTools {
     protected final AWSCredentials credentials;
     protected final Region region;
 
+    /**
+     * デフォルトコンストラクタ<br>
+     * デフォルトのリージョンとカレントディレクトリにあるAwsCredentials.propertiesを使用してインスタンスを作成
+     * 
+     * @throws IOException
+     */
     public GlacierTools() throws IOException {
         this(getDefaultEndpoint(), new File(AWS_PROPERTIES_FILENAME));
     }
 
+    /**
+     * 指定したリージョンとAwsCredentials.propertiesファイルでインスタンスを作成
+     * 
+     * @param endpoint リージョン
+     * @param awsProperties AwsCredentials.propertiesファイルのインスタンス
+     * @throws IOException
+     */
     public GlacierTools(Region endpoint, File awsProperties) throws IOException {
         this.region = endpoint;
         this.credentials = new PropertiesCredentials(awsProperties);
         this.client = new AmazonGlacierClient(credentials);
         this.client.setEndpoint(makeUrl(AwsService.Glacier, endpoint));
     }
-
 }

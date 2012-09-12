@@ -160,7 +160,7 @@ public class JobOperator extends StateLessJobOperator {
         checkAlreadyInitiateOrThrow();
 
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
-                .withAccountId(vaultName).withJobId(jobId);
+                .withVaultName(vaultName).withJobId(jobId);
         GetJobOutputResult result = client.getJobOutput(getJobOutputRequest);
 
         try {

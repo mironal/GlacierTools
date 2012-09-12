@@ -141,39 +141,57 @@ public class RestoreJobCmd extends CmdUtils {
     }
 
     private void execDownload() throws IOException, InterruptedException, ParseException {
-        RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam, awsPropFile);
+        if (!isDebug()) {
+            RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam,
+                    awsPropFile);
 
-        // 完了状態をチェック
-        // 完了してなからったら待つ
-        if (operator.waitForJobComplete()) {
-            // 完了してたらダウンロード
-            // Jobの種類(archive, inventory)のチェック
-            operator.updateJobKind();
+            // 完了状態をチェック
+            // 完了してなからったら待つ
+            if (operator.waitForJobComplete()) {
+                // 完了してたらダウンロード
+                // Jobの種類(archive, inventory)のチェック
+                operator.updateJobKind();
 
-            if (operator.getAction().equals(RestoreJobOperator.ACTION_ARCHIVE_RETRIEVAL)) {
-                if (filename == null) {
-                    System.out.println("--filename option is not specified");
-                    System.exit(-1);
+                if (operator.getAction().equals(RestoreJobOperator.ACTION_ARCHIVE_RETRIEVAL)) {
+                    if (filename == null) {
+                        System.out.println("--filename option is not specified");
+                        System.exit(-1);
+                    }
+                    operator.downloadArchiveJobOutput(new File(filename));
+                } else if (operator.getAction().equals(
+                        RestoreJobOperator.ACTION_INVENTORY_RETRIEVAL)) {
+                    InventoryRetrievalResult result = operator.downloadInventoryJobOutput();
+                    System.out.println(result.toString());
                 }
-                operator.downloadArchiveJobOutput(new File(filename));
-            } else if (operator.getAction().equals(RestoreJobOperator.ACTION_INVENTORY_RETRIEVAL)) {
-                InventoryRetrievalResult result = operator.downloadInventoryJobOutput();
-                System.out.println(result.toString());
+            } else {
+                System.out.println("job fault.");
             }
+
         } else {
-            System.out.println("job fault.");
+            System.out.println("execute download");
         }
     }
 
     private void execCheck() throws IOException {
-        RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam, awsPropFile);
-        System.out.println(operator.getStatusCode());
+        if (!isDebug()) {
+            RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam,
+                    awsPropFile);
+            System.out.println(operator.getStatusCode());
+        } else {
+            System.out.println("execute check");
+        }
     }
 
     private void execDesc() throws IOException {
-        RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam, awsPropFile);
-        DescribeJobResult result = operator.describeJob();
-        printDescribeJob(result);
+        if (!isDebug()) {
+
+            RestoreJobOperator operator = RestoreJobOperator.restoreJob(jobRestoreParam,
+                    awsPropFile);
+            DescribeJobResult result = operator.describeJob();
+            printDescribeJob(result);
+        } else {
+            System.out.println("execute describe");
+        }
     }
 
     @Override

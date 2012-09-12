@@ -68,7 +68,6 @@ public class VaultControllerCmd extends CmdUtils {
         if (debug) {
             System.err.println(e.getMessage());
         }
-        System.err.println(filename + " not found.");
         setCmdKind(VaultCmdKind.Bad);
     }
 
@@ -77,7 +76,6 @@ public class VaultControllerCmd extends CmdUtils {
         if (debug) {
             System.out.println(e.getMessage());
         }
-        System.err.println(e.getMessage() + " not found.");
         setCmdKind(VaultCmdKind.Bad);
     }
 

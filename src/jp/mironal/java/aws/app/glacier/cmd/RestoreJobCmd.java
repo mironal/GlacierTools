@@ -128,7 +128,6 @@ public class RestoreJobCmd extends CmdUtils {
                 reader.close();
             }
         }
-
     }
 
     @Override

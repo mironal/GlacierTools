@@ -406,13 +406,11 @@ public class ArchiveControllerCmd extends CmdUtils {
 
     @Override
     void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
-        System.err.println(filename + " is not found.");
         setCmdKind(ArchiveCmdKind.Bad);
     }
 
     @Override
     void onRegionNotFound(String endpointStr, Throwable e) {
-        System.err.println(e.getMessage() + " is not found.");
         setCmdKind(ArchiveCmdKind.Bad);
     }
 

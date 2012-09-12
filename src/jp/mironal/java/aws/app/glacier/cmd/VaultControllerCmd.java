@@ -23,12 +23,15 @@ public class VaultControllerCmd extends CmdUtils {
     }
     // @formatter:on
 
-    VaultCmdKind cmdKind = VaultCmdKind.Bad;
+    VaultCmdKind cmdKind;
     String vaultName = null;
 
     VaultControllerCmd(String[] args) {
         super(args);
 
+        /*
+         * 引数解析
+         */
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 
@@ -61,8 +64,14 @@ public class VaultControllerCmd extends CmdUtils {
         }
     }
 
+    /**
+     * コマンドの種類をセットする.<br>
+     * セット可能なのは最初の一回のみで、2回目以降は全てBadになる.
+     * 
+     * @param cmd
+     */
     private void setCmdKind(VaultCmdKind cmd) {
-        if (this.cmdKind == VaultCmdKind.Bad) {
+        if (this.cmdKind == null) {
             this.cmdKind = cmd;
         } else {
             /* オプション違反 */
@@ -72,11 +81,13 @@ public class VaultControllerCmd extends CmdUtils {
 
     @Override
     void onAwsCredentialsPropertiesFileNotFound(String filename, Throwable e) {
+        super.onAwsCredentialsPropertiesFileNotFound(filename, e);
         setCmdKind(VaultCmdKind.Bad);
     }
 
     @Override
     void onRegionNotFound(String endpointStr, Throwable e) {
+        super.onRegionNotFound(endpointStr, e);
         setCmdKind(VaultCmdKind.Bad);
     }
 

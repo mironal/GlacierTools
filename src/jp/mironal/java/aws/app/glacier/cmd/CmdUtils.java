@@ -54,9 +54,11 @@ public abstract class CmdUtils {
         String propertiesName = null;
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
+
             if (arg.equals("--debug")) {
                 debug = true;
             }
+
             if (arg.equals("--region")) {
                 if ((i + 1) < args.length) {
                     i++;

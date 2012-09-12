@@ -16,13 +16,14 @@ public class VaultControllerCmdTest {
     @Test
     public void test_Create() {
         VaultControllerCmd cmd = new VaultControllerCmd(new String[] {
-                "create", "--vault", "hogehoge"
+                "create", "--vault", "hogehoge", "--debug"
         });
 
         assertEquals(cmd.cmdKind, VaultCmdKind.Create);
         assertEquals(cmd.region, GlacierTools.getDefaultEndpoint());
         assertEquals(cmd.vaultName, "hogehoge");
         assertTrue(cmd.validateParam());
+        assertTrue(cmd.isDebug());
 
         // with region
         cmd = new VaultControllerCmd(new String[] {
@@ -32,6 +33,7 @@ public class VaultControllerCmdTest {
         assertEquals(cmd.region, Region.US_WEST_1);
         assertEquals(cmd.vaultName, "hogehoge");
         assertTrue(cmd.validateParam());
+        assertFalse(cmd.isDebug());
     }
 
     @Test

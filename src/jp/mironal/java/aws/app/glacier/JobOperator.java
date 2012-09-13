@@ -94,7 +94,7 @@ public class JobOperator extends StateLessJobOperator {
 
         JobParameters jobParameters = new JobParameters().withType("inventory-retrieval")
                 .withDescription("").withFormat("JSON");
-
+        debugPrintWithTime("initiate inventory job.");
         return executeInitiateJob(jobParameters, vaultName);
     }
 
@@ -110,7 +110,7 @@ public class JobOperator extends StateLessJobOperator {
 
         JobParameters jobParameters = new JobParameters().withType("archive-retrieval")
                 .withArchiveId(archiveId);
-
+        debugPrintWithTime("initiate archive job.");
         return executeInitiateJob(jobParameters, vaultName);
     }
 
@@ -165,9 +165,12 @@ public class JobOperator extends StateLessJobOperator {
             throw new NullPointerException("jobId is null.");
         }
 
+        printJobParam();
+        debugPrintWithTime("begin : download inventory job output.");
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
         GetJobOutputResult result = client.getJobOutput(getJobOutputRequest);
+        debugPrintWithTime("finish : download inventory job output.");
 
         try {
             return new InventoryRetrievalResult(result.getBody());
@@ -234,6 +237,7 @@ public class JobOperator extends StateLessJobOperator {
         InitiateJobResult result = client.initiateJob(request);
         this.vaultName = vaultName;
         this.jobId = result.getJobId();
+        printJobParam();
         return jobId;
     }
 
@@ -248,6 +252,14 @@ public class JobOperator extends StateLessJobOperator {
 
     private void initiateJob() {
         alreadyInitiate = true;
+    }
+
+    /**
+     * vaultNameとjobIdをprint
+     */
+    private void printJobParam() {
+        debugPrintWithTime("vaultName =" + this.vaultName);
+        debugPrintWithTime("jobId     =" + this.vaultName);
     }
 
 }

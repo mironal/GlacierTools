@@ -4,6 +4,7 @@ package jp.mironal.java.aws.app.glacier;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,6 +78,8 @@ public class GlacierTools extends AwsTools {
     protected final AWSCredentials credentials;
     protected final Region region;
 
+    private boolean isDebug = false;
+
     /**
      * デフォルトコンストラクタ<br>
      * デフォルトのリージョンとカレントディレクトリにあるAwsCredentials.propertiesを使用してインスタンスを作成
@@ -100,4 +103,45 @@ public class GlacierTools extends AwsTools {
         this.client = new AmazonGlacierClient(credentials);
         this.client.setEndpoint(makeUrl(AwsService.Glacier, endpoint));
     }
+
+    /**
+     * デバッグモードを設定する.<br>
+     * デフォルトでは無効になっている
+     * 
+     * @param debug true:デバッグモードにする.
+     */
+    protected void setDebugMode(boolean debug) {
+        isDebug = debug;
+    }
+
+    /**
+     * デバッグモードかどうか.
+     * 
+     * @return true:デバッグモード
+     */
+    protected boolean isDebug() {
+        return isDebug;
+    }
+
+    /**
+     * デバッグモード時のみmsgを出力する.
+     * 
+     * @param msg 出力したいメッセージ.
+     */
+    protected void debugPrint(String msg) {
+        if (isDebug()) {
+            System.out.println(msg);
+        }
+    }
+
+    /**
+     * デバッグモード時のみmsgを出力する.<br>
+     * 先頭にタイムスタンプが付く.
+     * 
+     * @param msg 出力したいメッセージ.
+     */
+    protected void debugPrintWithTime(String msg) {
+        debugPrint(new Date().toString() + " " + msg);
+    }
+
 }

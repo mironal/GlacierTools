@@ -93,7 +93,7 @@ public class JobOperator extends StateLessJobOperator {
     public String initiateInventoryJob(String vaultName) {
 
         JobParameters jobParameters = new JobParameters().withType("inventory-retrieval")
-                .withDescription("inventory-retrieval_job").withFormat("JSON");
+                .withDescription("").withFormat("JSON");
 
         return executeInitiateJob(jobParameters, vaultName);
     }
@@ -158,6 +158,12 @@ public class JobOperator extends StateLessJobOperator {
      */
     public InventoryRetrievalResult downloadInventoryJobOutput() {
         checkAlreadyInitiateOrThrow();
+        if (vaultName == null) {
+            throw new NullPointerException("vaultName is null.");
+        }
+        if (jobId == null) {
+            throw new NullPointerException("jobId is null.");
+        }
 
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
@@ -244,22 +250,4 @@ public class JobOperator extends StateLessJobOperator {
         alreadyInitiate = true;
     }
 
-    public static void main(String[] args) throws IOException {
-        JobOperator jobOperator = new JobOperator();
-
-        // String jobId = jobOperator.initiateInventoryJob("sample");
-        // System.out.println(jobId);
-        // InventoryRetrievalResult result =
-        // jobOperator.downloadInventoryJobOutput();
-
-        String jobId = "OF-cwVQWgnBkfTfom7WWyc4paVVW_NiW9KJnw14Opk481WLoGTYjAaqx6wzblj5XrMMP_rT8JdALOGHAH2XTeMapF762";
-        jobOperator.alreadyInitiate = true;
-        jobOperator.jobId = jobId;
-        jobOperator.vaultName = "sample";
-        InventoryRetrievalResult result = jobOperator.downloadInventoryJobOutput();
-        System.out.println(result.toString());
-        // DescribeJobResult describeJobResult =
-        // jobOperator.describeJob("sample", jobId);
-        // System.out.println(describeJobResult.toString());
-    }
 }

@@ -15,7 +15,9 @@ public class ArchiveControllerTest {
 	public void testConstract() throws IOException {
 		ArchiveController controller = new ArchiveController();
 		assertNotNull(controller);
-		assertNotNull(controller.client);
+		assertNotNull(controller.GlacierClient);
+		assertNotNull(controller.SQSClient);
+		assertNotNull(controller.SNSClient);
 		assertNotNull(controller.credentials);
 		assertNotNull(controller.region);
 

@@ -15,7 +15,9 @@ public class JobOperatorTest {
 	public void test_CreateInstance() throws IOException {
 		JobOperator jobOperator = new JobOperator();
 		assertNotNull(jobOperator);
-		assertNotNull(jobOperator.client);
+		assertNotNull(jobOperator.GlacierClient);
+		assertNotNull(jobOperator.SQSClient);
+		assertNotNull(jobOperator.SNSClient);
 		assertNotNull(jobOperator.credentials);
 		assertNotNull(jobOperator.region);
 		assertEquals(Region.US_EAST_1, jobOperator.region);

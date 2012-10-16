@@ -11,6 +11,8 @@ import java.util.Map;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sqs.AmazonSQSClient;
 
 /**
  * @author mironal
@@ -74,7 +76,9 @@ public class GlacierTools extends AwsTools {
         return ENDPOINTS.get(key);
     }
 
-    protected final AmazonGlacierClient client;
+    protected final AmazonGlacierClient GlacierClient;
+    protected final AmazonSQSClient SQSClient;
+    protected final AmazonSNSClient SNSClient;
     protected final AWSCredentials credentials;
     protected final Region region;
 
@@ -100,8 +104,12 @@ public class GlacierTools extends AwsTools {
     public GlacierTools(Region endpoint, File awsProperties) throws IOException {
         this.region = endpoint;
         this.credentials = new PropertiesCredentials(awsProperties);
-        this.client = new AmazonGlacierClient(credentials);
-        this.client.setEndpoint(makeUrl(AwsService.Glacier, endpoint));
+        this.GlacierClient = new AmazonGlacierClient(credentials);
+        this.SQSClient = new AmazonSQSClient(credentials);
+        this.SNSClient = new AmazonSNSClient(credentials);
+        this.GlacierClient.setEndpoint(makeUrl(AwsService.Glacier, endpoint));
+        this.SQSClient.setEndpoint(makeUrl(AwsService.Sqs, endpoint));
+        this.SNSClient.setEndpoint(makeUrl(AwsService.Sns, endpoint));
     }
 
     /**

@@ -47,7 +47,7 @@ public class ArchiveController extends GlacierTools {
      */
     public UploadResult upload(String vaultName, String description, File file)
             throws FileNotFoundException {
-        ArchiveTransferManager atm = new ArchiveTransferManager(GlacierClient, SQSClient, SNSClient);
+        ArchiveTransferManager atm = new ArchiveTransferManager(glacierClient, sqsClient, snsClient);
 
         UploadResult uploadResult = atm.upload(vaultName, description, file);
         return uploadResult;
@@ -62,7 +62,7 @@ public class ArchiveController extends GlacierTools {
      * @param file The file save the archive to.
      */
     public void download(String vaultName, String archiveId, File file) {
-        ArchiveTransferManager atm = new ArchiveTransferManager(GlacierClient, SQSClient, SNSClient);
+        ArchiveTransferManager atm = new ArchiveTransferManager(glacierClient, sqsClient, snsClient);
         atm.download(vaultName, archiveId, file);
     }
 
@@ -75,7 +75,7 @@ public class ArchiveController extends GlacierTools {
     public void delete(String vaultName, String archiveId) {
         DeleteArchiveRequest dar = new DeleteArchiveRequest().withVaultName(vaultName)
                 .withArchiveId(archiveId);
-        GlacierClient.deleteArchive(dar);
+        glacierClient.deleteArchive(dar);
 
     }
 

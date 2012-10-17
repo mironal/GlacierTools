@@ -69,7 +69,7 @@ public class VaultController extends GlacierTools {
      */
     public CreateVaultResult createVault(String vaultName) {
         CreateVaultRequest createVaultRequest = new CreateVaultRequest().withVaultName(vaultName);
-        CreateVaultResult createVaultResult = GlacierClient.createVault(createVaultRequest);
+        CreateVaultResult createVaultResult = glacierClient.createVault(createVaultRequest);
         return createVaultResult;
     }
 
@@ -82,7 +82,7 @@ public class VaultController extends GlacierTools {
     public DescribeVaultResult describeVault(String vaultName) {
         DescribeVaultRequest describeVaultRequest = new DescribeVaultRequest()
                 .withVaultName(vaultName);
-        DescribeVaultResult describeVaultResult = GlacierClient.describeVault(describeVaultRequest);
+        DescribeVaultResult describeVaultResult = glacierClient.describeVault(describeVaultRequest);
         return describeVaultResult;
     }
 
@@ -93,7 +93,7 @@ public class VaultController extends GlacierTools {
      */
     public List<DescribeVaultOutput> listVaults() {
         ListVaultsRequest listVaultsRequest = new ListVaultsRequest();
-        ListVaultsResult listVaultsResult = GlacierClient.listVaults(listVaultsRequest);
+        ListVaultsResult listVaultsResult = glacierClient.listVaults(listVaultsRequest);
         return listVaultsResult.getVaultList();
     }
 
@@ -104,7 +104,7 @@ public class VaultController extends GlacierTools {
      */
     public void deleteVault(String vaultName) {
         DeleteVaultRequest deleteVaultRequest = new DeleteVaultRequest().withVaultName(vaultName);
-        GlacierClient.deleteVault(deleteVaultRequest);
+        glacierClient.deleteVault(deleteVaultRequest);
     }
 
 }

@@ -17,9 +17,9 @@ public class VaultControllerTest {
 	public void test_Constract() throws IOException {
 		VaultController controller = new VaultController();
 		assertNotNull(controller);
-		assertNotNull(controller.GlacierClient);
-		assertNotNull(controller.SQSClient);
-		assertNotNull(controller.SNSClient);
+		assertNotNull(controller.glacierClient);
+		assertNotNull(controller.sqsClient);
+		assertNotNull(controller.snsClient);
 		assertNotNull(controller.credentials);
 		assertNotNull(controller.region);
 

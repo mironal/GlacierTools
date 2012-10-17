@@ -109,10 +109,12 @@ public class GlacierTools extends AwsTools {
 		this.region = endpoint;
 		this.credentials = new PropertiesCredentials(awsProperties);
 		this.glacierClient = new AmazonGlacierClient(credentials);
-		this.sqsClient = new AmazonSQSClient(credentials);
-		this.snsClient = new AmazonSNSClient(credentials);
 		this.glacierClient.setEndpoint(makeUrl(AwsService.Glacier, endpoint));
+
+		this.sqsClient = new AmazonSQSClient(credentials);
 		this.sqsClient.setEndpoint(makeUrl(AwsService.Sqs, endpoint));
+
+		this.snsClient = new AmazonSNSClient(credentials);
 		this.snsClient.setEndpoint(makeUrl(AwsService.Sns, endpoint));
 	}
 

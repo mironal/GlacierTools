@@ -169,7 +169,7 @@ public class JobOperator extends StateLessJobOperator {
         debugPrintWithTime("begin : download inventory job output.");
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
-        GetJobOutputResult result = client.getJobOutput(getJobOutputRequest);
+        GetJobOutputResult result = GlacierClient.getJobOutput(getJobOutputRequest);
         debugPrintWithTime("finish : download inventory job output.");
 
         try {
@@ -193,7 +193,7 @@ public class JobOperator extends StateLessJobOperator {
 
         GetJobOutputRequest getJobOutputRequest = new GetJobOutputRequest()
                 .withVaultName(vaultName).withJobId(jobId);
-        GetJobOutputResult getJobOutputResult = client.getJobOutput(getJobOutputRequest);
+        GetJobOutputResult getJobOutputResult = GlacierClient.getJobOutput(getJobOutputRequest);
 
         InputStream in = new BufferedInputStream(getJobOutputResult.getBody());
         OutputStream out = null;
@@ -234,7 +234,7 @@ public class JobOperator extends StateLessJobOperator {
         initiateJob();
         InitiateJobRequest request = new InitiateJobRequest().withVaultName(vaultName)
                 .withJobParameters(jobParameters);
-        InitiateJobResult result = client.initiateJob(request);
+        InitiateJobResult result = GlacierClient.initiateJob(request);
         this.vaultName = vaultName;
         this.jobId = result.getJobId();
         printJobParam();

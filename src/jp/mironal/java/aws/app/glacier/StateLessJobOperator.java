@@ -54,7 +54,7 @@ public class StateLessJobOperator extends GlacierTools {
         }
 
         ListJobsRequest request = new ListJobsRequest().withVaultName(vaultName);
-        ListJobsResult result = client.listJobs(request);
+        ListJobsResult result = GlacierClient.listJobs(request);
         return result.getJobList();
     }
 
@@ -93,7 +93,7 @@ public class StateLessJobOperator extends GlacierTools {
         ListJobsRequest request = new ListJobsRequest().withVaultName(vaultName)
                 .withCompleted(completed).withLimit(limit).withMarker(marker)
                 .withStatuscode(statuscode);
-        ListJobsResult result = client.listJobs(request);
+        ListJobsResult result = GlacierClient.listJobs(request);
         return result.getJobList();
     }
 
@@ -116,7 +116,7 @@ public class StateLessJobOperator extends GlacierTools {
         }
 
         DescribeJobRequest describeJobRequest = new DescribeJobRequest(vaultName, jobId);
-        DescribeJobResult result = client.describeJob(describeJobRequest);
+        DescribeJobResult result = GlacierClient.describeJob(describeJobRequest);
         return result;
     }
 

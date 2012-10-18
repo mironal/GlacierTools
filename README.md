@@ -64,12 +64,12 @@ Vaultに対する操作を行うコマンドです.以下の機能を提供し�
     --vault      : The name of the Vault.
     --region     : us-east-1 | us-west-1 | us-west-2 | eu-west-1 | ap-northeast-1
     --properties : If you want to specify explicitly AwsCredentials.properties
-    
+
 ### example
 #### Vaultの作成(Create Vault)
 ##### デフォルトのリージョン(us-east-1)にvaultnameというVaultを作成
     java -jar vault_controller.jar create --vault vaultname
-    
+
 ##### 指定したリージョン(ap-northeast-1)にvaultnameというVaultを作成
     java -jar vault_controller.jar create --vault vaultname --region ap-northeast-1
 ##### 指定したAwsCredentials.propertiesを使用してvaultnameというVaultを作成
